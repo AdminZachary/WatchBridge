@@ -100,10 +100,16 @@ export const Settings = ({
     return log.level >= Number(logLevelFilter);
   });
 
-  const [lang, setLang] = useStore<string>("lang", "en");
+  const [lang, setLang] = useStore<string>(
+    "lang",
+    i18n.resolvedLanguage ?? "en",
+  );
 
   useEffect(() => {
     i18n.changeLanguage(lang);
+    // Keep the chosen language for the next launch; without this the app
+    // re-detects the system language on every start.
+    localStorage.setItem("i18nextLng", lang);
   }, [lang]);
 
   useEffect(() => {

@@ -1,6 +1,5 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
 
 const languages = [
   ["az", "Azərbaycan"],
@@ -55,16 +54,43 @@ const resources = Object.fromEntries(
   }),
 );
 
-i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    fallbackLng: "en",
-    lng: localStorage.getItem("i18nextLng") ?? "zh_cn",
-    interpolation: {
-      escapeValue: false,
-    },
-    resources,
-  });
+// Locale codes differ between the OS ("zh-CN", "pt-BR") and the bundled files
+// ("zh_cn", "pt_br"), so map the system language onto a resource key before
+// handing it to i18next. Without this the detector's value never matched and
+// everything fell back to English.
+const normalize = (raw?: string | null) => {
+  if (!raw) return undefined;
+  const lower = raw.toLowerCase().replace(/-/g, "_");
+  if (lower in resources) return lower;
+  const base = lower.split("_")[0];
+  if (base in resources) return base;
+  const alias: Record<string, string> = {
+    zh: "zh_cn",
+    pt: "pt_br",
+    cs: "cs_cz",
+  };
+  return alias[base] in resources ? alias[base] : undefined;
+};
+
+const systemLanguage = () => {
+  const candidates = [...(navigator.languages ?? []), navigator.language];
+  for (const candidate of candidates) {
+    const matched = normalize(candidate);
+    if (matched) return matched;
+  }
+  return undefined;
+};
+
+const initialLanguage =
+  normalize(localStorage.getItem("i18nextLng")) ?? systemLanguage() ?? "en";
+
+i18n.use(initReactI18next).init({
+  fallbackLng: "en",
+  lng: initialLanguage,
+  interpolation: {
+    escapeValue: false,
+  },
+  resources,
+});
 
 export default i18n;
