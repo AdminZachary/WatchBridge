@@ -23,6 +23,7 @@ type SettingsProps = {
 };
 
 let anisetteServers = [
+  ["ani.jkcoxson.com", "jkcoxson (third-party)"],
   ["ani.sidestore.io", "SideStore (.io)"],
   ["ani.stikstore.app", "StikStore"],
   ["ani.sidestore.app", "SideStore (.app)"],
@@ -42,7 +43,7 @@ export const Settings = ({
   const { t } = useTranslation();
   const [anisetteServer, setAnisetteServer] = useStore<string>(
     "anisetteServer",
-    "ani.sidestore.io",
+    "ani.jkcoxson.com",
   );
 
   const [overrideKeyring, setOverrideKeyring] = useStore<boolean>(

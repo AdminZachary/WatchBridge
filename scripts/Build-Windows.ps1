@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [switch]$BuildExecutable,
+    [switch]$SkipTests,
     [switch]$Offline,
     [string]$FrontendDependencies
 )
@@ -54,8 +55,10 @@ try {
 
     $cargoOptions = @('--locked', '--manifest-path', 'src-tauri/Cargo.toml')
     if ($Offline) { $cargoOptions += '--offline' }
-    foreach ($package in @('iloader', 'isideload')) {
-        Run 'cargo' (@('test') + $cargoOptions + @('--lib', '-p', $package))
+    if (-not $SkipTests) {
+        foreach ($package in @('iloader', 'isideload')) {
+            Run 'cargo' (@('test') + $cargoOptions + @('--lib', '-p', $package))
+        }
     }
 
     $metadata = & cargo metadata @cargoOptions --no-deps --format-version 1
@@ -84,7 +87,7 @@ try {
         physicallyValidated = $false
         licenseReview = 'pending-signing-dependency-clarification; see LICENSES.zip'
         licensesSha256 = Hash (Join-Path $artifacts 'LICENSES.zip')
-        rustSuites = 'iloader and isideload unit tests passed'
+        rustSuites = $(if ($SkipTests) { 'not run (build-only)' } else { 'iloader and isideload unit tests passed' })
         executable = $(if ($BuildExecutable) { 'WatchBridge.exe' } else { $null })
         executableSha256 = $executableHash
     }

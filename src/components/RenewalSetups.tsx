@@ -39,7 +39,7 @@ export function RenewalSetups({ device, account, installOnce }: { device: Device
   const [detailsId, setDetailsId] = useState<string | null>(null);
   const [removeId, setRemoveId] = useState<string | null>(null);
   const [troubleshooting, setTroubleshooting] = useState(false);
-  const [anisetteServer] = useStore<string>("anisetteServer", "ani.sidestore.io");
+  const [anisetteServer] = useStore<string>("anisetteServer", "ani.jkcoxson.com");
   const anisetteUrl = /^https?:\/\//i.test(anisetteServer) ? anisetteServer : `https://${anisetteServer}`;
   const request = useRef(0);
   const mounted = useRef(true);

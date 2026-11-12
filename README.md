@@ -22,6 +22,13 @@ Windows 上的 Apple Watch 开发者模式准备与 Companion 应用安装助手
 签名之前会检查并保留 IPA，拒绝不包含 Watch Companion 的包。
 使用 Network 前需要在 USB 设备卡片上设置 Wi-Fi；开发者模式准备仍需 USB。
 
+## 登录服务
+
+经用户授权，新安装默认使用第三方 `ani.jkcoxson.com` anisette 服务；既有设置不覆盖。
+客户端身份与 user agent 从所选服务实时读取，不再写死。2026-11-12 公开接口核查
+返回的是 Mac 身份，与教程当时描述不同；这不构成 Windows 登录兼容性证明。
+若登录失败，可在设置中选择服务；程序不会自动把数据转到另一个服务。
+
 ## 当前验证边界
 
 这是待实机验收的开发预览。上游历史实机成功不等于本分支已经实机通过。
@@ -34,11 +41,11 @@ App Group 关联行为影响；本版不承诺 HermesEnabler 的备份功能已�
 ## 构建
 
 Windows 构建依赖和流程见 [BUILDING.md](BUILDING.md)。使用 Windows 原生构建，
-不要求 Linux 交叉编译。GitHub Actions 同样运行测试并生成 `WatchBridge.exe`、
+不要求 Linux 交叉编译。GitHub Actions 按当前用户要求仅编译、不运行测试，并生成 `WatchBridge.exe`、
 `BUILD.json`、`SHA256SUMS.txt` 和 `LICENSES.zip`，其中包含准确源码提交和校验值。
 
 ```powershell
-./scripts/Build-Windows.ps1 -BuildExecutable
+./scripts/Build-Windows.ps1 -BuildExecutable -SkipTests
 ```
 
 仅检查前端：`bun install --frozen-lockfile --ignore-scripts` 后运行 `bun run build`。

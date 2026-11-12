@@ -27,6 +27,10 @@ work by AdminZachary or by an AI provider.
   throughout installation. Phone-only packages are rejected.
 - A separate app name, icon, data identifier, credential-store service and Windows
   startup registry entry, avoiding collisions with the upstream app.
+- Public client-identity fetching from the selected anisette server, with local
+  HTTP regression tests. The default third-party service for new installations was explicitly authorized
+  by the user; existing preferences are preserved. Actual Apple ID sign-in still
+  needs account testing.
 - Attribution, validation boundaries, source/version records and license inventory
   included with Windows build output.
 

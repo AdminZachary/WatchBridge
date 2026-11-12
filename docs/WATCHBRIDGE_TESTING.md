@@ -32,6 +32,14 @@ Do not publish account identifiers, device UDIDs, signing keys or pairing record
 
 ## Automated checks
 
-Windows CI: locked frontend build, iloader library tests (including native Watch
-preparation/companion preflight tests), isideload tests, and production executable.
+Windows CI currently performs a locked frontend/production executable build only,
+without tests, at the user's request. Unit tests can be run manually by omitting
+`-SkipTests` from the Windows helper.
 Unit tests cannot establish real-device trust, transport compatibility or launch.
+
+## Authentication follow-up
+
+The client identity/user agent are fetched from the selected anisette server;
+no hard-coded identity is substituted after errors. Automated tests use local
+synthetic HTTP responses only. Real Apple ID, trusted-device 2FA and signing
+still need user-account and hardware acceptance.

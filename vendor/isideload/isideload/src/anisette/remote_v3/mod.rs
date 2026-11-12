@@ -23,16 +23,18 @@ use crate::util::plist::PlistDataExtract;
 use crate::util::storage::{SideloadingStorage, new_storage};
 use crate::{SideloadError, anisette::remote_v3::websocket::AppWebSocket};
 
-pub const DEFAULT_ANISETTE_V3_URL: &str = "https://ani.stikstore.app";
+pub const DEFAULT_ANISETTE_V3_URL: &str = "https://ani.jkcoxson.com";
 
 /// Fixed service endpoints; URL construction performs no network access.
 #[derive(Clone, Copy)]
 pub enum Endpoint {
+    ClientInfo,
     Headers,
     Provisioning,
 }
 pub fn endpoint_url(base: &str, endpoint: Endpoint) -> Result<reqwest::Url, Report> {
     let suffix = match endpoint {
+        Endpoint::ClientInfo => "client_info",
         Endpoint::Headers => "get_headers",
         Endpoint::Provisioning => "provisioning_session",
     };
@@ -190,12 +192,27 @@ impl AnisetteProvider for RemoteV3AnisetteProvider {
     }
 
     async fn get_client_info(&self) -> Result<AnisetteClientInfo, Report> {
-        Ok(AnisetteClientInfo {
-            client_info:
-                "<Mac15,7> <macOS;27.0;26A5378j> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
-                    .to_string(),
-            user_agent: "akd/1.0 CFNetwork/808.1.4".to_string(),
-        })
+        // Read public identity metadata from the already selected server.
+        // This GET sends no account, provisioning or device data and does not
+        // change the selected server or the existing provisioning data flow.
+        let info = self
+            .client
+            .get(endpoint_url(&self.url, Endpoint::ClientInfo)?)
+            .timeout(std::time::Duration::from_secs(15))
+            .send()
+            .await
+            .context("Failed to get anisette client info")?
+            .error_for_status()
+            .context("Failed to get anisette client info")?
+            .json::<AnisetteClientInfo>()
+            .await
+            .context("Failed to decode anisette client info")?;
+        if info.client_info.trim().is_empty() || info.user_agent.trim().is_empty() {
+            bail!("Anisette server returned empty client info or user agent");
+        }
+        HeaderValue::from_str(&info.client_info).context("Invalid anisette client info header")?;
+        HeaderValue::from_str(&info.user_agent).context("Invalid anisette user agent header")?;
+        Ok(info)
     }
 
     fn needs_provisioning(&self) -> Result<bool, Report> {
@@ -485,9 +502,100 @@ mod endpoint_tests {
             "https://user:secret@example.invalid",
             "ftp://example.invalid",
         ] {
-            for endpoint in [Endpoint::Headers, Endpoint::Provisioning] {
+            for endpoint in [
+                Endpoint::ClientInfo,
+                Endpoint::Headers,
+                Endpoint::Provisioning,
+            ] {
                 assert!(endpoint_url(base, endpoint).is_err());
             }
+        }
+    }
+}
+
+#[cfg(test)]
+mod client_info_tests {
+    use super::*;
+    use tokio::{
+        io::{AsyncReadExt, AsyncWriteExt},
+        net::TcpListener,
+    };
+
+    async fn server(
+        responses: Vec<(&'static str, &'static str)>,
+    ) -> (RemoteV3AnisetteProvider, tokio::task::JoinHandle<()>) {
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let url = format!("http://{}/test-prefix/", listener.local_addr().unwrap());
+        let task = tokio::spawn(async move {
+            for (status, body) in responses {
+                let (mut socket, _) = listener.accept().await.unwrap();
+                let mut request = Vec::new();
+                while !request.ends_with(b"\r\n\r\n") {
+                    let mut part = [0; 1024];
+                    let count = socket.read(&mut part).await.unwrap();
+                    assert!(count > 0);
+                    request.extend_from_slice(&part[..count]);
+                    assert!(request.len() < 8192);
+                }
+                let request = String::from_utf8(request).unwrap();
+                assert!(request.starts_with("GET /test-prefix/v3/client_info HTTP/1.1"));
+                assert!(!request.to_ascii_lowercase().contains("authorization:"));
+                assert!(!request.to_ascii_lowercase().contains("content-length:"));
+                let response = format!(
+                    "HTTP/1.1 {status}\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+                    body.len()
+                );
+                socket.write_all(response.as_bytes()).await.unwrap();
+            }
+        });
+        (
+            RemoteV3AnisetteProvider::new(
+                &url,
+                Box::new(crate::util::storage::InMemoryStorage::new()),
+                "test".into(),
+            )
+            .unwrap(),
+            task,
+        )
+    }
+
+    #[tokio::test]
+    async fn identity_is_fetched_from_selected_server_and_refreshed() {
+        let (provider, task) = server(vec![
+            (
+                "200 OK",
+                r#"{"client_info":"server-one","user_agent":"agent-one"}"#,
+            ),
+            (
+                "200 OK",
+                r#"{"client_info":"server-two","user_agent":"agent-two"}"#,
+            ),
+        ])
+        .await;
+        let first = provider.get_client_info().await.unwrap();
+        let second = provider.get_client_info().await.unwrap();
+        assert_eq!(first.client_info, "server-one");
+        assert_eq!(first.user_agent, "agent-one");
+        assert_eq!(second.client_info, "server-two");
+        assert_eq!(second.user_agent, "agent-two");
+        task.await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn unavailable_or_invalid_identity_has_no_hardcoded_fallback() {
+        for response in [
+            ("503 Service Unavailable", "{}"),
+            ("200 OK", "not json"),
+            ("200 OK", r#"{"client_info":"","user_agent":"agent"}"#),
+            ("200 OK", r#"{"client_info":"server","user_agent":""}"#),
+            (
+                "200 OK",
+                r#"{"client_info":"server","user_agent":"bad\r\nheader"}"#,
+            ),
+        ] {
+            let (provider, task) = server(vec![response]).await;
+            assert!(provider.get_client_info().await.is_err());
+            task.await.unwrap();
         }
     }
 }

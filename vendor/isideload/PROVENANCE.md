@@ -28,3 +28,12 @@ Changes made in this fork:
 The crate source, its tests, manifest, upstream README and LICENSE are kept;
 repository workflows and examples are not included. Keep LICENSE and this
 attribution when updating the copy.
+
+## WatchBridge follow-up (2026-11-12)
+
+The remote anisette provider fetches public `client_info` and `user_agent` from
+its already selected server rather than hard-coding a Mac identity. The GET
+sends no account/provisioning data. Local synthetic HTTP tests cover identity
+refresh, HTTP errors, malformed data and invalid headers. The user explicitly authorized `ani.jkcoxson.com` as the default for new
+installations. Existing saved preferences are not overwritten. This is protocol adaptation, not
+copied SideStore code; the original authorship and MIT license remain intact.

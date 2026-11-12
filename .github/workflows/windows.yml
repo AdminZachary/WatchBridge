@@ -27,9 +27,9 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Test and build
+      - name: Build Windows executable
         shell: pwsh
-        run: ./scripts/Build-Windows.ps1 -BuildExecutable
+        run: ./scripts/Build-Windows.ps1 -BuildExecutable -SkipTests
       - uses: actions/upload-artifact@v4
         with:
           name: watchbridge-windows

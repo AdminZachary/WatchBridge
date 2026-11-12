@@ -13,11 +13,12 @@ Run from a fresh checkout in PowerShell:
 .\scripts\Build-Windows.ps1
 
 # Also build the release executable.
-.\scripts\Build-Windows.ps1 -BuildExecutable
+.\scripts\Build-Windows.ps1 -BuildExecutable -SkipTests
 ```
 
-The script runs the TypeScript/Vite build and the Rust unit tests of iloader and
-the included isideload crate. The executable is built with
+The script runs the TypeScript/Vite build. Without `-SkipTests` it also runs
+the Rust unit tests of iloader and the included isideload crate. CI uses
+`-SkipTests` at the user's request and records that explicitly in BUILD.json. The executable is built with
 `src-tauri/ci.conf.json`, which turns off the original project's updater, and is
 copied to `artifacts/windows/WatchBridge.exe` without an installer.
 `artifacts/windows/BUILD.json` records the source commit, whether the checkout had
