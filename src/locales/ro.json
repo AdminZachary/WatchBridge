@@ -275,7 +275,7 @@
         "Aplicațiile expirate contează în continuare în limita de 3 aplicații."
       ]
     },
-    "support_message": "Dacă problema persistă, apasă „Copiază în clipboard” și trimite eroarea copiată către <discord>Discord</discord> sau către un <github>issue GitHub</github> pentru asistență."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Este disponibilă o versiune nouă: {{version}}. Vrei să actualizezi?",

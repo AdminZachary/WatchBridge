@@ -275,7 +275,7 @@
         "Les applications expirées comptent toujours dans la limite de 3 applications."
       ]
     },
-    "support_message": "Si le problème persiste, appuyez sur \"Copier dans le presse-papiers\" et envoyez l'erreur copiée sur <discord>Discord</discord> ou dans un <github>ticket GitHub</github> pour obtenir de l'aide."
+    "support_message": "Si le problème persiste, appuyez sur « Copier dans le presse-papiers » et ouvrez un <github>ticket GitHub</github> avec l’erreur copiée."
   },
   "update": {
     "new_version_available": "Une nouvelle version est disponible : {{version}}. Voulez-vous mettre à jour ?",

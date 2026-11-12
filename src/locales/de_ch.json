@@ -279,7 +279,7 @@
         "Abglaufeni Apps zähled immer no zum Limit vo 3 Apps."
       ]
     },
-    "support_message": "Wenn s Problem wiiterhin besteht, drück uf „In d Zwüscheablag kopiere“ und schick de kopierti Fehler i de <discord>Discord</discord> oder als <github>GitHub-Issue</github>, zum Support z übercho."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Es isch e neui Version verfügbar: {{version}}. Wotsch aktualisiere?",

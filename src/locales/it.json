@@ -200,7 +200,7 @@
   "error": {
     "title": "Si è verificato un errore: {{msg}}",
     "unknown": "Sconosciuto",
-    "support_message": "Se il problema persiste, premi \"Copia negli appunti\" e invia l'errore copiato nel <discord>Discord</discord> o invia un'<github>issue GitHub</github> per supporto.",
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error.",
     "suggestions_heading": "Suggerimenti",
     "suggestions": {
       "underage": [

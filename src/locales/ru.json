@@ -275,7 +275,7 @@
         "Приложения с истекшим сроком действия также учитываются в лимите из 3 приложений."
       ]
     },
-    "support_message": "Если ошибка сохраняется, нажмите \"Скопировать в буфер обмена\" и отправьте скопированную ошибку в <discord>Discord</discord> или <github>GitHub issue</github> для решения проблемы."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Доступна новая версия: {{version}}. Обновить?",

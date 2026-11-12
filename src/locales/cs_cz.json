@@ -193,7 +193,7 @@
   "error": {
     "title": "Došlo k chybě: {{msg}}",
     "unknown": "Neznámá chyba",
-    "support_message": "Pokud problém přetrvává, stiskněte „Kopírovat do schránky“ a odešlete zkopírovanou chybu na <discord>Discord</discord> nebo založte <github>GitHub issue</github> pro získání podpory."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Je k dispozici nová verze: {{version}}. Chcete aktualizovat?",

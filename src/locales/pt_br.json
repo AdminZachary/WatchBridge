@@ -275,7 +275,7 @@
         "Aplicativos expirados ainda são considerados na regra de 3 aplicativos."
       ]
     },
-    "support_message": "Se o erro persistir, aperte \"Copiar para Área de Transferência\" e envie o erro copiado para nosso <discord>Discord</discord> ou uma <github>postagem no GitHub</github> para receber ajuda."
+    "support_message": "Se o problema continuar, pressione \"Copiar para a área de transferência\" e abra uma <github>issue no GitHub</github> com o erro copiado."
   },
   "update": {
     "new_version_available": "Uma nova versão está disponível: {{version}}. Deseja atualizar?",

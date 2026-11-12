@@ -200,7 +200,7 @@
   "error": {
     "title": "发生错误：{{msg}}",
     "unknown": "未知",
-    "support_message": "如果问题仍然存在，请按“复制到剪贴板”，并将复制的错误信息发送到<discord>Discord</discord>或提交<github>GitHub issue</github>以获取支持。"
+    "support_message": "如果问题仍然存在，请按“复制到剪贴板”，并带上复制的错误信息提交 <github>GitHub issue</github>。"
   },
   "update": {
     "new_version_available": "有新版本可用：{{version}}。是否要更新？",

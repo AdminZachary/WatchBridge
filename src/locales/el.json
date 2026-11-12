@@ -275,7 +275,7 @@
         "Οι ληγμένες εφαρμογές εξακολουθούν να προσμετρώνται στο όριο των 3 εφαρμογών."
       ]
     },
-    "support_message": "Αν το πρόβλημα παραμένει, πατήστε «Αντιγραφή στο πρόχειρο» και στείλτε το αντιγραμμένο σφάλμα στο <discord>Discord</discord> ή σε ένα <github>ζήτημα στο GitHub</github> για υποστήριξη."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Διατίθεται νέα έκδοση: {{version}}. Θέλετε να ενημερώσετε;",

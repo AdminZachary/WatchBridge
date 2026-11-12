@@ -275,7 +275,7 @@
         "만료된 앱도 3개 앱 제한에 포함됩니다."
       ]
     },    
-    "support_message": "문제가 계속된다면 지원을 받기 위해 \"클립보드로 복사\"를 눌러 <discord>디스코드</discord>나 <github>GitHub 이슈</github>에 올려주세요."
+    "support_message": "문제가 계속되면 \"클립보드에 복사\"를 누르고 복사한 오류와 함께 <github>GitHub issue</github>를 열어 주세요."
   },
   "update": {
     "new_version_available": "새로운 버전을 사용할 수 있습니다. ({{version}}) 업데이트를 진행할까요?",

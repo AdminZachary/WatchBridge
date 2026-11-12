@@ -275,7 +275,7 @@
         "A lejárt alkalmazások is beleszámítanak a 3 alkalmazásos korlátba."
       ]
     },
-    "support_message": "Ha a hiba még mindig fennáll, kattintson a \"Kimásolás a vágólap\" gombra és küldje el a kimásolt hibát <discord>Discordon</discord> vagy <github>GitHub hibában</github> támogatásért."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Egy új verzió elérhető: {{version}}. Akarsz frissíteni?",

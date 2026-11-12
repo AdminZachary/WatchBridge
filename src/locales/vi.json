@@ -193,7 +193,7 @@
   "error": {
     "title": "Một lỗi đã xảy ra: {{msg}}",
     "unknown": "Không xác định",
-    "support_message": "Nếu vấn đề vẫn tiếp diễn, bấm \"Sao chép vào bộ nhớ tạm\" và gửi đến server <discord>Discord</discord> hoặc một <github>vấn đề Github</github> để được hỗ trợ."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Có phiên bản mới: {{version}}. Bạn có muốn cập nhật không?",

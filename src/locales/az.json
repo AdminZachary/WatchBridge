@@ -275,7 +275,7 @@
         "Vaxtı bitmiş tətbiqlər hələ də 3 tətbiq limitinə daxildir."
       ]
     },
-    "support_message": "Problem davam edərsə, \"Buferə kopyala\" düyməsinə basın və xətanı dəstək üçün <discord>Discord</discord> serverinə və ya bir <github>GitHub issue</github>-ya göndərin."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Yeni versiya mövcuddur: {{version}}. Yeniləmək istəyirsinizmi?",

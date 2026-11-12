@@ -279,7 +279,7 @@
         "Süresi dolmuş uygulamalar da 3 uygulama sınırına dâhildir."
       ]
     },
-    "support_message": "Sorun devam ederse \"Panoya Kopyala\" düğmesine basın ve kopyalanan hatayı destek almak için <discord>Discord</discord>'a ya da bir <github>GitHub issue</github>'suna gönderin."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Yeni bir sürüm mevcut: {{version}}. Güncellemek istiyor musunuz?",

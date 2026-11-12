@@ -193,7 +193,7 @@
   "error": {
     "title": "Ein Fehler ist aufgetreten: {{msg}}",
     "unknown": "Unbekannt",
-    "support_message": "Wenn das Problem weiterhin besteht, \"In die Zwischenablage kopieren\" drücken und den kopierten Fehler im <discord>Discord</discord> oder als <github>GitHub-Issue</github> melden."
+    "support_message": "Wenn das Problem weiterhin besteht, klicke auf „In die Zwischenablage kopieren“ und öffne mit der kopierten Fehlermeldung ein <github>GitHub-Issue</github>."
   },
   "update": {
     "new_version_available": "Eine neue Version ist verfügbar: {{version}}. Möchtest du aktualisieren?",

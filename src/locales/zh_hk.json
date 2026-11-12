@@ -193,7 +193,7 @@
   "error": {
     "title": "發生錯誤：{{msg}}",
     "unknown": "不明",
-    "support_message": "如果問題持續出現，請㩒「複製到剪貼簿」，然後將錯誤訊息傳去<discord>Discord</discord>或者開<github>GitHub issue</github>尋求協助。"
+    "support_message": "如果問題仍然存在，請按「複製到剪貼簿」，並附上複製的錯誤訊息提交 <github>GitHub issue</github>。"
   },
   "update": {
     "new_version_available": "有新版本用得：{{version}}。而家更新？",

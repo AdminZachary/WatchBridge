@@ -275,7 +275,7 @@
         "Aplikasi yang kedaluwarsa tetap dihitung dalam batas 3 aplikasi."
       ]
     },
-    "support_message": "Jika masalah masih berlanjut, tekan \"Salin ke clipboard\" dan kirimkan kesalahan yang disalin ke <discord>Discord</discord> atau <github>isu GitHub</github> untuk mendapatkan dukungan."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Versi baru tersedia: {{version}}. Apakah Anda ingin memperbarui?",

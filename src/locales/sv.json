@@ -196,7 +196,7 @@
   "error": {
     "title": "Ett fel har hänt: {{msg}}",
     "unknown": "Okänd",
-    "support_message": "Om problemet fortsätter, tryck på \"Kopiera till urklipp\" och skicka den kopierade felet till <discord>Discord</discord> eller till <github>GitHub issue</github> för hjälp."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "En ny verision är tillgängligt: {{version}}. Vill du uppdatera?",

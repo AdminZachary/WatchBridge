@@ -275,7 +275,7 @@
         "Wygasłe aplikacje nadal wliczają się do limitu 3 aplikacji."
       ]
     },
-    "support_message": "Jeśli problem będzie się powtarzać, naciśnij \"Skopiuj do schowka\" i wyślij skopiowany błąd na <discord>Discord</discord> lub jako <github>zgłoszenie GitHub</github>, aby uzyskać pomoc."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Dostępna jest nowa wersja: {{version}}. Czy chcesz zaktualizować?",

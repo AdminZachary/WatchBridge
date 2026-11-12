@@ -284,7 +284,7 @@
         "期限切れのアプリもこの制限に含まれます。"
       ]
     },
-    "support_message": "問題が解決しない場合は、「クリップボードにコピー」を押して、コピーされたエラー内容を <discord>Discord</discord> または <github>GitHubのIssue</github> に送ってサポートを受けてください。"
+    "support_message": "解決しない場合は「クリップボードにコピー」を押し、コピーしたエラーを添えて <github>GitHub issue</github> を作成してください。"
   },
   "update": {
     "new_version_available": "新しいバージョンが利用可能です: {{version}}。アップデートしますか？",

@@ -275,7 +275,7 @@
         "កម្មវិធីដែលផុតកំណត់ក៏ត្រូវបានគណនាក្នុងកំណត់នេះផងដែរ។"
       ]
     },
-    "support_message": "បើបញ្ហានៅតែមាន សូមចុច \"ចម្លងទៅ clipboard\" ហើយផ្ញើកំហុសទៅ <discord>Discord</discord> ឬ <github>GitHub issue</github> សម្រាប់ជំនួយ។"
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "មានកំណែថ្មី: {{version}}។ តើអ្នកចង់អាប់ដេតទេ?",

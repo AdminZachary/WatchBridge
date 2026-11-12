@@ -193,7 +193,7 @@
   "error": {
     "title": "Ocurrió un error: {{msg}}",
     "unknown": "Desconocido",
-    "support_message": "Si el problema persiste, presiona \"Copiar al portapapeles\" y envía el error copiado al <discord>Discord</discord> o a un <github>issue de GitHub</github> para recibir soporte."
+    "support_message": "Si el problema continúa, pulsa \"Copiar al portapapeles\" y abre un <github>issue en GitHub</github> con el error copiado."
   },
   "update": {
     "new_version_available": "Hay una nueva versión disponible: {{version}}. ¿Deseas actualizar?",

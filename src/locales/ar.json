@@ -273,7 +273,7 @@
         "التطبيقات المنتهية صلاحيتها ولا يمكن فتحها أيضاً تحسب من ضمن الثلاث تطبيقات المسموحة فقط"
       ]
     },
-    "support_message": "للحصول على المساعدة <github>GitHub مشاكل</github> أو <discord>Discord</discord> اذا استمر هذا الخطأ اضغط على \"نسخ إلى الحافظة\" وأرسله إلى سيرفير"
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "هل ترغب بتحميله؟ {{version}} :هناك إصدار أحدث من التطبيق متوفر للتحميل",

@@ -91,6 +91,11 @@ fieldset.wb-card { padding: 20px; }
 .wb-app .dropdown-option { color: #153d36; }
 .wb-app .dropdown-option:hover, .wb-app .dropdown-option:focus-visible { background: #eef4ea; }
 .wb-app .dropdown-option.selected { background: #e0edda; color: #17493c; }
+.wb-app .error-header button, .wb-app .error-outer button {
+  background: #f5f8f3;
+  border: 1px solid #d1ddd2;
+  color: #215044;
+}
 .wb-app .modal-container button, .wb-app .modal-container input { color: #214c3f; }
 .wb-app .logged-label { color: #64766d; }
 .wb-app .stored-email { color: #214c3f; overflow-wrap: anywhere; }

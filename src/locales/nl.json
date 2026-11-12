@@ -279,7 +279,7 @@
         "Verlopen apps tellen nog steeds mee voor de limiet van 3 apps."
       ]
     },
-    "support_message": "Als het probleem aanhoudt, druk op \"Kopieer naar klembord\" en stuur de gekopieerde foutmelding naar de <discord>Discord</discord> of een <github>GitHub issue</github> voor ondersteuning."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Een nieuwe versie is beschikbaar: {{version}}. Wil je updaten?",

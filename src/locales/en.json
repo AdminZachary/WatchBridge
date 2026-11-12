@@ -558,7 +558,7 @@
         "Expired apps still count towards the 3 app limit."
       ]
     },
-    "support_message": "If the issue persists, press \"Copy to clipboard\" and send the copied error to the <discord>Discord</discord> or a <github>GitHub issue</github> for support."
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "A new version is available: {{version}}. Do you want to update?",

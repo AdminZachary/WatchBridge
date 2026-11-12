@@ -193,7 +193,7 @@
   "error": {
     "title": "Առաջացավ սխալ՝ {{msg}}",
     "unknown": "Անհայտ",
-    "support_message": "Եթե խնդիրը պահպանվում է, սեղմեք «Պատճենել սեղմատախտակում» եւ ուղարկեք պատճենված սխալը <discord>Discord</discord> կամ բացեք <github>GitHub issue</github>՝ աջակցություն ստանալու համար։"
+    "support_message": "If the issue persists, press \"Copy to clipboard\" and open a <github>GitHub issue</github> with the copied error."
   },
   "update": {
     "new_version_available": "Հասանելի է նոր տարբերակ՝ {{version}}։ Ցանկանո՞ւմ եք թարմացնել։",
