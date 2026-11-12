@@ -105,27 +105,6 @@ Add `-SkipTests` for a faster local build without tests. The build must be nativ
 | **OS versions** | The Watch-side flow comes from xtool's experimental implementation; each iOS/watchOS combination needs device testing |
 | **Unofficial tool** | No jailbreak, no bypassing Apple signatures, no forged certificates |
 
-## Validation status
-
-Following the vocabulary used by the upstream community so that different strengths of evidence stay distinct:
-
-| Level | Meaning | Status |
-|---|---|---|
-| `BUILD_VALIDATED` | Compiles, unit tests pass | ✅ Windows CI |
-| `CI_VALIDATED` | CI produces a downloadable artifact | ✅ |
-| `IPHONE_INSTALLED` | App installed on the iPhone and launches | ✅ on device |
-| `WATCH_INSTALLED` | Watch app installed on the Watch | ✅ on device |
-| `PHYSICALLY_VALIDATED` | Whole chain confirmed on hardware | ✅ 2026-11-12 |
-
-Device log:
-
-| Date | Step | Devices | Result |
-|---|---|---|---|
-| 2026-11-12 | Full flow: prepare → sign → phone install → watch install → launch | iPhone 17 Pro + Ultra 2 | ✅ Passed |
-| 2026-11-12 | Full flow | iPhone 13 Pro + Series 7 | ✅ Passed |
-
-The hardware checklist is in [docs/WATCHBRIDGE_TESTING.md](docs/WATCHBRIDGE_TESTING.md).
-
 ## FAQ
 
 <details>

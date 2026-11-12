@@ -105,27 +105,6 @@ bun run build
 | **OS 버전** | 워치 쪽 흐름은 xtool의 실험적 구현에서 왔으며, iOS/watchOS 조합마다 실기기 검증이 필요합니다 |
 | **비공식 도구** | 탈옥 없음, Apple 서명 우회 없음, 인증서 위조 없음 |
 
-## 검증 상태
-
-증거의 강도를 섞지 않기 위해 상위 커뮤니티의 등급을 따릅니다:
-
-| 등급 | 의미 | 현재 |
-|---|---|---|
-| `BUILD_VALIDATED` | 컴파일되고 단위 테스트 통과 | ✅ Windows CI |
-| `CI_VALIDATED` | CI가 내려받을 수 있는 아티팩트 생성 | ✅ |
-| `IPHONE_INSTALLED` | 아이폰에 설치되고 실행됨 | ✅ 실기기 |
-| `WATCH_INSTALLED` | 워치에 앱 설치됨 | ✅ 실기기 |
-| `PHYSICALLY_VALIDATED` | 전체 경로 실기기 확인 | ✅ 2026-11-12 |
-
-실기기 기록:
-
-| 날짜 | 단계 | 기기 | 결과 |
-|---|---|---|---|
-| 2026-11-12 | 전체 흐름: 준비 → 서명 → 아이폰 설치 → 워치 설치 → 실행 | iPhone 17 Pro + Ultra 2 | ✅ 통과 |
-| 2026-11-12 | 전체 흐름 | iPhone 13 Pro + Series 7 | ✅ 통과 |
-
-실기기 점검 목록은 [docs/WATCHBRIDGE_TESTING.md](docs/WATCHBRIDGE_TESTING.md)에 있습니다.
-
 ## 자주 묻는 질문
 
 <details>

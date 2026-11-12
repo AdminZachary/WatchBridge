@@ -105,27 +105,6 @@ bun run build
 | **系统版本** | 手表侧流程源自 xtool 的实验性实现，不同 iOS/watchOS 组合需要实机验证 |
 | **非官方工具** | 不越狱、不绕过苹果签名、不伪造证书 |
 
-## 验证状态
-
-沿用上游社区约定的分级，避免把不同强度的证据混为一谈：
-
-| 级别 | 含义 | 当前 |
-|---|---|---|
-| `BUILD_VALIDATED` | 能编译、单测通过 | ✅ Windows CI |
-| `CI_VALIDATED` | CI 产出可下载的 artifact | ✅ |
-| `IPHONE_INSTALLED` | 应用装到 iPhone 并可启动 | ✅ 实机 |
-| `WATCH_INSTALLED` | Watch 应用装到手表 | ✅ 实机 |
-| `PHYSICALLY_VALIDATED` | 全链路真机确认 | ✅ 2026-11-12 |
-
-实机记录：
-
-| 日期 | 环节 | 设备 | 结果 |
-|---|---|---|---|
-| 2026-11-12 | 完整流程：准备 → 签名 → 手机安装 → 手表安装 → 启动 | iPhone 17 Pro + Ultra 2 | ✅ 通过 |
-| 2026-11-12 | 完整流程 | iPhone 13 Pro + Series 7 | ✅ 通过 |
-
-真机验收清单见 [docs/WATCHBRIDGE_TESTING.md](docs/WATCHBRIDGE_TESTING.md)。
-
 ## 常见问题
 
 <details>

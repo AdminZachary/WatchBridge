@@ -105,27 +105,6 @@ Für einen schnellen lokalen Build ohne Tests `-SkipTests` ergänzen. Der Build 
 | **Systemversionen** | Der Uhr-Ablauf stammt aus xtools experimenteller Implementierung; jede iOS/watchOS-Kombination braucht Gerätetests |
 | **Inoffizielles Werkzeug** | Kein Jailbreak, kein Umgehen der Apple-Signatur, keine gefälschten Zertifikate |
 
-## Validierungsstatus
-
-Nach der Terminologie der Upstream-Community, damit unterschiedlich starke Belege nicht vermischt werden:
-
-| Stufe | Bedeutung | Stand |
-|---|---|---|
-| `BUILD_VALIDATED` | Kompiliert, Unit-Tests grün | ✅ Windows-CI |
-| `CI_VALIDATED` | CI erzeugt ein herunterladbares Artefakt | ✅ |
-| `IPHONE_INSTALLED` | App auf dem iPhone installiert und startbar | ✅ auf Gerät |
-| `WATCH_INSTALLED` | App auf der Uhr installiert | ✅ auf Gerät |
-| `PHYSICALLY_VALIDATED` | Gesamter Ablauf auf Gerät bestätigt | ✅ 2026-11-12 |
-
-Geräteprotokoll:
-
-| Datum | Schritt | Geräte | Ergebnis |
-|---|---|---|---|
-| 2026-11-12 | Gesamter Ablauf: Vorbereiten → Signieren → Telefon → Uhr → Start | iPhone 17 Pro + Ultra 2 | ✅ Bestanden |
-| 2026-11-12 | Gesamter Ablauf | iPhone 13 Pro + Series 7 | ✅ Bestanden |
-
-Die Prüfliste steht in [docs/WATCHBRIDGE_TESTING.md](docs/WATCHBRIDGE_TESTING.md).
-
 ## Häufige Fragen
 
 <details>

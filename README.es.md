@@ -105,27 +105,6 @@ Añade `-SkipTests` para una compilación local rápida sin pruebas. La compilac
 | **Versiones de sistema** | El flujo del reloj proviene de la implementación experimental de xtool; cada combinación de iOS/watchOS necesita validación en hardware |
 | **Herramienta no oficial** | Sin jailbreak, sin saltarse la firma de Apple, sin certificados falsificados |
 
-## Estado de validación
-
-Siguiendo la terminología de la comunidad upstream para no mezclar evidencias de distinta fuerza:
-
-| Nivel | Significado | Estado |
-|---|---|---|
-| `BUILD_VALIDATED` | Compila y las pruebas pasan | ✅ CI de Windows |
-| `CI_VALIDATED` | La CI produce un artefacto descargable | ✅ |
-| `IPHONE_INSTALLED` | La app se instala en el iPhone y arranca | ✅ en hardware |
-| `WATCH_INSTALLED` | La app se instala en el reloj | ✅ en hardware |
-| `PHYSICALLY_VALIDATED` | Cadena completa confirmada en hardware | ✅ 2026-11-12 |
-
-Registro en hardware:
-
-| Fecha | Paso | Dispositivos | Resultado |
-|---|---|---|---|
-| 2026-11-12 | Flujo completo: preparación → firma → instalación en teléfono → instalación en reloj → arranque | iPhone 17 Pro + Ultra 2 | ✅ Correcto |
-| 2026-11-12 | Flujo completo | iPhone 13 Pro + Series 7 | ✅ Correcto |
-
-La lista de verificación está en [docs/WATCHBRIDGE_TESTING.md](docs/WATCHBRIDGE_TESTING.md).
-
 ## Preguntas frecuentes
 
 <details>

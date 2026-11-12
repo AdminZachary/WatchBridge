@@ -105,27 +105,6 @@ Ajoutez `-SkipTests` pour une compilation locale rapide sans tests. La compilati
 | **Versions du système** | Le flux côté montre vient de l'implémentation expérimentale d'xtool ; chaque combinaison iOS/watchOS doit être validée sur matériel |
 | **Outil non officiel** | Pas de jailbreak, pas de contournement de la signature Apple, pas de certificat falsifié |
 
-## État de validation
-
-Selon la terminologie de la communauté amont, pour ne pas mélanger des preuves de force différente :
-
-| Niveau | Signification | État |
-|---|---|---|
-| `BUILD_VALIDATED` | Compile, tests unitaires au vert | ✅ CI Windows |
-| `CI_VALIDATED` | La CI produit un artefact téléchargeable | ✅ |
-| `IPHONE_INSTALLED` | App installée sur l'iPhone et lançable | ✅ sur matériel |
-| `WATCH_INSTALLED` | App installée sur la montre | ✅ sur matériel |
-| `PHYSICALLY_VALIDATED` | Chaîne complète confirmée sur matériel | ✅ 2026-11-12 |
-
-Journal matériel :
-
-| Date | Étape | Appareils | Résultat |
-|---|---|---|---|
-| 2026-11-12 | Parcours complet : préparation → signature → installation téléphone → installation montre → lancement | iPhone 17 Pro + Ultra 2 | ✅ Réussi |
-| 2026-11-12 | Parcours complet | iPhone 13 Pro + Series 7 | ✅ Réussi |
-
-La liste de vérification est dans [docs/WATCHBRIDGE_TESTING.md](docs/WATCHBRIDGE_TESTING.md).
-
 ## FAQ
 
 <details>

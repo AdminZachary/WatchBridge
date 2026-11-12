@@ -105,27 +105,6 @@ bun run build
 | **OS バージョン** | Watch 側の処理は xtool の実験的実装に由来し、iOS/watchOS の組み合わせごとに実機検証が必要です |
 | **非公式ツール** | 脱獄なし、Apple の署名の回避なし、証明書の偽造なし |
 
-## 検証状況
-
-証拠の強さを混同しないよう、上流コミュニティの区分に従います:
-
-| 区分 | 意味 | 現在 |
-|---|---|---|
-| `BUILD_VALIDATED` | ビルドでき、ユニットテストが通る | ✅ Windows CI |
-| `CI_VALIDATED` | CI がダウンロード可能なアーティファクトを生成 | ✅ |
-| `IPHONE_INSTALLED` | iPhone にインストールされ起動する | ✅ 実機 |
-| `WATCH_INSTALLED` | Watch にアプリがインストールされる | ✅ 実機 |
-| `PHYSICALLY_VALIDATED` | 全経路を実機で確認 | ✅ 2026-11-12 |
-
-実機の記録:
-
-| 日付 | 工程 | 端末 | 結果 |
-|---|---|---|---|
-| 2026-11-12 | 全工程: 準備 → 署名 → iPhone インストール → Watch インストール → 起動 | iPhone 17 Pro + Ultra 2 | ✅ 成功 |
-| 2026-11-12 | 全工程 | iPhone 13 Pro + Series 7 | ✅ 成功 |
-
-実機チェックリストは [docs/WATCHBRIDGE_TESTING.md](docs/WATCHBRIDGE_TESTING.md) にあります。
-
 ## よくある質問
 
 <details>
