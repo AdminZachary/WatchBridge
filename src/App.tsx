@@ -79,7 +79,7 @@ export default function App() {
     <main className="wb-app">
       <header className="wb-header">
         <div className="wb-brand"><span className="wb-mark" aria-hidden="true"><i /></span><div><strong>WatchBridge</strong><span>Apple Watch · Windows 助手</span></div></div>
-        <div className="wb-header-right"><span className="wb-preview">开发预览 {version}</span><button onClick={() => openLink(repo)}>项目与源码 ↗</button></div>
+        <div className="wb-header-right"><span className="wb-preview">v{version}</span><button onClick={() => openLink(repo)}>项目与源码 ↗</button></div>
       </header>
       <div className="wb-layout">
         <aside className="wb-sidebar">
