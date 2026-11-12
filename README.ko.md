@@ -8,7 +8,7 @@
 
 [English](README.en.md) · [简体中文](README.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
-[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows-/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows-/actions/workflows/windows.yml)
+[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
@@ -69,7 +69,7 @@ iLoader는 그 절반(아이폰 쪽)을 Rust로 Windows에서 다시 구현했�
 
 ## 설치와 실행
 
-[Actions](https://github.com/AdminZachary/iloader-for-windows-/actions/workflows/windows.yml)의 `windows` 작업에서 `watchbridge-windows` 아티팩트를 내려받아 압축을 풀고 `WatchBridge.exe`를 실행하세요.
+[Actions](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)의 `windows` 작업에서 `watchbridge-windows` 아티팩트를 내려받아 압축을 풀고 `WatchBridge.exe`를 실행하세요.
 
 압축 파일 구성:
 

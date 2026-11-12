@@ -17,7 +17,7 @@ import "./WatchBridge.css";
 type WatchStatus = { name: string; paired: boolean; developerMode: boolean | null; switchRevealed: boolean };
 type InstallUpdate = { updateType: "started" | "finished" | "failed"; stepId: string; extraDetails?: { message: string } };
 type InstallState = "idle" | "validating" | "installing" | "done" | "failed";
-const repo = "https://github.com/AdminZachary/iloader-for-windows-";
+const repo = "https://github.com/AdminZachary/iloader-for-windows";
 const message = (error: unknown): string => typeof error === "object" && error !== null && "message" in error ? String(error.message) : String(error);
 
 export default function App() {

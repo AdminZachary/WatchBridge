@@ -8,7 +8,7 @@
 
 [English](README.en.md) · [简体中文](README.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
-[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows-/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows-/actions/workflows/windows.yml)
+[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
@@ -69,7 +69,7 @@ El camino hacia el dispositivo es indirecto: Windows no ve el reloj, así que el
 
 ## Instalación y ejecución
 
-Descarga el artefacto `watchbridge-windows` del job `windows` en [Actions](https://github.com/AdminZachary/iloader-for-windows-/actions/workflows/windows.yml), descomprímelo y ejecuta `WatchBridge.exe`.
+Descarga el artefacto `watchbridge-windows` del job `windows` en [Actions](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml), descomprímelo y ejecuta `WatchBridge.exe`.
 
 El archivo contiene:
 
