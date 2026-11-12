@@ -1,66 +1,181 @@
-# WatchBridge (development preview)
+<div align="center">
 
-Windows 上的 Apple Watch 开发者模式准备与 Companion 应用安装助手。
+<img src="public/watchbridge.svg" width="104" alt="WatchBridge" />
 
-这是基于 [AndreySemjonov 的 iLoader fork](https://github.com/AndreySemjonov/iloader)
-的独立社区衍生版本。上游为 [nab138/iLoader](https://github.com/nab138/iloader)。
-不代表 Apple 或任何上游项目的官方版本，也不暗示其背书。
+# WatchBridge
 
-## 第一版范围
+**在 Windows 上准备 Apple Watch 开发者模式，并把带 Watch Companion 的应用装到手表上。**
 
-1. USB 连接已配对的 iPhone，选择设备。
-2. 配对 Watch，在手表上确认信任；请求显示开发者模式开关。
-3. 在手表上手动开启、重启并确认，然后重新检查状态。
-4. 登录 Apple ID，选择包含 iPhone 宿主和 `Watch/*.app` 的原始 IPA，签名安装。
-5. 在手表上手动打开应用，验证启动。
+[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows-/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows-/actions/workflows/windows.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078D4)
+![Status](https://img.shields.io/badge/status-alpha-orange)
+![Version](https://img.shields.io/badge/version-0.1.0--alpha.1-lightgrey)
 
-开发者模式采用 Rust 原生流程，不要求用户另行安装 Python。准备操作不会自动开启
-开发者模式、重启手表或代替用户确认。Watch 信任记录只保存在本程序的内存中，退出
-程序后需要重新建立会话。第一版拒绝多块手表的模糊选择。
+</div>
 
-安装沿用 Andrey fork 的 USB 与 Network/RSD 路径。独立 Watch-only 包暂不支持。
-签名之前会检查并保留 IPA，拒绝不包含 Watch Companion 的包。
-使用 Network 前需要在 USB 设备卡片上设置 Wi-Fi；开发者模式准备仍需 USB。
+> [!IMPORTANT]
+> WatchBridge 是 [AndreySemjonov 的 iLoader fork](https://github.com/AndreySemjonov/iloader) 的独立社区衍生版本，上游为 [nab138/iLoader](https://github.com/nab138/iloader)。
+> 它**不代表 Apple 或任何上游项目的官方版本，也不暗示其背书**。出现问题时请报给本仓库，不要打扰上游。
 
-## 登录服务
+> [!WARNING]
+> **开发预览，未完成实机验收。** 不要把"编译成功"或"手机安装成功"当成"手表安装/启动成功"。
+> 二进制未签名、无安装包；第三方签名依赖的许可仍在核查，见 [许可核查](docs/LICENSE_REVIEW.md)。
 
-经用户授权，新安装默认使用第三方 `ani.jkcoxson.com` anisette 服务；既有设置不覆盖。
-客户端身份与 user agent 从所选服务实时读取，不再写死。2026-11-12 公开接口核查
-返回的是 Mac 身份，与教程当时描述不同；这不构成 Windows 登录兼容性证明。
-若登录失败，可在设置中选择服务；程序不会自动把数据转到另一个服务。
+## 这是什么
 
-## 当前验证边界
+Windows 上装自签 iOS 应用（SideStore 之类）需要三件事：Apple ID 签名、把目标设备注册为开发设备、设备开启开发者模式。官方工具链是 Xcode，只有 macOS 有。
 
-这是待实机验收的开发预览。上游历史实机成功不等于本分支已经实机通过。
-不得把编译成功或手机安装成功当成 Watch 安装、启动成功。
-具体测试步骤见 [硬件验收](docs/WATCHBRIDGE_TESTING.md)。
+iLoader 用 Rust 把 iPhone 侧这半件事在 Windows 上重做了一遍。**WatchBridge 补的是另外半件**：让装进 iPhone 的应用里那个 `Watch/*.app` 也能落到已配对的 Apple Watch 上，并在此之前把手表的开发者模式开关弄出来——全程不用装 Python、不用开命令行。
 
-本次修改保留上游签名策略。需要 Watch App Group 的应用可能仍受上游跳过 Watch
-App Group 关联行为影响；本版不承诺 HermesEnabler 的备份功能已经修复。
+整个设备通道是"借道"的：Windows 看不到手表，程序让 iPhone 当路由器，把端口转发给手表，再在转发出来的会话里完成配对、状态读取和安装。
 
-## 构建
+## 功能
 
-Windows 构建依赖和流程见 [BUILDING.md](BUILDING.md)。使用 Windows 原生构建，
-不要求 Linux 交叉编译。GitHub Actions 编译并运行 Rust 单元测试，并生成 `WatchBridge.exe`、
-`BUILD.json`、`SHA256SUMS.txt` 和 `LICENSES.zip`，其中包含准确源码提交和校验值。
+| | 功能 | 说明 |
+|---|---|---|
+| 🛠 | **开发者模式准备** | 配对手表 → 请求显示开关 → 读回状态。只发送 `action 0`，**开启/重启/确认始终由你在手表上完成** |
+| 📦 | **Companion 安装** | 校验 IPA 同时包含 iPhone 宿主与 `Watch/*.app`，重签后装到手机，再把 Watch 应用装到手表 |
+| 📶 | **Wi-Fi / RSD** | USB 配一次 Wi-Fi，之后可无线安装与续签；开发者模式准备仍需 USB |
+| ♻️ | **自动续签** | 7 天签名到期前自动重签，带托盘控制与可选开机启动 |
+| 🔐 | **账号与证书** | Apple ID 登录（anisette 提供设备身份）、证书查看/吊销、App ID 管理、keyring 支持 |
+| 🔗 | **配对文件** | 导入/导出 pairing file，修复 Wi-Fi 配对 |
+| 🌍 | **多语言界面** | 28 种语言，含简体/繁体中文 |
 
-```powershell
-./scripts/Build-Windows.ps1 -BuildExecutable -SkipTests
+## 使用流程
+
+```text
+① USB 连接已配对的 iPhone          ② 配对手表，手表上确认信任
+   选择设备                           请求显示「开发者模式」开关
+   ↓                                  ↓
+   在手表上手动开启 → 重启 → 确认 → 点「重新检查」
+   ↓
+③ 登录 Apple ID → 选择原始 IPA → 签名并安装
+   ↓
+   在手表上手动打开应用，确认能够启动
 ```
 
-仅检查前端：`bun install --frozen-lockfile --ignore-scripts` 后运行 `bun run build`。
+> [!NOTE]
+> 程序**不会**自动开启开发者模式、不会重启手表、不会代替你确认信任提示。手表信任记录只存在内存中，退出程序后需要重新建立会话。
 
-## 致谢与许可证
+## 系统要求
 
-当前依赖链中发现签名库许可声明不明确，详见 [许可核查](docs/LICENSE_REVIEW.md)。
-在澄清前，不宣称全依赖许可审核已完成，也不发布正式二进制 Release。
+- Windows 10 22H2 / Windows 11（x86_64）
+- **Apple Mobile Device Service**：来自 [iTunes](https://www.apple.com/itunes/) 或 Microsoft Store 的 Apple Devices 应用。没有它，USB 和 Wi-Fi 两条路都不通
+- WebView2 运行时（Windows 11 已内置）
+- iPhone 已与目标手表配对；准备阶段需要数据线
 
+## 安装与运行
 
-感谢 nab138、AndreySemjonov、Data_C0re_ (Rzbck)、oacevedo、Kabir Oberai、
-idevice 与其余上游作者。代码来源、准确提交与许可见
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、[LICENSE](LICENSE)、
-[vendor/isideload/PROVENANCE.md](vendor/isideload/PROVENANCE.md)。
-保留了[上游 README](docs/UPSTREAM_README.md)和上游贡献规则。当前分支是本 fork 的
-独立开发工作，不向禁止 AI 生成贡献的上游提交 PR。
+从 [Actions](https://github.com/AdminZachary/iloader-for-windows-/actions/workflows/windows.yml) 的 `windows` job 下载 `watchbridge-windows` artifact，解压后直接运行 `WatchBridge.exe`。
 
-请勿提交 Apple ID、密码、证书私钥、配对记录或未脱敏设备日志。
+压缩包里包含：
+
+| 文件 | 内容 |
+|---|---|
+| `WatchBridge.exe` | 主程序，**未签名**，首次运行会有 SmartScreen 提示 |
+| `BUILD.json` | 源码提交、构建是否脏、锁文件哈希、工具链版本、exe 的 SHA-256 |
+| `SHA256SUMS.txt` | 上述文件的校验和 |
+| `LICENSES.zip` | 第三方许可证原文 + 依赖清单（`inventory.json`） |
+
+## 从源码构建
+
+依赖与完整流程见 [BUILDING.md](BUILDING.md)。GitHub Actions 会编译、运行 `iloader` 与 `isideload` 的 Rust 单测，并产出上面那份 artifact。
+
+```powershell
+# 只构建前端
+bun install --frozen-lockfile --ignore-scripts
+bun run build
+
+# 完整 Windows 构建（含单测 + exe + 校验文件）
+.\scripts\Build-Windows.ps1 -BuildExecutable
+```
+
+本地快速构建可加 `-SkipTests` 跳过单测。构建必须是 Windows + MSVC 原生，不做交叉编译。
+
+## 兼容性与已知限制
+
+| 限制 | 说明 |
+|---|---|
+| **单块手表** | 一台 iPhone 配对了多块手表时，准备流程会明确拒绝而不是猜。转发协议没有"指定目标手表"的参数，选错比失败更糟 |
+| **不支持 Watch-only 包** | 需要同时包含 iPhone 宿主和 `Watch/*.app` 的原始 IPA |
+| **App Group** | 需要 Watch App Group 的应用可能仍受上游跳过关联行为的影响 |
+| **系统版本** | 手表侧流程源自 xtool 的实验性实现，不同 iOS/watchOS 组合需要实机验证 |
+| **非官方工具** | 不越狱、不绕过苹果签名、不伪造证书 |
+
+## 验证状态
+
+沿用上游社区约定的分级，避免把不同强度的证据混为一谈：
+
+| 级别 | 含义 | 当前 |
+|---|---|---|
+| `BUILD_VALIDATED` | 能编译、单测通过 | ✅ Windows CI |
+| `CI_VALIDATED` | CI 产出可下载的 artifact | ✅ |
+| `IPHONE_INSTALLED` | 应用装到 iPhone 并可启动 | ❌ 待验收 |
+| `WATCH_INSTALLED` | Watch 应用装到手表 | ❌ 待验收 |
+| `PHYSICALLY_VALIDATED` | 全链路真机确认 | ❌ |
+
+实机记录：
+
+| 日期 | 环节 | 设备 | 结果 |
+|---|---|---|---|
+| 2026-11-12 | 手表配对与识别 | iPhone 17 Pro + Ultra 2、iPhone 13 Pro + Series 7 | ✅ 通过 |
+
+真机验收清单见 [docs/WATCHBRIDGE_TESTING.md](docs/WATCHBRIDGE_TESTING.md)。
+
+## 常见问题
+
+<details>
+<summary><b><code>fail to connect to usbmuxd device socket: io error</code></b></summary>
+
+Windows 上的 usbmuxd 由 Apple Mobile Device Service 提供，监听 `127.0.0.1:27015`。报这个错说明端口上没人应答——通常是服务没安装或没启动。
+
+```powershell
+Get-Service "Apple Mobile Device Service"      # 应存在且为 Running
+Test-NetConnection 127.0.0.1 -Port 27015       # 应为 True
+$env:USBMUXD_SOCKET_ADDRESS                    # 应为空
+```
+
+服务不存在 → 安装 iTunes 或 Apple Devices 应用；服务被改过地址 → 删掉这个环境变量。程序**不打包** usbmuxd，完全依赖苹果的驱动与服务。
+</details>
+
+<details>
+<summary><b>提示「无法读取手表信息」</b></summary>
+
+旧版本在配对前向 iPhone 的配对注册表查询表名，在较新的 iOS 上该查询不返回。新版本改为先与手表建立信任、再从手表自己的会话读取身份。若仍失败，打开「设置与日志 → 查看日志」，查看 `watch step failed` 的 `kind=` 值：`timed out` 是手表没应答，`NotFound` / `UnexpectedResponse` 是协议差异。
+</details>
+
+<details>
+<summary><b>提示「发现多块配对手表」</b></summary>
+
+见上面的单表限制。请在 iPhone 的 Watch App 中确认目标手表；把另一块表关机或放远**不会**让它从配对注册表里消失。
+</details>
+
+## 参与贡献
+
+- 贡献规则见 [CONTRIBUTING.md](CONTRIBUTING.md)
+- 上游明确禁止 AI 生成贡献，**本仓库不会向上游提交 PR**，请把改动留在本 fork
+- 请勿提交 Apple ID、密码、证书私钥、配对记录或未脱敏的设备日志
+
+## 许可与致谢
+
+本项目代码以 MIT 发布（[LICENSE](LICENSE)），品牌使用条件见 [LICENSE-BRANDING](LICENSE-BRANDING)。
+
+> [!CAUTION]
+> 依赖链中签名库（`apple-crates` 的 `apple-codesign-quick`）未声明许可证，也未在源码中找到许可文本。**在澄清前，不宣称全依赖许可审核已完成，也不发布正式二进制 Release。** 详见 [docs/LICENSE_REVIEW.md](docs/LICENSE_REVIEW.md)。
+
+来源与归属详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、[vendor/isideload/PROVENANCE.md](vendor/isideload/PROVENANCE.md)：
+
+| 来源 | 贡献 |
+|---|---|
+| [nab138/iLoader](https://github.com/nab138/iloader) | 原始应用、签名与安装链路 |
+| [AndreySemjonov/iloader](https://github.com/AndreySemjonov/iloader) | 本仓库的起始分支：Wi-Fi/RSD 与自动续签 |
+| [oacevedo/xtool](https://github.com/oacevedo/xtool/tree/feat/experimental-watchos) | 手表开发者模式准备流程（本仓库为 Rust 原生重写，不含 Python） |
+| Data_C0re_ (Rzbck) | Watch Companion 的签名、注册与安装 |
+| idevice / isideload 及上游作者 | 设备通信与签名实现 |
+
+## 免责声明
+
+本项目与 Apple Inc. 无任何关联。Apple、iPhone、Apple Watch 是 Apple Inc. 的商标。
+
+仅供学习、研究与个人开发使用；使用者需自行确认其所在地区的法律与所安装应用的许可条款。作者不对设备损坏、数据丢失、账号风控或证书吊销承担责任。
