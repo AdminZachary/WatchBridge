@@ -1,6 +1,6 @@
 [package]
 name = "iloader"
-version = "0.1.0-alpha.2"
+version = "0.1.0-alpha.3"
 description = "Windows Apple Watch developer-mode and companion installer"
 authors = ["nab138", "AndreySemjonov", "AdminZachary"]
 edition = "2024"
