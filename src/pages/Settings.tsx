@@ -12,6 +12,8 @@ import { useDialog } from "../DialogContext";
 import { Trans, useTranslation } from "react-i18next";
 import i18n, { sortedLanguages } from "../i18next";
 import { openUrl } from "@tauri-apps/plugin-opener";
+import { save } from "@tauri-apps/plugin-dialog";
+import type { AppError } from "../errors";
 import { DeviceInfo } from "../Device";
 
 type SettingsProps = {
@@ -55,6 +57,29 @@ export const Settings = ({
   //   false,
   // );
   const [logsOpen, setLogsOpen] = useState(false);
+  const exportLogs = async () => {
+    try {
+      const destination = await save({
+        defaultPath: `watchbridge-logs-${new Date().toISOString().slice(0, 10)}.log`,
+        filters: [{ name: "Log", extensions: ["log", "txt"] }],
+      });
+      if (!destination) return;
+      const report = await invoke<{ files: number; bytes: number; truncated: boolean }>(
+        "export_logs",
+        { destination },
+      );
+      toast.success(
+        t("settings.export_logs_success", {
+          path: destination,
+          files: report.files,
+          size: Math.max(1, Math.round(report.bytes / 1024)),
+        }),
+      );
+    } catch (error) {
+      err(t("settings.export_logs_failed"), error as AppError);
+    }
+  };
+
   const [logLevelFilter, setLogLevelFilter] = useState("3");
   const logs = useLogs();
   const { err } = useError();
@@ -215,6 +240,9 @@ export const Settings = ({
           <div className="log-outer">
             <div className="log-header">
               <h2>{t("settings.logs")}</h2>
+              <button onClick={() => void exportLogs()}>
+                {t("settings.export_logs")}
+              </button>
               <button
                 onClick={() => {
                   const logText = filteredLogs

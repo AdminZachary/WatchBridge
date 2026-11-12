@@ -10,6 +10,7 @@ mod pairing;
 mod secure_storage;
 mod error;
 mod install_lock;
+mod log_export;
 mod logging;
 mod manual_install;
 mod manual_signing;
@@ -165,6 +166,7 @@ pub fn run() {
             reset_anisette_state,
             export_pairing_cmd,
             delete_stored_rppairing,
+            log_export::export_logs,
             keyring_available,
             force_disable_keyring,
             cancel_pairing,
