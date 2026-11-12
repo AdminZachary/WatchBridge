@@ -80,7 +80,8 @@
     "max_certs_desc": "WatchBridge 将撤销您现有的证书并生成一个新的。",
     "hide_certificate_list": "隐藏证书列表",
     "choose_what_to_revoke": "选择要撤销的内容",
-    "continue": "继续"
+    "continue": "继续",
+    "no_keyring_available": "无法在此设备上保存凭据。"
   },
   "device": {
     "title": "iDevice",
@@ -91,7 +92,11 @@
     "found_devices": "找到设备",
     "unable_load_devices_prefix": "无法加载设备：",
     "no_devices_found_period": "未找到设备。",
-    "selected": "已选择"
+    "selected": "已选择",
+    "failed_select": "无法选择设备",
+    "pairing_cancel": "取消",
+    "pairing_in_progress_header": "正在与 {{device}} 配对…",
+    "pairing_in_progress_hint": "请解锁设备并点按“信任”，如有提示请输入密码。"
   },
   "operation": {
     "failed": "操作失败。",
@@ -165,7 +170,8 @@
     "pairing_file_exported_success": "配对文件导出成功！",
     "failed_export_pairing_file": "导出配对文件失败",
     "export_not_recommended": "导出（不推荐）",
-    "refresh_installed_apps": "刷新已安装的应用"
+    "refresh_installed_apps": "刷新已安装的应用",
+    "place_all": "放入所有应用"
   },
   "settings": {
     "anisette_server": "Anisette 服务器：",
@@ -191,7 +197,13 @@
     "error": "错误",
     "language_hint": "您可以<translation>点击这里</translation>帮助我们改进翻译。",
     "dont_use_keyring": "不使用钥匙串",
-    "dont_use_keyring_message": "勾选此项会让 WatchBridge 将配对文件、anisette 状态和相关证书直接储存在磁盘内，从而使系统更不安全。只有当钥匙串无法正常储存且您充分了解此项的风险时可考虑勾选此项。"
+    "dont_use_keyring_message": "勾选此项会让 WatchBridge 将配对文件、anisette 状态和相关证书直接储存在磁盘内，从而使系统更不安全。只有当钥匙串无法正常储存且您充分了解此项的风险时可考虑勾选此项。",
+    "anisette_state_not_found": "没有可重置的 anisette 状态",
+    "delete_stored_rppairing": "删除已存储的配对",
+    "delete_stored_rppairing_message": "确定要删除此设备已存储的配对文件吗？删除后需要重新配对。",
+    "deleting_stored_rppairing": "正在删除已存储的配对…",
+    "failed_delete_stored_rppairing": "删除已存储的配对失败",
+    "stored_rppairing_deleted_success": "已成功删除存储的配对！"
   },
   "dialog": {
     "confirm": "确认",
@@ -200,7 +212,8 @@
   "error": {
     "title": "发生错误：{{msg}}",
     "unknown": "未知",
-    "support_message": "如果问题仍然存在，请按“复制到剪贴板”，并带上复制的错误信息提交 <github>GitHub issue</github>。"
+    "support_message": "如果问题仍然存在，请按“复制到剪贴板”，并带上复制的错误信息提交 <github>GitHub issue</github>。",
+    "suggestions_heading": "建议"
   },
   "update": {
     "new_version_available": "有新版本可用：{{version}}。是否要更新？",
@@ -216,6 +229,97 @@
     "failed": "Wi-Fi 设置失败"
   },
   "wifiRepair": {
-    "open": "修复 Wi-Fi 配对…"
+    "open": "修复 Wi-Fi 配对…",
+    "cancel": "如果尚未发送则取消",
+    "close": "关闭",
+    "explanation": "请保持所选设备通过 USB 连接。此操作会重新建立本机与手机的配对并启用 Wi-Fi 连接。已安装的应用和单独的 RemotePairing 数据都会保留。",
+    "phonePrompt": "解锁手机。如有提示，请在手机上点按“信任”并输入密码。WatchBridge 从不索要你的手机密码。",
+    "requestFailed": "未收到可靠的修复结果。配对状态可能已改变。设备选择已清除；请检查 USB 连接并重新选择手机后再继续。",
+    "retryLimit": "重试未完成配对。请关闭此对话框并检查手机，再进行一次修复。",
+    "target": "需要修复的 USB 设备",
+    "title": "修复 {{device}} 的配对"
+  },
+  "apps": {
+    "account": "已保存的账号",
+    "action_failed": "操作未能完成。打开“查看详情”查看已保存的结果。",
+    "action_finished": "应用操作已完成。下面的状态反映其续签设置。",
+    "app_actions": "{{app}} 的操作",
+    "archive": "已保留原始 SHA-256",
+    "bundle": "Bundle ID",
+    "catalog_busy": "正在安装，完成后列表会自动更新。",
+    "close_details": "关闭详情",
+    "confirm_remove": "移除设置",
+    "consent": "使用已保存的账号通过 Wi-Fi 安装 iPhone 应用并自动续签。请保持 WatchBridge 运行，且电脑不要休眠。",
+    "details": "查看详情",
+    "details_for": "{{app}} 的详情",
+    "empty": "尚未管理任何应用",
+    "empty_hint": "选择“安装并自动续签”来添加第一个手机应用。",
+    "evidence_hint": "有效期来自已签名的产物，而不是从已安装的描述文件回读。程序不会声称你打开过应用或验证过数据。手表端的自动续签仍不可用。",
+    "install_auto": "安装并自动续签",
+    "install_once": "仅安装一次",
+    "install_once_hint": "适用于 USB、手表安装包或一次性安装。",
+    "last_success": "上次记录的成功安装",
+    "more_install": "更多安装选项",
+    "next_check": "下次本地检查",
+    "pause": "暂停",
+    "pause_finished": "已暂停。正在进行的安装会继续完成。",
+    "pending_explanation": "最近一次安装尚未完全提交。下面的描述文件是历史记录，不能证明当前安装的是哪个 IPA。“继续”可在不重新安装的前提下完成已经验证过的安装；否则请先查看结果再恢复。",
+    "phone_id": "已保存的手机标识",
+    "recover": "恢复并续签",
+    "recover_before_remove": "移除这个出错的应用前，先在“查看详情”中恢复该账号。",
+    "recover_explanation": "这次显式恢复会尝试一次当前保留的 IPA。只有在验证成功后，才会清除该应用的账号停止状态。待处理的替换不会被自动重放。",
+    "remove": "从自动续签中移除",
+    "remove_explanation": "将 {{app}} 从自动续签中移除？已安装的应用和你原始的 IPA 文件都会保留。",
+    "renew": "立即续签",
+    "replace": "替换 IPA",
+    "requirements": "需要登录并选择 Wi-Fi 连接的 iPhone 才能安装新应用。",
+    "resume": "继续",
+    "settings_details": "续签设置与故障排查",
+    "startup": "登录 Windows 时在托盘中启动 WatchBridge",
+    "startup_hint": "使用当前这份 WatchBridge。续签与暂停设置保持不变。Windows 可能延迟启动；如果没有启动，请检查 Windows 的启动项设置。",
+    "startup_read_failed": "无法读取 Windows 启动项状态。其他续签控制仍然可用。",
+    "subtitle": "安装一次，让你选定的应用持续有效。",
+    "team": "签名团队",
+    "title": "你的应用",
+    "troubleshooting": "Wi-Fi 故障排查",
+    "unavailable": "此构建中自动续签不可用。“仅安装一次”仍然可用。",
+    "unknown": "尚未记录",
+    "waiting_history": "连接检查时手机已锁定或不可达",
+    "waiting_next": "计划于 {{date}} 重试",
+    "working": "处理中…"
+  },
+  "renewal": {
+    "attempt_stage": "最近一次续签活动",
+    "close_to_tray": "关闭窗口时让 WatchBridge 继续在托盘运行",
+    "previous_failure": "已记录的失败历史",
+    "session_stage_label": "已保存账号的阶段"
+  },
+  "wifi": {
+    "attempt_time": "尝试完成时间：{{time}}",
+    "check": "检查 iPhone 的 Wi-Fi 服务",
+    "connection_stage": "最后阶段：{{stage}}",
+    "copy_report": "复制安全的结果报告",
+    "direct": "Wi-Fi（直连）",
+    "evidence": "这些有效期来自已签名的应用，而不是从设备回读。“已安装”只代表安装器返回成功。请确认应用在两台设备上都能打开；手表的启动以及能否超过上一次的有效期仍需验证。",
+    "http_status": "HTTP 状态：{{code}}",
+    "installation_error": "安装器错误：{{name}}",
+    "installation_library_code": "设备库错误码：{{code}} / {{subcode}}（不是 Apple 服务错误码）",
+    "installation_platform_code": "平台错误码：{{code}}",
+    "installation_stage": "安装阶段：{{stage}}",
+    "installation_uncertain": "通信中断前，安装请求可能已经到达手机。重试前请先检查安装状态；只看到一个图标并不能证明安装成功或能启动。",
+    "installation_unclassified": "手机没有给出可识别的拒绝原因。详情请查看日志。",
+    "instructions": "断开 USB，让受信任的 iPhone 和手表保持在附近，然后刷新设备列表。请选择与已安装应用相同的原始 IPA。此操作会重新签名并安装一次，不会自动运行任何东西。",
+    "profile_expiry": "已签名描述文件的有效期",
+    "renew": "选择 IPA 并立即续签",
+    "request_failed": "请求未能完成。请重新打开程序，确认状态后再试。",
+    "select_direct": "选择手机的 Wi-Fi 条目。如果没有，请检查本地网络和现有配对设置。",
+    "service_code": "服务错误码：{{code}}",
+    "services": "AFC 读取：{{afc}} · 安装服务查询：{{proxy}}",
+    "signing": "签名",
+    "signing_stage": "签名阶段：{{stage}} · {{component}}",
+    "title": "通过 Wi-Fi 续签",
+    "unknown": "未知",
+    "watch_not_checked": "此次连接检查不验证手表是否就绪、应用签名或安装情况。",
+    "working": "处理中… 请保持此窗口打开。"
   }
 }
