@@ -240,7 +240,9 @@ impl AppId {
         &mut self,
         dev_session: &mut DeveloperSession,
         team: &DeveloperTeam,
+        device_type: impl Into<Option<DeveloperDeviceType>> + Send,
     ) -> Result<(), Report> {
+        let device_type = device_type.into();
         let app_group_feature_enabled = self.features.get_bool("APG3427HIY")?;
 
         if !app_group_feature_enabled {
@@ -248,7 +250,7 @@ impl AppId {
                 "APG3427HIY": true,
             });
             let new_features = dev_session
-                .update_app_id(team, self, body, None)
+                .update_app_id(team, self, body, device_type)
                 .await?
                 .features;
             self.features = new_features;

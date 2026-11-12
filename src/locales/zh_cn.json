@@ -75,6 +75,7 @@
     "valid_6digit": "请输入有效的 6 位数字验证码。",
     "submit": "提交",
     "max_certs_title": "已达到证书数量上限",
+    "revoke_count": "将撤销 {{count}} 个证书",
     "max_certs_desc": "WatchBridge 将撤销您现有的证书并生成一个新的。",
     "hide_certificate_list": "隐藏证书列表",
     "choose_what_to_revoke": "选择要撤销的内容",

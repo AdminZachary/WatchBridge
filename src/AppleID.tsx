@@ -97,6 +97,15 @@ export const AppleID = ({
     };
   }, []);
 
+  // Never pre-select certificates: revoking one is destructive and must be a
+  // deliberate choice. Opening the list makes that choice visible.
+  useEffect(() => {
+    if (certs) {
+      setSelectedSerials([]);
+      setChooseCertsOpen(true);
+    }
+  }, [certs]);
+
   return (
     <>
       <h2 style={{ marginTop: 0 }}>{t("apple_id.title")}</h2>
@@ -339,8 +348,14 @@ export const AppleID = ({
           </div>
         )}
         <div className="certs-buttons">
+          {selectedSerials.length > 0 && (
+            <p className="certs-desc">
+              {t("apple_id.revoke_count", { count: selectedSerials.length })}
+            </p>
+          )}
           <button
             className="action-button primary"
+            disabled={selectedSerials.length === 0}
             onClick={async () => {
               await emit(
                 "max-certs-response",

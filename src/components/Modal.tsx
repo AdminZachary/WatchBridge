@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import "./Modal.css";
 
 export const Modal = ({
@@ -34,34 +35,37 @@ export const Modal = ({
     };
   }, [isOpen, close]);
 
-  return (
-    <>
-      {isOpen && (
-        <div
-          className={`modal-container`}
-          style={
-            zIndex
-              ? {
-                  zIndex: zIndex.toString(),
-                }
-              : {}
-          }
-        >
-          <div className={`modal${sizeFit ? " size-fit" : ""}`}>
-            {!hideClose && close && (
-              <button
-                className="modal-close"
-                onClick={() => {
-                  close();
-                }}
-              >
-                &#x2715;
-              </button>
-            )}
-            <div className="modal-content">{children}</div>
-          </div>
-        </div>
-      )}
-    </>
+  if (!isOpen) {
+    return null;
+  }
+
+  // Render into <body>: a modal inside a disabled <fieldset> would inherit the
+  // disabled state and none of its buttons could be clicked.
+  return createPortal(
+    <div
+      className={`modal-container`}
+      style={
+        zIndex
+          ? {
+              zIndex: zIndex.toString(),
+            }
+          : {}
+      }
+    >
+      <div className={`modal${sizeFit ? " size-fit" : ""}`}>
+        {!hideClose && close && (
+          <button
+            className="modal-close"
+            onClick={() => {
+              close();
+            }}
+          >
+            &#x2715;
+          </button>
+        )}
+        <div className="modal-content">{children}</div>
+      </div>
+    </div>,
+    document.body,
   );
 };

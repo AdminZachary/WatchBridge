@@ -26,7 +26,7 @@ use idevice::{
 };
 use plist::Dictionary;
 use rootcause::{option_ext::OptionExt, prelude::*};
-use tracing::info;
+use tracing::{info, warn};
 
 pub struct Sideloader {
     team_selection: TeamSelection,
@@ -151,19 +151,40 @@ impl Sideloader {
             .await?;
 
         for app_id in app_ids.iter_mut() {
-            if watch_bundle_ids.contains(&app_id.identifier) {
-                continue;
+            let is_watch = watch_bundle_ids.contains(&app_id.identifier);
+            let device_type = if is_watch {
+                Some(DeveloperDeviceType::Watchos)
+            } else {
+                None
+            };
+
+            // Watch App IDs used to be skipped here, so their provisioning profiles
+            // never carried an application-groups entitlement even when the Watch app
+            // needed one. Apply it with the watchOS platform marker, but tolerate a
+            // rejection: Watch apps that do not use App Groups must keep installing.
+            let applied = async {
+                app_id
+                    .ensure_group_feature(&mut self.dev_session, &team, device_type.clone())
+                    .await?;
+                self.dev_session
+                    .assign_app_group(&team, &app_group, app_id, device_type.clone())
+                    .await?;
+                Ok::<(), Report>(())
+            }
+            .await;
+
+            match applied {
+                Ok(()) => {}
+                Err(error) if is_watch => {
+                    warn!(
+                        "Watch App ID {} did not accept the application group: {:?}",
+                        app_id.identifier, error
+                    );
+                }
+                Err(error) => return Err(error),
             }
 
-            app_id
-                .ensure_group_feature(&mut self.dev_session, &team)
-                .await?;
-
-            self.dev_session
-                .assign_app_group(&team, &app_group, app_id, None)
-                .await?;
-
-            if increased_memory_limit {
+            if !is_watch && increased_memory_limit {
                 self.dev_session
                     .add_increased_memory_limit(&team, app_id)
                     .await?;
@@ -212,6 +233,31 @@ impl Sideloader {
             let entitlements = parsed_profile.entitlements().clone();
 
             provisioning_profiles.push((bundle_id, profile, entitlements));
+        }
+
+        // Record what each profile actually grants; this is what the signature will
+        // carry, and it is the only place the two can drift apart.
+        for (bundle_id, _, entitlements) in &provisioning_profiles {
+            let groups = entitlements
+                .get("com.apple.security.application-groups")
+                .and_then(|value| value.as_array())
+                .map(|values| {
+                    values
+                        .iter()
+                        .filter_map(|value| value.as_string())
+                        .collect::<Vec<_>>()
+                        .join(", ")
+                })
+                .unwrap_or_default();
+            info!(
+                "Profile {} application-groups: {}",
+                bundle_id,
+                if groups.is_empty() {
+                    "(none)"
+                } else {
+                    groups.as_str()
+                }
+            );
         }
 
         if let Some(callback) = &progress_callback {
