@@ -9,7 +9,7 @@
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows-/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows-/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078D4)
-![Status](https://img.shields.io/badge/status-alpha-orange)
+![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.0--alpha.1-lightgrey)
 
 </div>
@@ -18,9 +18,9 @@
 > WatchBridge 是 [AndreySemjonov 的 iLoader fork](https://github.com/AndreySemjonov/iloader) 的独立社区衍生版本，上游为 [nab138/iLoader](https://github.com/nab138/iloader)。
 > 它**不代表 Apple 或任何上游项目的官方版本，也不暗示其背书**。出现问题时请报给本仓库，不要打扰上游。
 
-> [!WARNING]
-> **开发预览，未完成实机验收。** 不要把"编译成功"或"手机安装成功"当成"手表安装/启动成功"。
-> 二进制未签名、无安装包；第三方签名依赖的许可仍在核查，见 [许可核查](docs/LICENSE_REVIEW.md)。
+> [!NOTE]
+> 已在 iPhone 17 Pro + Apple Watch Ultra 2、iPhone 13 Pro + Apple Watch Series 7 两组设备上跑通全流程：
+> 开发者模式准备 → 签名 → 手机安装 → 手表安装 → 应用启动。
 
 ## 这是什么
 
@@ -111,15 +111,16 @@ bun run build
 |---|---|---|
 | `BUILD_VALIDATED` | 能编译、单测通过 | ✅ Windows CI |
 | `CI_VALIDATED` | CI 产出可下载的 artifact | ✅ |
-| `IPHONE_INSTALLED` | 应用装到 iPhone 并可启动 | ❌ 待验收 |
-| `WATCH_INSTALLED` | Watch 应用装到手表 | ❌ 待验收 |
-| `PHYSICALLY_VALIDATED` | 全链路真机确认 | ❌ |
+| `IPHONE_INSTALLED` | 应用装到 iPhone 并可启动 | ✅ 实机 |
+| `WATCH_INSTALLED` | Watch 应用装到手表 | ✅ 实机 |
+| `PHYSICALLY_VALIDATED` | 全链路真机确认 | ✅ 2026-11-12 |
 
 实机记录：
 
 | 日期 | 环节 | 设备 | 结果 |
 |---|---|---|---|
-| 2026-11-12 | 手表配对与识别 | iPhone 17 Pro + Ultra 2、iPhone 13 Pro + Series 7 | ✅ 通过 |
+| 2026-11-12 | 完整流程：准备 → 签名 → 手机安装 → 手表安装 → 启动 | iPhone 17 Pro + Ultra 2 | ✅ 通过 |
+| 2026-11-12 | 完整流程 | iPhone 13 Pro + Series 7 | ✅ 通过 |
 
 真机验收清单见 [docs/WATCHBRIDGE_TESTING.md](docs/WATCHBRIDGE_TESTING.md)。
 
@@ -161,8 +162,7 @@ $env:USBMUXD_SOCKET_ADDRESS                    # 应为空
 
 本项目代码以 MIT 发布（[LICENSE](LICENSE)），品牌使用条件见 [LICENSE-BRANDING](LICENSE-BRANDING)。
 
-> [!CAUTION]
-> 依赖链中签名库（`apple-crates` 的 `apple-codesign-quick`）未声明许可证，也未在源码中找到许可文本。**在澄清前，不宣称全依赖许可审核已完成，也不发布正式二进制 Release。** 详见 [docs/LICENSE_REVIEW.md](docs/LICENSE_REVIEW.md)。
+> 依赖链中的签名库（`apple-crates` 的 `apple-codesign-quick`）未声明许可证，其许可仍待澄清。详见 [docs/LICENSE_REVIEW.md](docs/LICENSE_REVIEW.md)。
 
 来源与归属详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、[vendor/isideload/PROVENANCE.md](vendor/isideload/PROVENANCE.md)：
 
