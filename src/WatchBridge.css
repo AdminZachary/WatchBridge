@@ -66,6 +66,10 @@ fieldset.wb-card { padding: 20px; }
 @media (max-width: 880px) { .wb-layout { grid-template-columns: 240px minmax(0, 1fr); gap: 18px; padding: 24px 20px; } .wb-step { padding: 21px; } .wb-header { padding: 20px; } .wb-status { display: none; } .wb-file { flex-wrap: wrap; } }
 @media (max-width: 650px) { .wb-layout { grid-template-columns: 1fr; } .wb-header-right .wb-preview { display: none; } .wb-intro h1 { font-size: 25px; } .wb-install-footer { align-items: flex-start; flex-direction: column; } .wb-install-footer button { width: 100%; } }
 .wb-app .modal-close { color: #214c3f; }
+/* The base styles ship dark-theme panels; the light theme needs its own values
+   inside dialogs, otherwise the text areas render as solid black blocks. */
+.wb-app .error-inner, .wb-app .log-inner { background-color: #eef2ec; color: #1d3d34; border: 1px solid #dbe6d7; }
+.wb-app .link-button:hover { color: #153d36; }
 .wb-app .modal-container button, .wb-app .modal-container input { color: #214c3f; }
 .wb-app .logged-label { color: #64766d; }
 .wb-app .stored-email { color: #214c3f; overflow-wrap: anywhere; }
