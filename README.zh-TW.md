@@ -21,7 +21,7 @@
 > 它**不代表 Apple 或任何上游專案的官方版本，也不暗示其背書**。發生問題請回報到本儲存庫，不要打擾上游。
 
 > [!NOTE]
-> 已在 iPhone 17 Pro + Apple Watch Ultra 2、iPhone 13 Pro + Apple Watch Series 7 兩組裝置上跑通完整流程：
+> 已在實機裝置上跑通完整流程：
 > 開發者模式準備 → 簽章 → 手機安裝 → 手錶安裝 → App 啟動。
 
 ## 這是什麼

@@ -21,7 +21,7 @@
 > It is **not an official version of Apple or of any upstream project, and implies no endorsement**. Please report problems to this repository, not upstream.
 
 > [!NOTE]
-> The full flow has been exercised on an iPhone 17 Pro + Apple Watch Ultra 2 and an iPhone 13 Pro + Apple Watch Series 7:
+> The full flow has been exercised on physical devices:
 > developer-mode preparation → signing → phone install → watch install → app launch.
 
 ## What it is

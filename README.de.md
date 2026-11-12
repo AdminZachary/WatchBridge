@@ -21,7 +21,7 @@
 > Es ist **keine offizielle Version von Apple oder eines Upstream-Projekts und impliziert keine Billigung**. Melde Probleme in diesem Repository, nicht upstream.
 
 > [!NOTE]
-> Der komplette Ablauf wurde mit iPhone 17 Pro + Apple Watch Ultra 2 und iPhone 13 Pro + Apple Watch Series 7 verifiziert:
+> Der komplette Ablauf wurde auf echten Geräten verifiziert:
 > Entwicklermodus vorbereiten → signieren → auf dem Telefon installieren → auf der Uhr installieren → App starten.
 
 ## Was ist das

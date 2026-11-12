@@ -21,7 +21,7 @@
 > **No es una versión oficial de Apple ni de ningún proyecto upstream, y no implica respaldo alguno.** Reporta los problemas en este repositorio, no upstream.
 
 > [!NOTE]
-> El flujo completo se ha verificado en un iPhone 17 Pro + Apple Watch Ultra 2 y en un iPhone 13 Pro + Apple Watch Series 7:
+> El flujo completo se ha verificado en dispositivos reales:
 > preparación del modo desarrollador → firma → instalación en el teléfono → instalación en el reloj → arranque de la app.
 
 ## Qué es

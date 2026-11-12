@@ -21,7 +21,7 @@
 > Ce n'est **pas une version officielle d'Apple ni d'un projet amont, et cela n'implique aucun cautionnement**. Signalez les problèmes sur ce dépôt, pas en amont.
 
 > [!NOTE]
-> Le parcours complet a été validé sur un iPhone 17 Pro + Apple Watch Ultra 2 et un iPhone 13 Pro + Apple Watch Series 7 :
+> Le parcours complet a été validé sur des appareils réels :
 > préparation du mode développeur → signature → installation sur le téléphone → installation sur la montre → lancement de l'app.
 
 ## Présentation

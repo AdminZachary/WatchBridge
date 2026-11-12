@@ -21,7 +21,7 @@
 > **Não é uma versão oficial da Apple nem de qualquer projeto upstream, e não implica endosso.** Relate problemas neste repositório, não no upstream.
 
 > [!NOTE]
-> O fluxo completo foi validado em um iPhone 17 Pro + Apple Watch Ultra 2 e em um iPhone 13 Pro + Apple Watch Series 7:
+> O fluxo completo foi validado em dispositivos reais:
 > preparação do modo desenvolvedor → assinatura → instalação no telefone → instalação no relógio → abertura do app.
 
 ## O que é
