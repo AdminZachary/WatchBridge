@@ -17,8 +17,8 @@ Run from a fresh checkout in PowerShell:
 ```
 
 The script runs the TypeScript/Vite build. Without `-SkipTests` it also runs
-the Rust unit tests of iloader and the included isideload crate. CI uses
-`-SkipTests` at the user's request and records that explicitly in BUILD.json. The executable is built with
+the Rust unit tests of iloader and the included isideload crate; CI runs them and
+records the result in BUILD.json. The executable is built with
 `src-tauri/ci.conf.json`, which turns off the original project's updater, and is
 copied to `artifacts/windows/WatchBridge.exe` without an installer.
 `artifacts/windows/BUILD.json` records the source commit, whether the checkout had

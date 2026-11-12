@@ -32,9 +32,9 @@ Do not publish account identifiers, device UDIDs, signing keys or pairing record
 
 ## Automated checks
 
-Windows CI currently performs a locked frontend/production executable build only,
-without tests, at the user's request. Unit tests can be run manually by omitting
-`-SkipTests` from the Windows helper.
+Windows CI performs a locked frontend/production executable build and runs the
+Rust unit tests of iloader and isideload. Locally, `-SkipTests` skips them for a
+faster build-only run.
 Unit tests cannot establish real-device trust, transport compatibility or launch.
 
 ## Authentication follow-up

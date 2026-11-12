@@ -41,7 +41,7 @@ App Group 关联行为影响；本版不承诺 HermesEnabler 的备份功能已�
 ## 构建
 
 Windows 构建依赖和流程见 [BUILDING.md](BUILDING.md)。使用 Windows 原生构建，
-不要求 Linux 交叉编译。GitHub Actions 按当前用户要求仅编译、不运行测试，并生成 `WatchBridge.exe`、
+不要求 Linux 交叉编译。GitHub Actions 编译并运行 Rust 单元测试，并生成 `WatchBridge.exe`、
 `BUILD.json`、`SHA256SUMS.txt` 和 `LICENSES.zip`，其中包含准确源码提交和校验值。
 
 ```powershell
