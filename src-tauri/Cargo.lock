@@ -2639,7 +2639,7 @@ dependencies = [
 
 [[package]]
 name = "iloader"
-version = "0.1.0-alpha.3"
+version = "0.1.0-alpha.4"
 dependencies = [
  "apple-codesign",
  "chrono",
