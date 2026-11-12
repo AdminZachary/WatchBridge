@@ -8,10 +8,14 @@ import zipfile
 ROOT = Path(__file__).resolve().parents[1]
 
 def collect(destination):
+    # Decode explicitly as UTF-8 with replacement: text=True would use the
+    # platform encoding (CP1252 on Windows), and Cargo output can contain bytes
+    # that codepage cannot represent, which aborts the build with a
+    # UnicodeDecodeError instead of a useful message.
     metadata = json.loads(subprocess.check_output([
         'cargo', 'metadata', '--locked', '--format-version', '1',
         '--manifest-path', str(ROOT / 'src-tauri/Cargo.toml'),
-    ], cwd=ROOT, text=True))
+    ], cwd=ROOT).decode('utf-8', errors='replace'))
     entries = []
     destination.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(destination, 'w', zipfile.ZIP_DEFLATED, strict_timestamps=False) as archive:
@@ -40,7 +44,7 @@ def collect(destination):
             relative = manifest.relative_to(ROOT / 'node_modules')
             if len(relative.parts) not in (2, 3) or (len(relative.parts) == 3 and not relative.parts[0].startswith('@')):
                 continue
-            package = json.loads(manifest.read_text(encoding='utf-8'))
+            package = json.loads(manifest.read_text(encoding='utf-8-sig'))
             files = [p for p in manifest.parent.iterdir() if p.is_file() and
                      p.name.upper().startswith(('LICENSE', 'LICENCE', 'COPYING', 'NOTICE', 'COPYRIGHT'))]
             name = package.get('name', str(relative.parent))
