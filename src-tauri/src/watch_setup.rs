@@ -19,9 +19,16 @@ const LOCKDOWN: u16 = 62078;
 const AMFI: &str = "com.apple.amfi.lockdown";
 const SERVICE_TIMEOUT: Duration = Duration::from_secs(10);
 
-// Pairing keys live in memory only. They are never returned to the webview or logged.
+// Pairing keys and the Watch identity live in memory only. They are never returned
+// to the webview or logged.
+#[derive(Clone)]
+struct WatchSession {
+    pairing: PairingFile,
+    name: String,
+}
+
 #[derive(Default)]
-pub struct WatchSessions(Mutex<HashMap<(String, String), PairingFile>>);
+pub struct WatchSessions(Mutex<HashMap<(String, String), WatchSession>>);
 
 #[derive(Clone, Copy, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
@@ -57,8 +64,27 @@ async fn step<T>(
         Ok(Err(IdeviceError::PasswordProtected | IdeviceError::DeviceLocked)) => {
             Err(fail("请解锁 iPhone 和 Apple Watch，保持手表亮屏后重试。"))
         }
-        _ => Err(fail(message)),
+        Ok(Err(error)) => {
+            tracing::warn!(target: "watch_setup", kind = %error_kind(&error), "watch step failed");
+            Err(fail(message))
+        }
+        Err(_) => {
+            tracing::warn!(target: "watch_setup", step = message, "watch step timed out");
+            Err(fail(message))
+        }
     }
+}
+
+// Error payloads can carry device data, so only the variant name is logged.
+fn error_kind(error: &IdeviceError) -> String {
+    let rendered = format!("{error:?}");
+    rendered
+        .split('(')
+        .next()
+        .unwrap_or("Unknown")
+        .chars()
+        .take(48)
+        .collect()
 }
 
 fn single_watch(registry: &[String]) -> Result<&str, AppError> {
@@ -213,20 +239,12 @@ pub async fn prepare_watch(
     .await?;
     let registry = step("无法读取配对手表列表。", proxy.get_device_registry()).await?;
     let watch_id = single_watch(&registry)?.to_owned();
-    let name = step(
-        "无法读取手表信息，请保持手表解锁后重试。",
-        proxy.get_value(&watch_id, "DeviceName"),
-    )
-    .await?
-    .as_string()
-    .unwrap_or("Apple Watch")
-    .to_owned();
     drop(proxy);
     let cache_key = (selected.udid, watch_id.clone());
     let cached = sessions.0.lock().unwrap().get(&cache_key).cloned();
     if action == Action::Check && cached.is_none() {
         return Ok(WatchStatus {
-            name,
+            name: "Apple Watch".into(),
             paired: false,
             developer_mode: None,
             switch_revealed: false,
@@ -258,7 +276,10 @@ pub async fn prepare_watch(
                 _ => return Err(fail("手表配对未完成。请解锁手表并确认信任提示，然后重试。")),
             }
         } else {
-            cached.expect("non-pair actions require cached trust")
+            match cached.as_ref() {
+                Some(session) => session.pairing.clone(),
+                None => return Err(fail("请先点击“配对手表”，在手表上确认信任后再重试。")),
+            }
         };
         // A record is admitted only after a successful authenticated session.
         let legacy = match step(
@@ -282,11 +303,36 @@ pub async fn prepare_watch(
             sessions.0.lock().unwrap().remove(&cache_key);
             return Err(fail("转发目标与选择的手表不一致，请断开连接后重试。"));
         }
-        sessions
-            .0
-            .lock()
-            .unwrap()
-            .insert(cache_key.clone(), pairing.clone());
+        // Read the identity from the forwarded Watch instead of the companion-proxy
+        // registry: the registry answers the device list reliably, but not value
+        // queries, on current iOS versions.
+        let name = step(
+            "无法读取手表信息，请保持手表解锁后重试。",
+            lockdown.get_value(Some("DeviceName"), None),
+        )
+        .await?
+        .as_string()
+        .unwrap_or("Apple Watch")
+        .to_owned();
+        let device_class = step(
+            "无法确认转发目标，请断开连接后重试。",
+            lockdown.get_value(Some("DeviceClass"), None),
+        )
+        .await?
+        .as_string()
+        .unwrap_or_default()
+        .to_owned();
+        if device_class != "Watch" {
+            sessions.0.lock().unwrap().remove(&cache_key);
+            return Err(fail("转发到的设备不是 Apple Watch，请断开连接后重试。"));
+        }
+        sessions.0.lock().unwrap().insert(
+            cache_key.clone(),
+            WatchSession {
+                pairing: pairing.clone(),
+                name: name.clone(),
+            },
+        );
         let enabled = developer_mode(
             &step(
                 "无法读取开发者模式状态，请解锁手表后重试。",
