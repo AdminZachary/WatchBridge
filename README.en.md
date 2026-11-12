@@ -69,7 +69,7 @@ The device path is indirect: Windows cannot see the Watch, so the program uses t
 
 ## Install and run
 
-Download the `watchbridge-windows` artifact from the `windows` job on [Actions](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml) and run `WatchBridge.exe` after extracting.
+Download `watchbridge-windows.zip` from [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest), extract it and run `WatchBridge.exe`.
 
 The archive contains:
 

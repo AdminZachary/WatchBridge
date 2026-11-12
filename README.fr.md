@@ -69,7 +69,7 @@ Le chemin vers l'appareil est indirect : Windows ne voit pas la montre, donc le 
 
 ## Installation et exécution
 
-Téléchargez l'artefact `watchbridge-windows` du job `windows` dans [Actions](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml), décompressez-le et lancez `WatchBridge.exe`.
+Téléchargez `watchbridge-windows.zip` depuis [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest), décompressez-le et lancez `WatchBridge.exe`.
 
 L'archive contient :
 

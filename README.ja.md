@@ -69,7 +69,7 @@ iLoader はその半分（iPhone 側）を Rust で Windows に移植しまし�
 
 ## インストールと実行
 
-[Actions](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml) の `windows` ジョブから `watchbridge-windows` アーティファクトを取得し、展開して `WatchBridge.exe` を実行します。
+[Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) から `watchbridge-windows.zip` を取得し、展開して `WatchBridge.exe` を実行します。
 
 アーカイブの内容:
 

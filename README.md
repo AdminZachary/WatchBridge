@@ -69,7 +69,7 @@ iLoader 用 Rust 把 iPhone 侧这半件事在 Windows 上重做了一遍。**Wa
 
 ## 安装与运行
 
-从 [Actions](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml) 的 `windows` job 下载 `watchbridge-windows` artifact，解压后直接运行 `WatchBridge.exe`。
+从 [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) 下载 `watchbridge-windows.zip`，解压后直接运行 `WatchBridge.exe`。
 
 压缩包里包含：
 

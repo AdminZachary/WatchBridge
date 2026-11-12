@@ -69,7 +69,7 @@ O caminho até o dispositivo é indireto: o Windows não enxerga o relógio, ent
 
 ## Instalação e execução
 
-Baixe o artefato `watchbridge-windows` do job `windows` em [Actions](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml), descompacte e execute `WatchBridge.exe`.
+Baixe `watchbridge-windows.zip` em [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest), descompacte e execute `WatchBridge.exe`.
 
 O arquivo contém:
 

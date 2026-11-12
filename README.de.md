@@ -69,7 +69,7 @@ Der Weg zum Gerät ist indirekt: Windows sieht die Uhr nicht, deshalb benutzt da
 
 ## Installation und Start
 
-Lade das Artefakt `watchbridge-windows` aus dem `windows`-Job unter [Actions](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml), entpacke es und starte `WatchBridge.exe`.
+Lade `watchbridge-windows.zip` von [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest), entpacke es und starte `WatchBridge.exe`.
 
 Das Archiv enthält:
 
