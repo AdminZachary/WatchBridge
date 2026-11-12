@@ -191,6 +191,41 @@ async fn connect_forwarded(
     ))
 }
 
+// Value queries can miss while the Watch is asleep or busy; retry briefly.
+async fn watch_value(lockdown: &mut LockdownClient, key: &str) -> Option<Value> {
+    for _ in 0..3 {
+        if let Ok(Ok(value)) =
+            tokio::time::timeout(SERVICE_TIMEOUT, lockdown.get_value(Some(key), None)).await
+        {
+            return Some(value);
+        }
+        tokio::time::sleep(Duration::from_millis(400)).await;
+    }
+    None
+}
+
+// The name is cosmetic, so a miss falls back instead of aborting preparation.
+async fn watch_name(lockdown: &mut LockdownClient) -> String {
+    match watch_value(lockdown, "DeviceName").await {
+        Some(value) => value.as_string().unwrap_or("Apple Watch").to_owned(),
+        None => {
+            tracing::warn!(target: "watch_setup", "watch name unavailable; continuing");
+            "Apple Watch".to_owned()
+        }
+    }
+}
+
+// UniqueDeviceID already proved the target; DeviceClass is a redundant guard.
+async fn watch_class(lockdown: &mut LockdownClient) -> Option<String> {
+    match watch_value(lockdown, "DeviceClass").await {
+        Some(value) => value.as_string().map(str::to_owned),
+        None => {
+            tracing::warn!(target: "watch_setup", "watch class unavailable; continuing");
+            None
+        }
+    }
+}
+
 // Await cleanup after success, errors and local timeouts. A cleanup failure must
 // not be reported as a fully successful preparation operation.
 async fn finish<T>(
@@ -256,42 +291,59 @@ pub async fn prepare_watch(
     let port = forward(&provider, LOCKDOWN, "com.apple.mobile.lockdownd").await?;
     let result = async {
         let mut lockdown = LockdownClient::new(connect_forwarded(&provider, port).await?);
-        let pairing = if action == Action::Pair {
-            let phone_pairing =
-                step("无法读取 iPhone 配对信息。", provider.get_pairing_file()).await?;
-            let result = tokio::time::timeout(
-                Duration::from_secs(45),
-                lockdown.pair(
-                    phone_pairing.host_id,
-                    phone_pairing.system_buid,
-                    Some("WatchBridge"),
-                ),
+        // Reuse a session that still authenticates instead of pairing again. A
+        // trusted Watch does not need a second pairing round, and repeating it can
+        // leave the session in a state where value queries stop answering.
+        let mut reused = None;
+        if let Some(session) = cached.as_ref() {
+            if let Ok(legacy) = step(
+                "无法验证手表信任，请重新配对手表。",
+                lockdown.start_session(&session.pairing),
             )
-            .await;
-            match result {
-                Ok(Ok(record)) => record,
-                Ok(Err(IdeviceError::UserDeniedPairing)) => {
-                    return Err(fail("手表拒绝了信任请求，请再次配对并在手表上允许。"));
+            .await
+            {
+                reused = Some((session.pairing.clone(), legacy));
+            }
+        }
+        let (pairing, legacy) = match reused {
+            Some(pair) => pair,
+            None => {
+                if action != Action::Pair {
+                    sessions.0.lock().unwrap().remove(&cache_key);
+                    return Err(fail("手表信任已失效，请点击“配对手表”重新建立会话。"));
                 }
-                _ => return Err(fail("手表配对未完成。请解锁手表并确认信任提示，然后重试。")),
-            }
-        } else {
-            match cached.as_ref() {
-                Some(session) => session.pairing.clone(),
-                None => return Err(fail("请先点击“配对手表”，在手表上确认信任后再重试。")),
-            }
-        };
-        // A record is admitted only after a successful authenticated session.
-        let legacy = match step(
-            "无法验证手表信任，请重新配对手表。",
-            lockdown.start_session(&pairing),
-        )
-        .await
-        {
-            Ok(legacy) => legacy,
-            Err(error) => {
-                sessions.0.lock().unwrap().remove(&cache_key);
-                return Err(error);
+                let phone_pairing =
+                    step("无法读取 iPhone 配对信息。", provider.get_pairing_file()).await?;
+                let result = tokio::time::timeout(
+                    Duration::from_secs(45),
+                    lockdown.pair(
+                        phone_pairing.host_id,
+                        phone_pairing.system_buid,
+                        Some("WatchBridge"),
+                    ),
+                )
+                .await;
+                let pairing = match result {
+                    Ok(Ok(record)) => record,
+                    Ok(Err(IdeviceError::UserDeniedPairing)) => {
+                        return Err(fail("手表拒绝了信任请求，请再次配对并在手表上允许。"));
+                    }
+                    _ => return Err(fail("手表配对未完成。请解锁手表并确认信任提示，然后重试。")),
+                };
+                // A record is admitted only after a successful authenticated session.
+                let legacy = match step(
+                    "无法验证手表信任，请重新配对手表。",
+                    lockdown.start_session(&pairing),
+                )
+                .await
+                {
+                    Ok(legacy) => legacy,
+                    Err(error) => {
+                        sessions.0.lock().unwrap().remove(&cache_key);
+                        return Err(error);
+                    }
+                };
+                (pairing, legacy)
             }
         };
         let actual_id = step(
@@ -306,25 +358,12 @@ pub async fn prepare_watch(
         // Read the identity from the forwarded Watch instead of the companion-proxy
         // registry: the registry answers the device list reliably, but not value
         // queries, on current iOS versions.
-        let name = step(
-            "无法读取手表信息，请保持手表解锁后重试。",
-            lockdown.get_value(Some("DeviceName"), None),
-        )
-        .await?
-        .as_string()
-        .unwrap_or("Apple Watch")
-        .to_owned();
-        let device_class = step(
-            "无法确认转发目标，请断开连接后重试。",
-            lockdown.get_value(Some("DeviceClass"), None),
-        )
-        .await?
-        .as_string()
-        .unwrap_or_default()
-        .to_owned();
-        if device_class != "Watch" {
-            sessions.0.lock().unwrap().remove(&cache_key);
-            return Err(fail("转发到的设备不是 Apple Watch，请断开连接后重试。"));
+        let name = watch_name(&mut lockdown).await;
+        if let Some(device_class) = watch_class(&mut lockdown).await {
+            if device_class != "Watch" {
+                sessions.0.lock().unwrap().remove(&cache_key);
+                return Err(fail("转发到的设备不是 Apple Watch，请断开连接后重试。"));
+            }
         }
         sessions.0.lock().unwrap().insert(
             cache_key.clone(),
