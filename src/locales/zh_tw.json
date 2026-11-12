@@ -80,7 +80,8 @@
     "max_certs_desc": "iloader 將撤銷您現有的憑證並產生一個新的。",
     "hide_certificate_list": "隱藏憑證列表",
     "choose_what_to_revoke": "選擇要撤銷的內容",
-    "continue": "繼續"
+    "continue": "繼續",
+    "no_keyring_available": "無法在此裝置上儲存憑證。"
   },
   "device": {
     "title": "iDevice",
@@ -91,7 +92,11 @@
     "found_devices": "找到裝置",
     "unable_load_devices_prefix": "無法載入裝置：",
     "no_devices_found_period": "未找到裝置。",
-    "selected": "已選擇"
+    "selected": "已選擇",
+    "failed_select": "無法選擇裝置",
+    "pairing_cancel": "取消",
+    "pairing_in_progress_header": "正在與 {{device}} 配對...",
+    "pairing_in_progress_hint": "請解鎖您的裝置並點一下「信任」，若出現提示請輸入密碼。"
   },
   "operation": {
     "failed": "操作失敗。",
@@ -165,7 +170,8 @@
     "pairing_file_exported_success": "配對檔案匯出成功！",
     "failed_export_pairing_file": "匯出配對檔案失敗",
     "export_not_recommended": "匯出（不建議）",
-    "refresh_installed_apps": "重新整理已安裝的應用程式"
+    "refresh_installed_apps": "重新整理已安裝的應用程式",
+    "place_all": "放置到所有 App"
   },
   "settings": {
     "anisette_server": "Anisette 伺服器：",
@@ -189,7 +195,15 @@
     "info": "資訊",
     "warn": "警告",
     "error": "錯誤",
-    "language_hint": "您可以<translation>在此</translation>協助改善翻譯。"
+    "language_hint": "您可以<translation>在此</translation>協助改善翻譯。",
+    "anisette_state_not_found": "沒有可重設的 anisette 狀態",
+    "delete_stored_rppairing": "刪除已儲存的配對",
+    "delete_stored_rppairing_message": "確定要刪除此裝置已儲存的配對檔案嗎？這將需要重新配對。",
+    "deleting_stored_rppairing": "正在刪除已儲存的配對...",
+    "dont_use_keyring": "不使用金鑰環",
+    "dont_use_keyring_message": "這會將配對檔案、anisette 狀態與憑證存放在磁碟上，降低 WatchBridge 的安全性。只有在預設金鑰環儲存無法運作且您瞭解風險時，才啟用此選項。",
+    "failed_delete_stored_rppairing": "刪除已儲存的配對失敗",
+    "stored_rppairing_deleted_success": "已成功刪除儲存的配對！"
   },
   "dialog": {
     "confirm": "確認",
@@ -198,12 +212,114 @@
   "error": {
     "title": "發生錯誤：{{msg}}",
     "unknown": "未知",
-    "support_message": "如果問題仍然存在，請按「複製到剪貼簿」，並附上複製的錯誤訊息提交 <github>GitHub issue</github>。"
+    "support_message": "如果問題仍然存在，請按「複製到剪貼簿」，並附上複製的錯誤訊息提交 <github>GitHub issue</github>。",
+    "suggestions_heading": "建議"
   },
   "update": {
     "new_version_available": "有新版本可用：{{version}}。是否要更新？",
     "updating": "正在更新...",
     "downloaded_restarting": "更新已下載！正在重新啟動應用程式...",
     "failed_download": "下載更新失敗：{{error}}"
+  },
+  "apps": {
+    "account": "已儲存的帳號",
+    "action_failed": "動作無法完成。請開啟「檢視詳情」查看已儲存的結果。",
+    "action_finished": "App 動作已完成。下方狀態反映其續簽設定。",
+    "app_actions": "{{app}} 的動作",
+    "archive": "保留的原始 SHA-256",
+    "bundle": "Bundle ID",
+    "catalog_busy": "安裝進行中。完成後清單將會更新。",
+    "close_details": "關閉詳情",
+    "confirm_remove": "移除安裝設定",
+    "consent": "使用已儲存的帳號，透過 Wi-Fi 安裝 iPhone App 並自動續簽。請保持 WatchBridge 執行中，並讓電腦保持喚醒。",
+    "details": "檢視詳情",
+    "details_for": "{{app}} 的詳情",
+    "empty": "尚未管理任何 App",
+    "empty_hint": "選擇「安裝並自動續簽」來新增第一個手機 App。",
+    "evidence_hint": "到期時間來自已簽章的產物，而非讀取已安裝的描述檔。不會自動宣稱您已開啟 App 或已驗證其資料。Watch 的自動續簽仍無法使用。",
+    "install_auto": "安裝並自動續簽",
+    "install_once": "單次安裝",
+    "install_once_hint": "適用於 USB、Watch 套件或單次安裝。",
+    "last_success": "先前記錄的成功安裝",
+    "more_install": "更多安裝選項",
+    "next_check": "下次本機檢查",
+    "pause": "暫停",
+    "pause_finished": "已暫停。任何進行中的安裝都會完成。",
+    "pending_explanation": "最近一次安裝尚未完全提交。下方的描述檔僅供參考，無法證明目前安裝的是哪個 IPA。繼續可完成已驗證的安裝，無需重新安裝；否則請先檢視結果再進行復原。",
+    "phone_id": "已儲存的手機 ID",
+    "recover": "復原並續簽",
+    "recover_before_remove": "移除此帳號中失敗的 App 前，請先從「檢視詳情」復原此帳號。",
+    "recover_explanation": "此手動復原會使用目前保留的 IPA 嘗試一次。只有在驗證成功後，才會清除此 App 的帳號停用狀態。待處理的替換不會自動重播。",
+    "remove": "從自動續簽中移除",
+    "remove_explanation": "要將 {{app}} 從自動續簽中移除嗎？已安裝的 App 和您的原始 IPA 檔案都會保留。",
+    "renew": "立即續簽",
+    "replace": "取代 IPA",
+    "requirements": "請登入並透過 Wi-Fi 選擇您的 iPhone，以安裝新的 App。",
+    "resume": "繼續",
+    "settings_details": "續簽設定與疑難排解",
+    "startup": "登入 Windows 時在系統匣啟動 WatchBridge",
+    "startup_hint": "使用這份 WatchBridge。您的續簽與暫停設定維持不變。Windows 可能延後啟動；若未啟動，請檢查 Windows 的啟動設定。",
+    "startup_read_failed": "無法讀取 Windows 啟動狀態。其他續簽控制項仍可使用。",
+    "subtitle": "單次安裝。讓您選擇的 App 持續續簽。",
+    "team": "簽章團隊",
+    "title": "您的 App",
+    "troubleshooting": "Wi-Fi 疑難排解",
+    "unavailable": "此版本無法使用自動續簽。仍可使用單次安裝。",
+    "unknown": "尚未記錄",
+    "waiting_history": "連線檢查時手機已鎖定或無法連線",
+    "waiting_next": "已排定於 {{date}} 重試",
+    "working": "處理中…"
+  },
+  "renewal": {
+    "attempt_stage": "最近一次續簽活動",
+    "close_to_tray": "關閉視窗時讓 WatchBridge 繼續在系統匣執行",
+    "previous_failure": "先前的失敗記錄",
+    "session_stage_label": "已儲存帳號階段"
+  },
+  "wifi": {
+    "attempt_time": "嘗試完成時間：{{time}}",
+    "check": "檢查 iPhone 的 Wi-Fi 服務",
+    "connection_stage": "最後階段：{{stage}}",
+    "copy_report": "複製安全結果報告",
+    "direct": "Wi-Fi（直連）",
+    "evidence": "這些到期日來自已簽章的 App，而非讀取裝置。已安裝表示安裝程式回報成功。請確認 App 在兩台裝置上都能開啟；Watch 的啟動情形，以及能否存活超過先前的到期日，仍待檢查。",
+    "http_status": "HTTP 狀態：{{code}}",
+    "installation_error": "安裝程式錯誤：{{name}}",
+    "installation_library_code": "裝置資料庫錯誤碼：{{code}} / {{subcode}}（非 Apple 服務錯誤碼）",
+    "installation_platform_code": "平台錯誤碼：{{code}}",
+    "installation_stage": "安裝階段：{{stage}}",
+    "installation_uncertain": "安裝請求可能在通訊中斷前已送達手機。重試前請先確認安裝狀態；單憑看見圖示無法證明已安裝或可啟動。",
+    "installation_unclassified": "手機未提供可辨識的拒絕原因。詳情請參閱日誌。",
+    "instructions": "請拔除 USB，讓已信任的 iPhone 與 Watch 保持在附近，然後重新整理裝置清單。請選擇與已安裝 App 相同的原始 IPA。此動作會重新簽章並安裝。不會自動執行任何操作。",
+    "profile_expiry": "已簽章描述檔到期",
+    "renew": "選擇 IPA 並立即續簽",
+    "request_failed": "請求無法完成。請重新開啟 App 並確認其狀態後再試一次。",
+    "select_direct": "請選擇手機的 Wi-Fi 項目。若找不到，請檢查區域網路與既有的配對設定。",
+    "service_code": "服務錯誤碼：{{code}}",
+    "services": "AFC 讀取：{{afc}} · 安裝服務查詢：{{proxy}}",
+    "signing": "簽章中",
+    "signing_stage": "簽章階段：{{stage}} · {{component}}",
+    "title": "透過 Wi-Fi 續簽",
+    "unknown": "未知",
+    "watch_not_checked": "此連線檢查不會驗證 Watch 是否就緒、App 簽章或安裝狀態。",
+    "working": "處理中… 請保持此視窗開啟。"
+  },
+  "wifiRepair": {
+    "cancel": "若尚未送出請取消",
+    "close": "關閉",
+    "explanation": "請讓此已選擇的裝置保持 USB 連線。這會重新建立此電腦與手機的配對，並啟用 Wi-Fi 連線。既有的 App 安裝與個別的 RemotePairing 資料都會保留。",
+    "open": "修復 Wi-Fi 配對…",
+    "phonePrompt": "請解鎖手機。若出現提示，請在手機上點一下「信任」並輸入密碼。WatchBridge 絕不會要求您輸入手機密碼。",
+    "requestFailed": "未收到可靠的修復結果。配對可能已變更。裝置選擇已清除；請檢查 USB 連線並重新選擇手機後再繼續。",
+    "retryLimit": "重試未能完成配對。請關閉此對話方塊，檢查手機後再開始另一次修復。",
+    "target": "要修復的 USB 裝置",
+    "title": "修復 {{device}} 的配對"
+  },
+  "wifiSetup": {
+    "button": "設定 Wi-Fi",
+    "done": "Wi-Fi 設定完成。請重新整理裝置清單，以查看手機的 Wi-Fi 項目。",
+    "failed": "Wi-Fi 設定失敗",
+    "hint": "讓此電腦能透過 Wi-Fi 連線到手機：開啟手機的 Wi-Fi 連線設定，並建立供 Wi-Fi 安裝使用的配對信任。請保持手機解鎖並以 USB 連接。若要復原，請在手機上重設「位置與隱私權」。",
+    "working": "正在設定 Wi-Fi… 請保持手機解鎖並以 USB 連接。"
   }
 }

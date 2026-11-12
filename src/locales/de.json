@@ -78,7 +78,10 @@
     "max_certs_desc": "iloader widerruft deine vorhandenen Zertifikate und erstellt ein neues.",
     "hide_certificate_list": "Zertifikatliste ausblenden",
     "choose_what_to_revoke": "Auswählen, was widerrufen werden soll",
-    "continue": "Weiter"
+    "continue": "Weiter",
+    "no_keyring_available": "Anmeldedaten können auf diesem Gerät nicht gespeichert werden.",
+    "revoke_count": "{{count}} Zertifikat(e) werden widerrufen",
+    "revoke_warning": "Durch das Widerrufen eines Zertifikats werden bereits damit signierte Apps ungültig; sie müssen erneut signiert werden."
   },
   "device": {
     "title": "iDevice",
@@ -89,7 +92,11 @@
     "found_devices": "Geräte gefunden",
     "unable_load_devices_prefix": "Geräte konnten nicht geladen werden: ",
     "no_devices_found_period": "Keine Geräte gefunden.",
-    "selected": "Ausgewählt"
+    "selected": "Ausgewählt",
+    "failed_select": "Gerät konnte nicht ausgewählt werden",
+    "pairing_cancel": "Abbrechen",
+    "pairing_in_progress_header": "Kopplung mit {{device}}...",
+    "pairing_in_progress_hint": "Bitte entsperre dein Gerät, tippe auf „Vertrauen“ und gib bei Aufforderung deinen Code ein."
   },
   "operation": {
     "failed": "Vorgang fehlgeschlagen.",
@@ -163,7 +170,8 @@
     "pairing_file_exported_success": "Pairing-Datei erfolgreich exportiert!",
     "failed_export_pairing_file": "Pairing-Datei konnte nicht exportiert werden",
     "export_not_recommended": "Exportieren (Nicht empfohlen)",
-    "refresh_installed_apps": "Installierte Apps aktualisieren"
+    "refresh_installed_apps": "Installierte Apps aktualisieren",
+    "place_all": "In alle Apps ablegen"
   },
   "settings": {
     "anisette_server": "Anisette-Server:",
@@ -184,7 +192,18 @@
     "info": "Info",
     "warn": "Warnung",
     "error": "Fehler",
-    "language_hint": "Du kannst <translation>hier</translation> bei der Übersetzung helfen."
+    "language_hint": "Du kannst <translation>hier</translation> bei der Übersetzung helfen.",
+    "anisette_state_not_found": "Kein Anisette-Zustand zum Zurücksetzen",
+    "delete_stored_rppairing": "Gespeicherte Kopplung löschen",
+    "delete_stored_rppairing_message": "Möchtest du die gespeicherte Pairing-Datei für dieses Gerät wirklich löschen? Danach ist eine erneute Kopplung erforderlich.",
+    "deleting_stored_rppairing": "Gespeicherte Kopplung wird gelöscht...",
+    "dont_use_keyring": "Schlüsselbund nicht verwenden",
+    "dont_use_keyring_message": "Dies macht WatchBridge unsicherer, da Pairing-Dateien, Anisette-Zustand und Zertifikate auf der Festplatte gespeichert werden. Aktiviere dies nur, wenn die standardmäßige Schlüsselbund-Speicherung nicht funktioniert und du die Risiken kennst.",
+    "export_logs": "Logs exportieren",
+    "export_logs_failed": "Logs konnten nicht exportiert werden",
+    "export_logs_success": "{{files}} Datei(en) mit {{size}} KB nach {{path}} exportiert",
+    "failed_delete_stored_rppairing": "Gespeicherte Kopplung konnte nicht gelöscht werden",
+    "stored_rppairing_deleted_success": "Gespeicherte Kopplung erfolgreich gelöscht!"
   },
   "dialog": {
     "confirm": "Bestätigen",
@@ -193,12 +212,114 @@
   "error": {
     "title": "Ein Fehler ist aufgetreten: {{msg}}",
     "unknown": "Unbekannt",
-    "support_message": "Wenn das Problem weiterhin besteht, klicke auf „In die Zwischenablage kopieren“ und öffne mit der kopierten Fehlermeldung ein <github>GitHub-Issue</github>."
+    "support_message": "Wenn das Problem weiterhin besteht, klicke auf „In die Zwischenablage kopieren“ und öffne mit der kopierten Fehlermeldung ein <github>GitHub-Issue</github>.",
+    "suggestions_heading": "Vorschläge"
   },
   "update": {
     "new_version_available": "Eine neue Version ist verfügbar: {{version}}. Möchtest du aktualisieren?",
     "updating": "Wird aktualisiert...",
     "downloaded_restarting": "Update heruntergeladen! App wird neu gestartet...",
     "failed_download": "Update konnte nicht heruntergeladen werden: {{error}}"
+  },
+  "apps": {
+    "account": "Gespeichertes Konto",
+    "action_failed": "Die Aktion konnte nicht abgeschlossen werden. Öffne „Details anzeigen“, um das gespeicherte Ergebnis zu prüfen.",
+    "action_finished": "App-Aktion abgeschlossen. Der Status unten spiegelt die Erneuerungseinstellungen wider.",
+    "app_actions": "Aktionen für {{app}}",
+    "archive": "Ursprüngliche SHA-256 beibehalten",
+    "bundle": "Bundle-ID",
+    "catalog_busy": "Installation läuft. Die Liste wird nach Abschluss aktualisiert.",
+    "close_details": "Details schließen",
+    "confirm_remove": "Einrichtung entfernen",
+    "consent": "Installiere eine iPhone-App und erneuere sie automatisch per WLAN mit deinem gespeicherten Konto. Lass WatchBridge laufen und halte deinen PC wach.",
+    "details": "Details anzeigen",
+    "details_for": "Details für {{app}}",
+    "empty": "Noch keine Apps verwaltet",
+    "empty_hint": "Wähle „Installieren & automatisch erneuern“, um deine erste Telefon-App hinzuzufügen.",
+    "evidence_hint": "Das Ablaufdatum stammt aus dem signierten Artefakt, nicht aus einem Rücklesen des installierten Profils. Es wird nicht automatisch behauptet, dass du die App geöffnet oder ihre Daten geprüft hast. Die automatische Erneuerung für die Watch ist weiterhin nicht verfügbar.",
+    "install_auto": "Installieren & automatisch erneuern",
+    "install_once": "Einmalig installieren",
+    "install_once_hint": "Für USB, Watch-Pakete oder eine einmalige Installation.",
+    "last_success": "Zuletzt erfasste erfolgreiche Installation",
+    "more_install": "Weitere Installationsoptionen",
+    "next_check": "Nächste lokale Prüfung",
+    "pause": "Pausieren",
+    "pause_finished": "Pausiert. Eine bereits laufende Installation wird noch abgeschlossen.",
+    "pending_explanation": "Die letzte Installation wurde nicht vollständig abgeschlossen. Das folgende Profil ist historisch; es belegt nicht, welche IPA aktuell installiert ist. Fortsetzen kann eine bereits validierte Installation abschließen, ohne neu zu installieren. Prüfe andernfalls das Ergebnis, bevor du die Wiederherstellung startest.",
+    "phone_id": "Gespeicherte Telefon-ID",
+    "recover": "Wiederherstellen & erneuern",
+    "recover_before_remove": "Stelle dieses Konto über „Details anzeigen“ wieder her, bevor du die zugehörige fehlerhafte App entfernst.",
+    "recover_explanation": "Diese ausdrückliche Wiederherstellung versucht einmalig die aktuell beibehaltene IPA. Die Kontosperre dieser App wird erst nach einem validierten Erfolg aufgehoben. Ein ausstehender Austausch wird nicht automatisch wiederholt.",
+    "remove": "Aus der automatischen Erneuerung entfernen",
+    "remove_explanation": "{{app}} aus der automatischen Erneuerung entfernen? Die installierte App und deine ursprüngliche IPA-Datei bleiben erhalten.",
+    "renew": "Jetzt erneuern",
+    "replace": "IPA ersetzen",
+    "requirements": "Melde dich an und wähle dein iPhone per WLAN aus, um eine neue App zu installieren.",
+    "resume": "Fortsetzen",
+    "settings_details": "Erneuerungseinstellungen und Fehlerbehebung",
+    "startup": "WatchBridge beim Anmelden an Windows im Infobereich starten",
+    "startup_hint": "Verwendet diese WatchBridge-Installation. Deine Erneuerungs- und Pauseneinstellungen bleiben unverändert. Windows kann den Start verzögern; prüfe die Windows-Starteinstellungen, falls die App nicht startet.",
+    "startup_read_failed": "Der Windows-Startstatus konnte nicht gelesen werden. Die übrigen Erneuerungssteuerungen bleiben verfügbar.",
+    "subtitle": "Einmal installieren. Deine gewählten Apps erneuert halten.",
+    "team": "Signier-Team",
+    "title": "Deine Apps",
+    "troubleshooting": "WLAN-Fehlerbehebung",
+    "unavailable": "Die automatische Erneuerung ist in dieser Version nicht verfügbar. Die einmalige Installation bleibt verfügbar.",
+    "unknown": "Noch nicht erfasst",
+    "waiting_history": "Telefon während der Verbindungsprüfung gesperrt oder nicht erreichbar",
+    "waiting_next": "Neuer Versuch geplant: {{date}}",
+    "working": "Wird ausgeführt…"
+  },
+  "renewal": {
+    "attempt_stage": "Letzte Erneuerungsaktivität",
+    "close_to_tray": "WatchBridge im Infobereich weiterlaufen lassen, wenn ich das Fenster schließe",
+    "previous_failure": "Erfasster Fehlerverlauf",
+    "session_stage_label": "Phase des gespeicherten Kontos"
+  },
+  "wifi": {
+    "attempt_time": "Versuch abgeschlossen: {{time}}",
+    "check": "iPhone-WLAN-Dienste prüfen",
+    "connection_stage": "Letzte Phase: {{stage}}",
+    "copy_report": "Bereinigten Ergebnisbericht kopieren",
+    "direct": "WLAN (direkt)",
+    "evidence": "Diese Ablaufdaten stammen aus der signierten App, nicht aus einem Rücklesen der Geräte. „Installiert“ bedeutet, dass der Installer Erfolg gemeldet hat. Prüfe, ob die App auf beiden Geräten startet; der Start auf der Watch und ob sie das bisherige Ablaufdatum übersteht, sind weiterhin zu prüfen.",
+    "http_status": "HTTP-Status: {{code}}",
+    "installation_error": "Installer-Fehler: {{name}}",
+    "installation_library_code": "Fehlercode der Gerätebibliothek: {{code}} / {{subcode}} (kein Apple-Dienstcode)",
+    "installation_platform_code": "Plattform-Fehlercode: {{code}}",
+    "installation_stage": "Installationsphase: {{stage}}",
+    "installation_uncertain": "Die Installationsanfrage hat das Telefon möglicherweise noch erreicht, bevor die Verbindung abbrach. Prüfe den Installationsstatus, bevor du es erneut versuchst; ein sichtbares Symbol allein belegt weder Installation noch Start.",
+    "installation_unclassified": "Das Telefon hat keinen erkannten Grund für die Ablehnung geliefert. Details findest du im Log.",
+    "instructions": "Trenne USB, halte dein vertrauenswürdiges iPhone und die Watch in der Nähe und aktualisiere die Geräteliste. Wähle dieselbe ursprüngliche IPA, die für die installierte App verwendet wurde. Diese Aktion signiert und installiert sie erneut. Es läuft nichts automatisch ab.",
+    "profile_expiry": "Ablauf des signierten Profils",
+    "renew": "IPA wählen und jetzt erneuern",
+    "request_failed": "Die Anfrage konnte nicht abgeschlossen werden. Öffne die App erneut und prüfe ihren Status, bevor du es noch einmal versuchst.",
+    "select_direct": "Wähle den WLAN-Eintrag des Telefons. Fehlt er, prüfe das lokale Netzwerk und die bestehende Kopplung.",
+    "service_code": "Dienst-Fehlercode: {{code}}",
+    "services": "AFC-Lesen: {{afc}} · Suche nach Installationsdienst: {{proxy}}",
+    "signing": "Signieren",
+    "signing_stage": "Signierphase: {{stage}} · {{component}}",
+    "title": "Per WLAN erneuern",
+    "unknown": "Unbekannt",
+    "watch_not_checked": "Diese Verbindungsprüfung prüft weder die Bereitschaft der Watch noch App-Signierung oder Installation.",
+    "working": "Wird ausgeführt… Lass dieses Fenster geöffnet."
+  },
+  "wifiRepair": {
+    "cancel": "Abbrechen, falls noch nicht gesendet",
+    "close": "Schließen",
+    "explanation": "Lass das ausgewählte Gerät per USB verbunden. Dadurch wird die Kopplung dieses Computers mit dem Telefon erneuert und WLAN-Verbindungen werden ermöglicht. Bestehende App-Installationen und separate RemotePairing-Daten bleiben erhalten.",
+    "open": "WLAN-Kopplung reparieren…",
+    "phonePrompt": "Entsperre das Telefon. Tippe auf „Vertrauen“ und gib den Code am Telefon ein, falls du gefragt wirst. WatchBridge fragt niemals nach dem Code deines Telefons.",
+    "requestFailed": "Es wurde kein verlässliches Reparaturergebnis empfangen. Die Kopplung hat sich möglicherweise geändert. Die Geräteauswahl wurde zurückgesetzt; prüfe die USB-Verbindung und wähle das Telefon erneut aus, bevor du fortfährst.",
+    "retryLimit": "Der erneute Versuch hat die Kopplung nicht abgeschlossen. Schließe diesen Dialog und prüfe das Telefon, bevor du eine weitere Reparatur startest.",
+    "target": "USB-Gerät für die Reparatur",
+    "title": "Kopplung für {{device}} reparieren"
+  },
+  "wifiSetup": {
+    "button": "WLAN einrichten",
+    "done": "WLAN ist eingerichtet. Aktualisiere die Geräteliste, um den WLAN-Eintrag des Telefons zu sehen.",
+    "failed": "WLAN-Einrichtung fehlgeschlagen",
+    "hint": "Ermöglicht diesem Computer den Zugriff auf das Telefon per WLAN: aktiviert die WLAN-Verbindungseinstellung des Telefons und erstellt eine Kopplungsvertrauensstellung für WLAN-Installationen. Lass das Telefon entsperrt und per USB verbunden. Zum Rückgängigmachen setze „Standort & Datenschutz“ am Telefon zurück.",
+    "working": "WLAN wird eingerichtet… Lass das Telefon entsperrt und per USB verbunden."
   }
 }

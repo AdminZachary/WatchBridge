@@ -78,7 +78,10 @@
     "max_certs_desc": "iloader revocará tus certificados existentes y generará uno nuevo.",
     "hide_certificate_list": "Ocultar lista de certificados",
     "choose_what_to_revoke": "Elige qué revocar",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "no_keyring_available": "No se pueden guardar las credenciales en este dispositivo.",
+    "revoke_count": "Se revocarán {{count}} certificado(s)",
+    "revoke_warning": "Revocar un certificado invalida las apps ya firmadas con él; deberás firmarlas de nuevo."
   },
   "device": {
     "title": "iDevice",
@@ -89,7 +92,11 @@
     "found_devices": "Dispositivos encontrados",
     "unable_load_devices_prefix": "No se pueden cargar los dispositivos: ",
     "no_devices_found_period": "No se encontraron dispositivos.",
-    "selected": "Seleccionado"
+    "selected": "Seleccionado",
+    "failed_select": "No se pudo seleccionar el dispositivo",
+    "pairing_cancel": "Cancelar",
+    "pairing_in_progress_header": "Emparejando con {{device}}...",
+    "pairing_in_progress_hint": "Desbloquea tu dispositivo y haz clic en \"Confiar\"; luego ingresa tu código de acceso si se te solicita."
   },
   "operation": {
     "failed": "La operación falló.",
@@ -163,7 +170,8 @@
     "pairing_file_exported_success": "¡Archivo de emparejamiento exportado con éxito!",
     "failed_export_pairing_file": "Error al exportar archivo de emparejamiento",
     "export_not_recommended": "Exportar (No recomendado)",
-    "refresh_installed_apps": "Actualizar aplicaciones instaladas"
+    "refresh_installed_apps": "Actualizar aplicaciones instaladas",
+    "place_all": "Colocar en todas las apps"
   },
   "settings": {
     "anisette_server": "Servidor Anisette:",
@@ -184,7 +192,18 @@
     "info": "Información",
     "warn": "Advertencia",
     "error": "Error",
-    "language_hint": "Puedes ayudar con las traducciones <translation>aquí</translation>."
+    "language_hint": "Puedes ayudar con las traducciones <translation>aquí</translation>.",
+    "anisette_state_not_found": "No hay estado de Anisette para restablecer",
+    "delete_stored_rppairing": "Eliminar emparejamiento guardado",
+    "delete_stored_rppairing_message": "¿Estás seguro de que deseas eliminar el archivo de emparejamiento guardado para este dispositivo? Tendrás que emparejar de nuevo.",
+    "deleting_stored_rppairing": "Eliminando el emparejamiento guardado...",
+    "dont_use_keyring": "No usar el llavero",
+    "dont_use_keyring_message": "Esto hace que WatchBridge sea menos segura al guardar los archivos de emparejamiento, el estado de Anisette y los certificados en el disco. Actívalo solo si el almacenamiento del llavero predeterminado no funciona y entiendes los riesgos.",
+    "export_logs": "Exportar registros",
+    "export_logs_failed": "No se pudieron exportar los registros",
+    "export_logs_success": "Se exportaron {{files}} archivo(s), {{size}} KB a {{path}}",
+    "failed_delete_stored_rppairing": "No se pudo eliminar el emparejamiento guardado",
+    "stored_rppairing_deleted_success": "¡Emparejamiento guardado eliminado con éxito!"
   },
   "dialog": {
     "confirm": "Confirmar",
@@ -193,12 +212,114 @@
   "error": {
     "title": "Ocurrió un error: {{msg}}",
     "unknown": "Desconocido",
-    "support_message": "Si el problema continúa, pulsa \"Copiar al portapapeles\" y abre un <github>issue en GitHub</github> con el error copiado."
+    "support_message": "Si el problema continúa, pulsa \"Copiar al portapapeles\" y abre un <github>issue en GitHub</github> con el error copiado.",
+    "suggestions_heading": "Sugerencias"
   },
   "update": {
     "new_version_available": "Hay una nueva versión disponible: {{version}}. ¿Deseas actualizar?",
     "updating": "Actualizando...",
     "downloaded_restarting": "¡Actualización descargada! Reiniciando la aplicación...",
     "failed_download": "Error al descargar la actualización: {{error}}"
+  },
+  "apps": {
+    "account": "Cuenta guardada",
+    "action_failed": "La acción no pudo completarse. Abre Ver detalles para revisar el resultado guardado.",
+    "action_finished": "La acción de la app terminó. El estado a continuación refleja su configuración de renovación.",
+    "app_actions": "Acciones para {{app}}",
+    "archive": "SHA-256 original conservado",
+    "bundle": "Bundle ID",
+    "catalog_busy": "Instalación en curso. La lista se actualizará cuando termine.",
+    "close_details": "Cerrar detalles",
+    "confirm_remove": "Quitar configuración",
+    "consent": "Instala una app del iPhone y renuévala automáticamente por Wi-Fi con tu cuenta guardada. Mantén WatchBridge en ejecución y evita que tu PC se suspenda.",
+    "details": "Ver detalles",
+    "details_for": "Detalles de {{app}}",
+    "empty": "Aún no hay apps administradas",
+    "empty_hint": "Elige Instalar y autorrenovar para agregar tu primera app del teléfono.",
+    "evidence_hint": "La expiración proviene del artefacto firmado, no de una relectura del perfil instalado. Ningún estado automático afirma que abriste la app o que verificaste sus datos. La renovación automática en el Watch sigue sin estar disponible.",
+    "install_auto": "Instalar y autorrenovar",
+    "install_once": "Instalar una vez",
+    "install_once_hint": "Para USB, paquetes del Watch o una instalación única.",
+    "last_success": "Instalación exitosa registrada anteriormente",
+    "more_install": "Más opciones de instalación",
+    "next_check": "Próxima verificación local",
+    "pause": "Pausar",
+    "pause_finished": "En pausa. Cualquier instalación ya en curso terminará.",
+    "pending_explanation": "La última instalación no se ha confirmado por completo. El perfil de abajo es histórico; no prueba qué IPA está instalado actualmente. Reanudar puede terminar una instalación ya validada sin volver a instalarla. De lo contrario, revisa el resultado antes de recuperar.",
+    "phone_id": "ID del teléfono guardado",
+    "recover": "Recuperar y renovar",
+    "recover_before_remove": "Recupera esta cuenta desde Ver detalles antes de quitar su app con fallas.",
+    "recover_explanation": "Esta recuperación explícita hace un único intento con el IPA retenido actualmente. Solo puede quitar el bloqueo de cuenta de esta app después de un éxito validado. Un reemplazo pendiente no se repite automáticamente.",
+    "remove": "Quitar de la renovación automática",
+    "remove_explanation": "¿Quitar {{app}} de la renovación automática? Su app instalada y tu archivo IPA original se mantienen.",
+    "renew": "Renovar ahora",
+    "replace": "Reemplazar IPA",
+    "requirements": "Inicia sesión y selecciona tu iPhone por Wi-Fi para instalar una nueva app.",
+    "resume": "Reanudar",
+    "settings_details": "Configuración de renovación y solución de problemas",
+    "startup": "Iniciar WatchBridge en la bandeja del sistema al iniciar sesión en Windows",
+    "startup_hint": "Usa esta copia de WatchBridge. Tu configuración de renovación y pausa no cambia. Windows puede retrasar el inicio; revisa la configuración de Inicio de Windows si no se inicia.",
+    "startup_read_failed": "No se pudo leer el estado de inicio de Windows. Los demás controles de renovación siguen disponibles.",
+    "subtitle": "Instala una vez. Mantén renovadas las apps que elijas.",
+    "team": "Equipo de firma",
+    "title": "Tus apps",
+    "troubleshooting": "Solución de problemas de Wi-Fi",
+    "unavailable": "La renovación automática no está disponible en esta compilación. Instalar una vez sigue disponible.",
+    "unknown": "Aún no registrado",
+    "waiting_history": "Teléfono bloqueado o inaccesible durante la verificación de conexión",
+    "waiting_next": "Reintento programado para {{date}}",
+    "working": "Procesando…"
+  },
+  "renewal": {
+    "attempt_stage": "Última actividad de renovación",
+    "close_to_tray": "Mantener WatchBridge en ejecución en la bandeja del sistema al cerrar la ventana",
+    "previous_failure": "Historial de fallos registrados",
+    "session_stage_label": "Etapa de la cuenta guardada"
+  },
+  "wifi": {
+    "attempt_time": "Intento completado: {{time}}",
+    "check": "Verificar servicios Wi-Fi del iPhone",
+    "connection_stage": "Última etapa: {{stage}}",
+    "copy_report": "Copiar informe de resultados sin datos sensibles",
+    "direct": "Wi-Fi (directo)",
+    "evidence": "Estas fechas de expiración provienen de la app firmada, no de una relectura de los dispositivos. Instalado significa que el instalador devolvió éxito. Verifica que la app se abra en ambos dispositivos; aún falta comprobar el inicio en el Watch y que siga funcionando después de la expiración anterior.",
+    "http_status": "Estado HTTP: {{code}}",
+    "installation_error": "Error del instalador: {{name}}",
+    "installation_library_code": "Código de error de la biblioteca del dispositivo: {{code}} / {{subcode}} (no es un código de servicio de Apple)",
+    "installation_platform_code": "Código de error de la plataforma: {{code}}",
+    "installation_stage": "Etapa de instalación: {{stage}}",
+    "installation_uncertain": "Es posible que la solicitud de instalación haya llegado al teléfono antes de que se interrumpiera la comunicación. Revisa el estado de instalación antes de reintentar; un ícono visible por sí solo no prueba que se haya instalado ni que se haya iniciado.",
+    "installation_unclassified": "El teléfono no dio un motivo reconocido para el rechazo. Consulta el registro para más detalles.",
+    "instructions": "Desconecta el USB, mantén cerca tu iPhone de confianza y tu Watch, y actualiza la lista de dispositivos. Elige el mismo IPA original que se usó para la app instalada. Esta acción lo firma y lo instala de nuevo. Nada se ejecuta automáticamente.",
+    "profile_expiry": "Expiración del perfil firmado",
+    "renew": "Elegir IPA y renovar ahora",
+    "request_failed": "La solicitud no pudo completarse. Vuelve a abrir la app y revisa su estado antes de intentarlo de nuevo.",
+    "select_direct": "Selecciona la entrada Wi-Fi del teléfono. Si no aparece, revisa la red local y la configuración de emparejamiento existente.",
+    "service_code": "Código de error del servicio: {{code}}",
+    "services": "Lectura AFC: {{afc}} · Búsqueda del servicio de instalación: {{proxy}}",
+    "signing": "Firmando",
+    "signing_stage": "Etapa de firma: {{stage}} · {{component}}",
+    "title": "Renovar por Wi-Fi",
+    "unknown": "Desconocido",
+    "watch_not_checked": "Esta comprobación de conexión no verifica la preparación del Watch, la firma de la app ni la instalación.",
+    "working": "Procesando… Mantén esta ventana abierta."
+  },
+  "wifiRepair": {
+    "cancel": "Cancelar si aún no se envió",
+    "close": "Cerrar",
+    "explanation": "Mantén este dispositivo seleccionado conectado por USB. Esto renueva el emparejamiento de esta computadora con el teléfono y habilita las conexiones Wi-Fi. Se conservan las instalaciones de apps existentes y los datos separados de RemotePairing.",
+    "open": "Reparar emparejamiento Wi-Fi…",
+    "phonePrompt": "Desbloquea el teléfono. Si se te pide, toca Confiar e ingresa el código de acceso en el teléfono. WatchBridge nunca te pide el código de acceso de tu teléfono.",
+    "requestFailed": "No se recibió un resultado de reparación confiable. El emparejamiento puede haber cambiado. Se borró la selección del dispositivo; revisa la conexión USB y vuelve a seleccionar el teléfono antes de continuar.",
+    "retryLimit": "El reintento no completó el emparejamiento. Cierra este diálogo y revisa el teléfono antes de iniciar otra reparación.",
+    "target": "Dispositivo USB a reparar",
+    "title": "Reparar emparejamiento de {{device}}"
+  },
+  "wifiSetup": {
+    "button": "Configurar Wi-Fi",
+    "done": "Wi-Fi está configurado. Actualiza la lista de dispositivos para ver la entrada Wi-Fi del teléfono.",
+    "failed": "La configuración de Wi-Fi falló",
+    "hint": "Permite que esta computadora llegue al teléfono por Wi-Fi: activa la opción de conexiones Wi-Fi del teléfono y crea una confianza de emparejamiento para instalaciones por Wi-Fi. Mantén el teléfono desbloqueado y conectado por USB. Para deshacerlo, restablece Ubicación y privacidad en el teléfono.",
+    "working": "Configurando Wi-Fi… Mantén el teléfono desbloqueado y conectado por USB."
   }
 }
