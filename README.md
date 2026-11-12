@@ -1,178 +1,59 @@
-> [!IMPORTANT]
-> **This is an unofficial fork of [iloader](https://github.com/nab138/iloader) by nab138.**
-> It is not affiliated with or endorsed by the original author. The official
-> project is at [iloader.app](https://iloader.app).
->
-> The fork adds, for **Windows**:
-> - **Apple Watch companion apps:** apps that contain a Watch app are installed
->   on the paired Apple Watch too, over USB or Wi-Fi.
-> - **Wi-Fi setup and installs:** set a phone up once over USB (**Set up Wi-Fi**),
->   then install and renew over the local network without a cable.
-> - **Automatic renewal** of iPhone apps with saved accounts, before their 7-day
->   signature expires, with tray controls and optional Windows startup. See
->   [automatic renewal](docs/automatic-renewal.md).
->
-> Download it from this fork's [releases](../../releases). It keeps its own data
-> and saved passwords, separate from the official iloader. Report problems with
-> the fork here, not to the original project. Building: [BUILDING.md](BUILDING.md).
-> The original README follows, kept for attribution.
-<a href="https://iloader.app">
-  <picture align="left" >
-    <source media="(prefers-color-scheme: dark)" srcset="/iloader.svg">
-    <img align="left" width="90" height="90" src="/iloader-dark.svg">
-  </picture>
-  
-  <div id="user-content-toc">
-    <ul style="list-style: none;">
-      <summary>
-        <h1>iloader</h1>
-      </summary>
-    </ul>
-  </div>
-</a>
+# WatchBridge (development preview)
 
----
+Windows 上的 Apple Watch 开发者模式准备与 Companion 应用安装助手。
 
-[![Build iloader](https://img.shields.io/github/actions/workflow/status/nab138/iloader/build.yml?style=flat&logo=github&logoColor=white&label=Build%20iloader)](https://github.com/nab138/iloader/actions/workflows/build.yml) ![Downloads](https://img.shields.io/endpoint?url=https%3A%2F%2Fgist.githubusercontent.com%2Fnab138%2F28258aff7e3f1d3a3084a21f4cff2e57%2Fraw%2Filoader_downloads.json&style=flat)
+这是基于 [AndreySemjonov 的 iLoader fork](https://github.com/AndreySemjonov/iloader)
+的独立社区衍生版本。上游为 [nab138/iLoader](https://github.com/nab138/iloader)。
+不代表 Apple 或任何上游项目的官方版本，也不暗示其背书。
 
-Install SideStore (or other apps) and import your pairing file with ease
+## 第一版范围
 
-**The [upstream repository](https://github.com/nab138/iloader) and [iloader.app](https://iloader.app) are the official ways to download upstream iloader. There is also an unofficial [Homebrew cask](https://formulae.brew.sh/cask/iloader), an unofficial [AUR package](https://aur.archlinux.org/packages/iloader-bin), and an unofficial [Fedora COPR repository](https://copr.fedorainfracloud.org/coprs/anudeepd/iloader) maintained by the community. Do not download from any other sources or websites.**
+1. USB 连接已配对的 iPhone，选择设备。
+2. 配对 Watch，在手表上确认信任；请求显示开发者模式开关。
+3. 在手表上手动开启、重启并确认，然后重新检查状态。
+4. 登录 Apple ID，选择包含 iPhone 宿主和 `Watch/*.app` 的原始 IPA，签名安装。
+5. 在手表上手动打开应用，验证启动。
 
-<img width="1918" height="998" alt="iloader0" src="https://github.com/user-attachments/assets/93cd135d-6d89-46ee-9b9f-12c596806911" />
+开发者模式采用 Rust 原生流程，不要求用户另行安装 Python。准备操作不会自动开启
+开发者模式、重启手表或代替用户确认。Watch 信任记录只保存在本程序的内存中，退出
+程序后需要重新建立会话。第一版拒绝多块手表的模糊选择。
 
-## How to use
+安装沿用 Andrey fork 的 USB 与 Network/RSD 路径。独立 Watch-only 包暂不支持。
+签名之前会检查并保留 IPA，拒绝不包含 Watch Companion 的包。
+使用 Network 前需要在 USB 设备卡片上设置 Wi-Fi；开发者模式准备仍需 USB。
 
-- Install usbmuxd for your platform
-  - Windows: [iTunes](https://apple.co/ms)
-  - macOS: Included
-  - Linux: Potentially included, if not, install via your package manager
-- Install the latest version for your platform from the [releases](https://github.com/nab138/iloader/releases)
-  - NixOS: Use the flake `github:nab138/iloader`
-- Plug in your iDevice to your computer
-- Open the app
-- Sign into your Apple ID
-- Select your action (e.g. install SideStore)
+## 当前验证边界
 
-## Features
+这是待实机验收的开发预览。上游历史实机成功不等于本分支已经实机通过。
+不得把编译成功或手机安装成功当成 Watch 安装、启动成功。
+具体测试步骤见 [硬件验收](docs/WATCHBRIDGE_TESTING.md)。
 
-- Install SideStore (or LiveContainer + SideStore), import certificate and place rppairing+lockdown pairing files automatically
-- Import any IPA
-- Intelligent error suggestions to help resolve common issues
-- Manage pairing files in apps like StikDebug, SideStore, Protokolle, etc
-- See and revoke development certificates & app ids
+本次修改保留上游签名策略。需要 Watch App Group 的应用可能仍受上游跳过 Watch
+App Group 关联行为影响；本版不承诺 HermesEnabler 的备份功能已经修复。
 
-## Troubleshooting
+## 构建
 
-- If you are unable to solve an issue on your own, copy the full error message and ask on the [idevice Discord server](https://discord.gg/EA6yVgydBz) or [open an issue](https://github.com/nab138/iloader/issues).
-- You can view app logs with the "View Logs." If nothing is showing up, change the log level to "Debug."
-- If those logs aren't helpful, logs with additional are stored in the following locations:
-  - Windows: `%APPDATA%\me.nabdev.iloader\logs`
-  - macOS: `~/Library/Application Support/me.nabdev.iloader/logs`
-  - Linux: `~/.local/share/me.nabdev.iloader/logs/`
+Windows 构建依赖和流程见 [BUILDING.md](BUILDING.md)。使用 Windows 原生构建，
+不要求 Linux 交叉编译。GitHub Actions 同样运行测试并生成 `WatchBridge.exe`、
+`BUILD.json`、`SHA256SUMS.txt` 和 `LICENSES.zip`，其中包含准确源码提交和校验值。
 
-## Translating
-
-iloader needs localization! If you speak another language and notice iloader does not support it or has mistakes, please consider contributing.
-
-To update/edit an existing language, make a PR modifying `src/locales/<lang>.json`.
-
-To add a new language, add your language to `src/i18next.ts`, and in `src/locales` copy `en.json` to a new file titled `<langcode>.json` and update the strings.
-
-**i18next.ts:**
-
-```ts
-const languages = [
-  ["en", "English"],
-  ["es", "Español"],
-  // Your language here...
-] as const;
+```powershell
+./scripts/Build-Windows.ps1 -BuildExecutable
 ```
 
-You can also add your name to the translators section of the README.
+仅检查前端：`bun install --frozen-lockfile --ignore-scripts` 后运行 `bun run build`。
 
-Thank you for translating!
+## 致谢与许可证
 
-## Building from source
+当前依赖链中发现签名库许可声明不明确，详见 [许可核查](docs/LICENSE_REVIEW.md)。
+在澄清前，不宣称全依赖许可审核已完成，也不发布正式二进制 Release。
 
-1. Install [bun](https://bun.sh) (or [Node.js](https://nodejs.org)) and [Rust](https://www.rust-lang.org/tools/install)
-2. Clone the repository and `cd` into it
-3. Run `bun i` (or `npm i`)
 
-For development with hot reload: `bun tauri dev` (or `npm run tauri dev`)
-For this Windows fork, run the tests and build the executable with `./scripts/Build-Windows.ps1 -BuildExecutable`. See [BUILDING.md](BUILDING.md) for prerequisites.
+感谢 nab138、AndreySemjonov、Data_C0re_ (Rzbck)、oacevedo、Kabir Oberai、
+idevice 与其余上游作者。代码来源、准确提交与许可见
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)、[LICENSE](LICENSE)、
+[vendor/isideload/PROVENANCE.md](vendor/isideload/PROVENANCE.md)。
+保留了[上游 README](docs/UPSTREAM_README.md)和上游贡献规则。当前分支是本 fork 的
+独立开发工作，不向禁止 AI 生成贡献的上游提交 PR。
 
-## Credits
-
-- Icon made by [Transistor](https://github.com/transistor-exe)
-- UI improved by [StephenDev0](https://github.com/StephenDev0)
-- [idevice](https://github.com/jkcoxson/idevice) by [jkcoxson](https://github.com/jkcoxson) for communicating with iOS devices
-- [isideload](https://github.com/nab138/isideload) for installing apps
-  - [idevice](https://github.com/jkcoxson/idevice) by [jkcoxson](https://github.com/jkcoxson) crate is used to communicate with the device
-  - [apple-codesign-quick](https://github.com/Dadoum/apple-codesign-quick) by [Dadoum](https://github.com/Dadoum) for codesigning and entitlements
-  - [Impactor](https://github.com/claration/Impactor) by [claration](https://github.com/claration) was used as a reference for cryptography operations (converting certs to p12, etc.).
-  - [Sideloader](https://github.com/Dadoum/Sideloader) by [Dadoum](https://github.com/Dadoum) was used as a reference for how apple private developer endpoints work
-- [idevice_pair](https://github.com/jkcoxson/idevice_pair) was used as a reference for pairing file management
-- App made with [tauri](https://tauri.app)
-
-## Translators
-
-Thank you to everyone who has contributed translations! See the [Translating](#translating) section if you would like to contribute as well.
-
-- [By3lish](https://github.com/by3lish): Azerbaijani (az)
-- [TNT-333](https://github.com/TNT-333): German (de)
-- [basketshoe](https://github.com/basketshoe): Italian (it)
-- [baocreata](https://github.com/baocreata): Vietnamese (vt)
-- [IamArayel](https://github.com/IamArayel): French (fr)
-- [kkula9999](https://github.com/kkula9999): Traditional & Simplified Chinese (zh_tw & zh_cn)
-- [sibwaze](https://github.com/sibwaze): Russian (ru)
-- [notmalicik](https://github.com/notmalicik): Română (ro)
-- [mirdukkkkk](https://github.com/mirdukkkkk): Improved Russian (ru)
-- [okinaau](https://github.com/okinaau): Arabic (ar)
-- [ChouChiu](https://github.com/ChouChiu): Cantonese (zh_hk) & Improved Chinese (zh_tw & zh_cn)
-- [marcinmajsc](https://github.com/marcinmajsc): Polish (pl)
-- [ern775](https://github.com/ern775): Turkish (tr)
-- [canpng](https://github.com/canpng): Improved Turkish (tr)
-- [jazoppix](https://github.com/jazoppix): Spanish (es)
-- [eseiker](https://github.com/eseiker): Korean (ko)
-- [seomin0610](https://github.com/seomin0610): Improved Korean (ko)
-- [Ordyan777](https://github.com/Ordyan777): Armenian (am)
-- [kakik0u](https://github.com/kakik0u): Japanese (ja)
-- [lkspodmol](https://github.com/lkspodmol): Czech (cs_cz)
-- [marcusherelammonstyle-cmd](https://github.com/marcusherelammonstyle-cmd): Swedish (sv)
-- [MCI49312](https://github.com/MCI49312): Hungarian (hu)
-- [Kynonim](https://github.com/Kynonim): Indonesian (id)
-- [DD00031](https://github.com/DD00031): Dutch (nl)
-- [Toritan123](https://github.com/Toritan123): Improved Japanese (ja)
-- [marcinmajsc](https://github.com/marcinmajsc): Improved Polish (pl)
-- [dleiferives](https://github.com/dleiferives): Greek (el)
-- [ShadowWLX](https://github.com/ShadowWLX): Improved French (fr)
-- [fkpcomposer](https://github.com/fkpcomposer): Brazilian Portuguese (pt_br)
-- [474FrediFred](https://github.com/474FrediFred): Swiss German (de_ch)
-
-## License
-
-Copyright (C) 2026 nab138
-
-The source code of this repository is licensed under the MIT License. See the [LICENSE](/LICENSE) file for the full text.
-
-Branding, logos, media assets, and the name “iloader” are not licensed under the MIT License and are subject to separate restrictions.
-
-You may retain or use branding materials in forks, tutorials, or documentation if you include a clear link to either the official site (https://iloader.app) or the iloader source code repository (https://github.com/nab138/iloader) and do not imply official endorsement. See [LICENSE-BRANDING](/LICENSE-BRANDING) for full details.
-
-## Contributing
-
-Please read our [Contributing](/CONTRIBUTING.md) policy before making a contribution.
-
-## Future Plans
-
-- Checks for if device is in developer mode, has password set, etc
-- Automatic anisette fallback
-- Team selection when an account has multiple teams
-- Auto-refresh installed apps
-  - Minimize to tray
-  - Detect installed apps
-  - Refresh apps automatically
-- Set a "default" account to automatically log into
-- Import SideStore account info automatically
-- Mount DDI and open sidestore after installation
+请勿提交 Apple ID、密码、证书私钥、配对记录或未脱敏设备日志。

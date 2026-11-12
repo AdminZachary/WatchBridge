@@ -16,21 +16,21 @@ pub(crate) fn show(app: &AppHandle) -> Result<(), String> {
 }
 fn tray_label(status: &Status) -> &'static str {
     if status.exit_pending {
-        "iLoader: waiting for active work before exit"
+        "WatchBridge: waiting for active work before exit"
     } else if status.running && status.settings.paused {
-        "iLoader: pausing after current renewal"
+        "WatchBridge: pausing after current renewal"
     } else if status.running {
-        "iLoader: renewal running"
+        "WatchBridge: renewal running"
     } else if !status.available {
-        "iLoader: renewal host unavailable"
+        "WatchBridge: renewal host unavailable"
     } else if !status.settings.opted_in {
-        "iLoader: phone renewal is off"
+        "WatchBridge: phone renewal is off"
     } else if status.settings.paused {
-        "iLoader: phone renewals paused"
+        "WatchBridge: phone renewals paused"
     } else if status.notice.is_some() {
-        "iLoader: review renewal status"
+        "WatchBridge: review renewal status"
     } else {
-        "iLoader: waiting for the next eligible check"
+        "WatchBridge: waiting for the next eligible check"
     }
 }
 impl NativeSurface<'_> {
@@ -44,7 +44,7 @@ impl NativeSurface<'_> {
                 .map_err(|_| "Unable to create the tray menu.".to_string())
         };
         let state = item("renewal-status", label, false)?;
-        let open = item("renewal-open", "Open iLoader", true)?;
+        let open = item("renewal-open", "Open WatchBridge", true)?;
         let pause = item(
             "renewal-pause",
             "Pause renewals",
@@ -55,7 +55,7 @@ impl NativeSurface<'_> {
             "Resume renewals",
             usable && status.settings.paused,
         )?;
-        let quit = item("renewal-quit", "Quit iLoader", !status.exit_pending)?;
+        let quit = item("renewal-quit", "Quit WatchBridge", !status.exit_pending)?;
         let menu = Menu::with_items(app, &[&state, &open, &pause, &resume, &quit])
             .map_err(|_| "Unable to create the tray menu.")?;
         Ok((menu, label))
@@ -104,17 +104,17 @@ impl Surface for NativeSurface<'_> {
     fn unminimize(&mut self) -> Result<(), String> {
         self.window()?
             .unminimize()
-            .map_err(|_| "Unable to restore the minimized window. Try Open iLoader again.".into())
+            .map_err(|_| "Unable to restore the minimized window. Try Open WatchBridge again.".into())
     }
     fn show(&mut self) -> Result<(), String> {
         self.window()?
             .show()
-            .map_err(|_| "Unable to show the window. Try Open iLoader again.".into())
+            .map_err(|_| "Unable to show the window. Try Open WatchBridge again.".into())
     }
     fn focus(&mut self) -> Result<(), String> {
         self.window()?
             .set_focus()
-            .map_err(|_| "Unable to focus the window. Try Open iLoader again.".into())
+            .map_err(|_| "Unable to focus the window. Try Open WatchBridge again.".into())
     }
     fn hide(&mut self) -> Result<(), String> {
         self.0
@@ -163,7 +163,7 @@ pub(crate) fn refresh_tray(app: &AppHandle) {
                 .0
                 .lock()
                 .unwrap()
-                .notice("Unable to refresh tray status; open iLoader to review it.".into());
+                .notice("Unable to refresh tray status; open WatchBridge to review it.".into());
         }
     }
 }
@@ -220,9 +220,9 @@ pub async fn configure_renewal_desktop(app: AppHandle, close_to_tray: bool) -> R
     let ui = app.clone();
     app.run_on_main_thread(move || {
         let result = if crate::install_lock::exiting() {
-            Err("iLoader is waiting to exit".into())
+            Err("WatchBridge is waiting to exit".into())
         } else if close_to_tray && !super::management::execution_available() {
-            Err("Keeping iLoader in the tray is unavailable".into())
+            Err("Keeping WatchBridge in the tray is unavailable".into())
         } else {
             ui.state::<DesktopState>()
                 .0
@@ -269,10 +269,10 @@ pub async fn configure_renewal_startup(app: AppHandle, enabled: bool) -> Result<
     let ui = app.clone();
     app.run_on_main_thread(move || {
         let result = if crate::install_lock::exiting() {
-            Err("iLoader is waiting to exit".into())
+            Err("WatchBridge is waiting to exit".into())
         } else if !ui.state::<Host>().snapshot().available {
             Err(
-                "The renewal host is unavailable or already open. Use the existing iLoader window."
+                "The renewal host is unavailable or already open. Use the existing WatchBridge window."
                     .into(),
             )
         } else {

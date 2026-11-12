@@ -90,7 +90,7 @@ impl Desktop {
     }
     pub fn configure(&mut self, enabled: bool, surface: &mut impl Surface) -> Result<(), String> {
         if enabled && !self.available {
-            return Err("Keeping iLoader in the tray is unavailable".into());
+            return Err("Keeping WatchBridge in the tray is unavailable".into());
         }
         if enabled {
             surface.ensure_tray()?;
@@ -159,7 +159,7 @@ impl Desktop {
         }
         if let Err(error) = surface.ensure_tray().and_then(|_| surface.hide()) {
             let message = match surface.restore() {
-                Ok(()) => format!("{error} iLoader remains open; close-to-tray was not completed."),
+                Ok(()) => format!("{error} WatchBridge remains open; close-to-tray was not completed."),
                 Err(restore) => {
                     format!("{error} {restore} Use the tray Open command to recover the window.")
                 }

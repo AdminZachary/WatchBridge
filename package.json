@@ -1,7 +1,7 @@
 {
-  "name": "iloader",
+  "name": "watchbridge",
   "private": true,
-  "version": "2.3.4-fork.2",
+  "version": "0.1.0-alpha.1",
   "type": "module",
   "scripts": {
     "dev": "vite",

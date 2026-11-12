@@ -21,6 +21,7 @@ mod renewal_commands;
 mod renewal_report;
 mod wifi_pairing;
 mod wifi_rsd;
+mod watch_setup;
 
 use crate::{
     account::{
@@ -119,6 +120,7 @@ pub fn run() {
             }));
 
             app.manage(DeviceInfoMutex::new(None));
+            app.manage(watch_setup::WatchSessions::default());
             app.manage(SideloaderMutex::new(None));
             app.manage(PairingCancelToken::new(None));
             app.manage(wifi_pairing::PairingOperation::new(()));
@@ -133,7 +135,9 @@ pub fn run() {
             login_stored,
             delete_account,
             list_devices,
+            watch_setup::prepare_watch,
             sideload_operation,
+            sideload::watch_sideload_operation,
             renew_wifi,
             manual_wifi::check_wifi_connection,
             wifi_pairing::repair_wifi_pairing,

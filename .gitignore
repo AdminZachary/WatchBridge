@@ -28,3 +28,7 @@ keys
 
 dockerfile
 /artifacts/
+
+# Task-local tooling and review outputs
+/work/
+/outputs/

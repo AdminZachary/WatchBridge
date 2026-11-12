@@ -18,7 +18,7 @@ function Hash([string]$Path) {
 $repository = Split-Path -Parent $PSScriptRoot
 Push-Location $repository
 try {
-    foreach ($program in @('git', 'bun', 'cargo', 'rustc')) {
+    foreach ($program in @('git', 'bun', 'cargo', 'rustc', 'python')) {
         Get-Command $program -ErrorAction Stop | Out-Null
     }
     if ($env:OS -ne 'Windows_NT') { throw 'Use this script on Windows with the MSVC Rust toolchain.' }
@@ -30,7 +30,7 @@ try {
     New-Item -ItemType Directory -Path $artifacts -Force | Out-Null
     # Clear only this helper's generated files, including results from failed runs.
     # A checks-only run must never publish an older executable as its own output.
-    foreach ($name in @('iloader.exe', 'BUILD.json', 'SHA256SUMS.txt')) {
+    foreach ($name in @('WatchBridge.exe', 'BUILD.json', 'SHA256SUMS.txt', 'LICENSES.zip')) {
         $previous = Join-Path $artifacts $name
         if (Test-Path -LiteralPath $previous) { Remove-Item -LiteralPath $previous }
     }
@@ -67,10 +67,11 @@ try {
         $arguments = @('run', 'tauri', 'build', '--no-bundle', '--config', 'src-tauri/ci.conf.json', '--', '--locked')
         if ($Offline) { $arguments += '--offline' }
         Run 'bun' $arguments
-        $executable = Join-Path $artifacts 'iloader.exe'
+        $executable = Join-Path $artifacts 'WatchBridge.exe'
         Copy-Item -LiteralPath (Join-Path $target 'release/iloader.exe') -Destination $executable
         $executableHash = Hash $executable
     }
+    Run 'python' @('scripts/Collect-Licenses.py', '--output', (Join-Path $artifacts 'LICENSES.zip'))
     $result = [ordered]@{
         completedUtc = [DateTime]::UtcNow.ToString('o')
         sourceCommit = $commit
@@ -80,14 +81,20 @@ try {
         rustVersion = (& rustc --version) -join ' '
         bunVersion = (& bun --version) -join ' '
         frontend = 'passed'
+        physicallyValidated = $false
+        licenseReview = 'pending-signing-dependency-clarification; see LICENSES.zip'
+        licensesSha256 = Hash (Join-Path $artifacts 'LICENSES.zip')
         rustSuites = 'iloader and isideload unit tests passed'
-        executable = $(if ($BuildExecutable) { 'iloader.exe' } else { $null })
+        executable = $(if ($BuildExecutable) { 'WatchBridge.exe' } else { $null })
         executableSha256 = $executableHash
     }
     $report = Join-Path $artifacts 'BUILD.json'
     $result | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath $report -Encoding utf8
-    $checksums = @((Hash $report) + '  BUILD.json')
-    if ($BuildExecutable) { $checksums += $executableHash + '  iloader.exe' }
+    $checksums = @(
+        ((Hash $report) + '  BUILD.json')
+        ((Hash (Join-Path $artifacts 'LICENSES.zip')) + '  LICENSES.zip')
+    )
+    if ($BuildExecutable) { $checksums += $executableHash + '  WatchBridge.exe' }
     $checksums | Set-Content -LiteralPath (Join-Path $artifacts 'SHA256SUMS.txt') -Encoding ascii
     Write-Output "Build checks passed. Report: $report"
     if ($BuildExecutable) { Write-Output "Executable: $executable (SHA-256: $executableHash)" }

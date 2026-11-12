@@ -1,6 +1,6 @@
 # Building on Windows
 
-Install Git, Bun, Rust with the Windows MSVC toolchain, and Visual Studio Build
+Install Python 3.12, Git, Bun, Rust with the Windows MSVC toolchain, and Visual Studio Build
 Tools with "Desktop development with C++" and a Windows SDK. The app also needs
 the WebView2 runtime. Native dependencies need Perl and a make tool; Strawberry
 Perl provides both (CI installs it). Keep the MSVC linker ahead of Unix tools on
@@ -19,10 +19,12 @@ Run from a fresh checkout in PowerShell:
 The script runs the TypeScript/Vite build and the Rust unit tests of iloader and
 the included isideload crate. The executable is built with
 `src-tauri/ci.conf.json`, which turns off the original project's updater, and is
-copied to `artifacts/windows/iloader.exe` without an installer.
+copied to `artifacts/windows/WatchBridge.exe` without an installer.
 `artifacts/windows/BUILD.json` records the source commit, whether the checkout had
 local changes, lockfile hashes, tool versions and the executable's SHA-256;
-`SHA256SUMS.txt` lists the hashes. Use a clean checkout for release builds.
+`SHA256SUMS.txt` lists the hashes. `LICENSES.zip` preserves collected third-party
+license texts and a dependency inventory; its pending review status is also
+recorded in BUILD.json. See docs/LICENSE_REVIEW.md before public release. Use a clean checkout for release builds.
 
 The script does not run the app or change Windows startup, accounts, pairing or
 phone apps. The tests do not use a physical iPhone or Apple Watch.

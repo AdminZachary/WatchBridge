@@ -24,11 +24,14 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - run: choco install strawberryperl make --no-progress
       - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
       - name: Test and build
         shell: pwsh
         run: ./scripts/Build-Windows.ps1 -BuildExecutable
       - uses: actions/upload-artifact@v4
         with:
-          name: iloader-windows
+          name: watchbridge-windows
           if-no-files-found: error
           path: artifacts/windows/*

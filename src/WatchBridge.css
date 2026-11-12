@@ -1,0 +1,72 @@
+:root { color: #153d36; background: #f2f5f1; --glass-surface: #fff; --glass-surface-alt: #edf2ed; --glass-border: #dce5dc; --glass-highlight: #246756; --text-muted: #64766d; --accent-primary: #246756; --accent-secondary: #1d5849; --success: #246756; --danger: #ab3535; }
+body { background: #f2f5f1; }
+.wb-app { min-height: 100vh; background: #f2f5f1; font-size: 14px; }
+.wb-app p { line-height: 1.7; }
+.wb-header { background: #123f36; color: #eff8ed; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 36px; }
+.wb-brand { display: flex; align-items: center; gap: 14px; }
+.wb-brand strong { display: block; font-size: 23px; letter-spacing: -.7px; }
+.wb-brand span:not(.wb-mark) { color: #b8d4c4; font-size: 11px; }
+.wb-mark { width: 30px; height: 42px; border-radius: 9px; border: 2px solid #cce9b8; padding: 6px 3px; display: block; }
+.wb-mark i { display: block; height: 100%; border-radius: 4px; background: #cce9b8; }
+.wb-header-right { display: flex; align-items: center; gap: 16px; }
+.wb-preview { font-size: 11px; color: #bfd5c9; }
+.wb-header button { color: #eff8ed; background: #ffffff13; border-color: #ffffff33; }
+.wb-layout { max-width: 1320px; margin: auto; padding: 34px 36px 30px; display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 30px; align-items: start; }
+.wb-sidebar, .wb-main { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+.wb-intro { padding: 3px 5px 0; }
+.wb-eyebrow { color: #64766d; font-size: 11px; letter-spacing: 2px; }
+.wb-intro h1 { margin: 12px 0; font-size: 29px; line-height: 1.45; letter-spacing: -1px; font-weight: 650; }
+.wb-intro p, .wb-note, .wb-sidebar-note { color: #64766d; font-size: 12px; }
+.wb-card { border: 1px solid #dae3d9; background: #fff; border-radius: 18px; padding: 23px; margin: 0; min-width: 0; }
+fieldset.wb-card { padding: 20px; }
+.wb-card h2 { font-size: 17px; margin: 0; color: #153d36; }
+.wb-sidebar .wb-card h2 { font-size: 14px; }
+.wb-card button, .wb-tools button, .wb-header button { border-radius: 9px; padding: 10px 14px; font-size: 12px; font-weight: 600; min-height: 38px; border: 1px solid #d1ddd2; box-shadow: none; color: #215044; background: #f5f8f3; cursor: pointer; }
+.wb-card button:hover, .wb-tools button:hover { background: #eaf1e7; }
+.wb-card button:disabled, .wb-tools button:disabled, fieldset:disabled button { cursor: not-allowed; opacity: .45; }
+.wb-card .wb-primary { background: #246756; color: #fff; border-color: #246756; }
+.wb-card .wb-primary:hover { background: #194c40; }
+.wb-app button:focus-visible, .wb-app summary:focus-visible { outline: 3px solid #84b49a; outline-offset: 3px; }
+.wb-step { padding: 27px; }
+.wb-step-heading { display: flex; gap: 14px; align-items: center; margin-bottom: 22px; }
+.wb-step-heading p { margin: 4px 0 0; font-size: 12px; color: #64766d; }
+.wb-step-number { background: #edf3e7; color: #426f4c; width: 37px; height: 37px; display: grid; place-items: center; border-radius: 11px; font-weight: 600; flex-shrink: 0; }
+.wb-status { font-size: 10px; padding: 6px 10px; border-radius: 15px; background: #f2f4ef; color: #778374; margin-left: auto; white-space: nowrap; }
+.wb-status.is-ready { background: #e6f3e5; color: #246756; }
+.wb-instructions { margin: 0 0 22px; padding-left: 22px; color: #53675c; font-size: 13px; line-height: 1.9; }
+.wb-instructions li { margin: 8px 0; padding-left: 4px; }
+.wb-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+.wb-note { margin-bottom: 0; }
+.wb-result { padding: 15px 17px; margin-top: 20px; background: #eef6e9; border: 1px solid #d7e6ce; border-radius: 11px; font-size: 13px; }
+.wb-result p { margin: 4px 0 0; color: #42634e; }
+.wb-error { border: 1px solid #edcecb; background: #fff4f1; color: #983a35; padding: 14px; border-radius: 10px; white-space: pre-wrap; overflow-wrap: anywhere; user-select: text; }
+.wb-file { display: flex; align-items: center; gap: 16px; background: #f8faf5; border: 1px dashed #c6d6c2; border-radius: 12px; padding: 20px; }
+.wb-file div { flex: 1; min-width: 0; }
+.wb-file strong { display: block; overflow-wrap: anywhere; font-size: 13px; }
+.wb-file p { font-size: 11px; color: #71816d; margin: 6px 0 0; }
+.wb-file-icon { font-size: 27px; color: #709066; }
+.wb-file button { flex-shrink: 0; }
+.wb-install-footer { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 24px; }
+.wb-install-footer strong { font-size: 13px; }
+.wb-install-footer p { font-size: 11px; color: #64766d; margin-bottom: 0; }
+.wb-install-footer button { flex-shrink: 0; }
+.wb-details { margin-top: 20px; border-top: 1px solid #e4eae1; padding-top: 15px; font-size: 12px; color: #64766d; }
+.wb-details summary { cursor: pointer; }
+.wb-tools { display: flex; justify-content: flex-end; gap: 10px; }
+.wb-tools button { font-size: 11px; color: #64766d; }
+.wb-attribution { text-align: center; color: #788573; font-size: 10px; line-height: 1.9; padding: 0 12px; }
+.wb-attribution button { background: transparent; border: 0; padding: 0 2px; color: #37634e; font-size: inherit; cursor: pointer; }
+.wb-sidebar-note { margin: -8px 5px 0; }
+.wb-app .card { background: #f2f6ef; border-color: #dbe6d7; color: #214c3f; }
+.wb-app .device-name, .wb-app .logged-value { color: #214c3f; }
+.wb-app input { color: #153d36; background: #fff; border-color: #cddccd; }
+.wb-app .device-selected-pill { color: #246756; background: #e0edda; }
+.wb-app .device-connection { color: #64766d; }
+.wb-app .modal-overlay { color: #153d36; }
+@media (max-width: 880px) { .wb-layout { grid-template-columns: 240px minmax(0, 1fr); gap: 18px; padding: 24px 20px; } .wb-step { padding: 21px; } .wb-header { padding: 20px; } .wb-status { display: none; } .wb-file { flex-wrap: wrap; } }
+@media (max-width: 650px) { .wb-layout { grid-template-columns: 1fr; } .wb-header-right .wb-preview { display: none; } .wb-intro h1 { font-size: 25px; } .wb-install-footer { align-items: flex-start; flex-direction: column; } .wb-install-footer button { width: 100%; } }
+.wb-app .modal-close { color: #214c3f; }
+.wb-app .modal-container button, .wb-app .modal-container input { color: #214c3f; }
+.wb-app .logged-label { color: #64766d; }
+.wb-app .stored-email { color: #214c3f; overflow-wrap: anywhere; }
+.wb-app .device-card.active { background: #edf4e6; }

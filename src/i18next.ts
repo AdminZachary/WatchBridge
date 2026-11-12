@@ -60,6 +60,7 @@ i18n
   .use(initReactI18next)
   .init({
     fallbackLng: "en",
+    lng: localStorage.getItem("i18nextLng") ?? "zh_cn",
     interpolation: {
       escapeValue: false,
     },

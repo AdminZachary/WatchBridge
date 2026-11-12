@@ -5,7 +5,7 @@ use winreg::{
     enums::{HKEY_CURRENT_USER, KEY_QUERY_VALUE, KEY_SET_VALUE, REG_SZ},
 };
 const KEY: &str = r"Software\Microsoft\Windows\CurrentVersion\Run";
-const NAME: &str = "iLoaderRenewal";
+const NAME: &str = "WatchBridgeRenewal";
 pub(crate) struct NativeRegistry;
 fn read_key(key: &RegKey) -> Result<Option<Value>, String> {
     let raw = match key.get_raw_value(NAME) {

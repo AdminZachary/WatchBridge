@@ -68,10 +68,10 @@ impl Startup {
         }
         let result = (|| -> Result<(), String> {
             if args.len() != 1 || args[0] != ARGUMENT {
-                return Err("Unrecognized startup arguments; iLoader remains visible.".into());
+                return Err("Unrecognized startup arguments; WatchBridge remains visible.".into());
             }
             if !host_available {
-                return Err("The renewal host is unavailable or already open. Use Open iLoader in the existing tray, then quit this extra window.".into());
+                return Err("The renewal host is unavailable or already open. Use Open WatchBridge in the existing tray, then quit this extra window.".into());
             }
             let status = self.snapshot(registry);
             if !status.verified {
@@ -215,7 +215,7 @@ impl Startup {
         })
     }
 }
-const CONFLICT: &str = "The Windows startup entry was changed outside iLoader. It was left untouched; review it in Windows Startup settings.";
+const CONFLICT: &str = "The Windows startup entry was changed outside WatchBridge. It was left untouched; review it in Windows Startup settings.";
 impl Record {
     fn owns(&self, value: &Value) -> bool {
         let Value::Command(command) = value else {
@@ -250,13 +250,13 @@ pub(crate) fn command_for(executable: &str, temporary_roots: &[String]) -> Resul
         normalized == root || normalized.starts_with(&(root + "\\"))
     }) {
         return Err(
-            "Open the stable iLoader copy outside Temp before enabling Windows startup.".into(),
+            "Open the stable WatchBridge copy outside Temp before enabling Windows startup.".into(),
         );
     }
     let command = format!("\"{path}\" {ARGUMENT}");
     if command.encode_utf16().count() > 260 {
         return Err(
-            "The startup path is too long. Move iLoader to a shorter stable folder.".into(),
+            "The startup path is too long. Move WatchBridge to a shorter stable folder.".into(),
         );
     }
     Ok(command)

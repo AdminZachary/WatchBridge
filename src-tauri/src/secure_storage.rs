@@ -10,7 +10,7 @@ use crate::error::AppError;
 
 /// Credential Manager service name. Deliberately different from the original
 /// iloader's "iloader", so this fork never reads or overwrites its saved data.
-pub(crate) const KEYRING_SERVICE: &str = "io.github.andreysemjonov.iloader";
+pub(crate) const KEYRING_SERVICE: &str = "io.github.adminzachary.watchbridge";
 
 static FORCE_DISABLE_KEYRING: AtomicBool = AtomicBool::new(false);
 

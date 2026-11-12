@@ -339,6 +339,41 @@ async fn sideload_with_report(
     Ok(special)
 }
 
+/// WatchBridge accepts companion IPAs only; retain the checked source through installation.
+#[tauri::command]
+pub async fn watch_sideload_operation(
+    window: Window,
+    device_state: State<'_, DeviceInfoMutex>,
+    sideloader_state: State<'_, SideloaderMutex>,
+    operation: State<'_, crate::wifi_pairing::PairingOperation>,
+    app_path: String,
+) -> Result<(), AppError> {
+    let op = Operation::new("watch_sideload".into(), &window);
+    op.start("validate")?;
+    let _selection = op.fail_if_err("validate", operation.try_lock().map_err(|_| AppError::Misc("设备正在准备中，请稍后重试。".into())))?;
+    let directory = op.fail_if_err("validate", window.app_handle().path().app_data_dir().map_err(|_| AppError::Misc("无法访问应用数据目录。".into())))?;
+    let original = op.fail_if_err("validate", crate::manual_wifi::Original::retain(std::path::Path::new(&app_path), &directory))?;
+    op.fail_if_err("validate", require_companion(original.has_watch()))?;
+    op.complete("validate")?;
+    op.start("install")?;
+    op.fail_if_err("install", Box::pin(sideload(window.app_handle(), device_state, sideloader_state, original.path().to_string_lossy().into_owned())).await)?;
+    op.complete("install")?;
+    Ok(())
+}
+
+fn require_companion(has_watch: bool) -> Result<(), AppError> {
+    if has_watch { Ok(()) } else { Err(AppError::Misc("此 IPA 没有嵌入 Watch App。第一版需要同时包含 iPhone 宿主和 Watch Companion 的原始 IPA。".into())) }
+}
+
+#[cfg(test)]
+mod watchbridge_tests {
+    #[test]
+    fn phone_only_packages_are_rejected_before_signing() {
+        assert!(super::require_companion(false).is_err());
+        assert!(super::require_companion(true).is_ok());
+    }
+}
+
 #[tauri::command]
 pub async fn sideload_operation(
     window: Window,

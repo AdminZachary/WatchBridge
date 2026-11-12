@@ -24,7 +24,7 @@ impl Gate {
         let mut state = self.0.lock().unwrap();
         if state.exiting {
             return Err(AppError::Misc(
-                "iLoader is waiting for active work before exiting".into(),
+                "WatchBridge is waiting for active work before exiting".into(),
             ));
         }
         state.active += 1;

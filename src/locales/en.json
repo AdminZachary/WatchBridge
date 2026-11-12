@@ -11,14 +11,14 @@
     "title": "Repair pairing for {{device}}",
     "target": "USB device to repair",
     "explanation": "Keep this selected device connected by USB. This renews this computer’s pairing with the phone and enables Wi-Fi connections. Existing app installations and separate RemotePairing data are kept.",
-    "phonePrompt": "Unlock the phone. If asked, tap Trust and enter the passcode on the phone. iLoader never asks for your phone passcode.",
+    "phonePrompt": "Unlock the phone. If asked, tap Trust and enter the passcode on the phone. WatchBridge never asks for your phone passcode.",
     "start": "Repair pairing over USB",
     "retry": "I accepted Trust — retry once",
     "retryLimit": "The retry did not complete pairing. Close this dialog and check the phone before starting another repair.",
     "cancel": "Cancel if not yet sent",
     "close": "Close",
     "working": "Requesting pairing and checking the USB connection. A request already sent to the phone must finish or time out before this dialog can close.",
-    "stopping": "Cancellation requested. If the phone accepts pairing, iLoader must save the new record before stopping. Waiting for the result…",
+    "stopping": "Cancellation requested. If the phone accepts pairing, WatchBridge must save the new record before stopping. Waiting for the result…",
     "saved": "The new pairing record was saved and read back, but USB verification or Wi-Fi settings did not finish. Reconnect and reselect the USB device before continuing.",
     "saveUnconfirmed": "The phone accepted pairing, but saving or refreshing the host record could not be confirmed. Device selection was cleared. Keep USB connected and check pairing before installing or exporting.",
     "requestFailed": "No reliable repair result was received. Pairing may have changed. Device selection was cleared; check the USB connection and reselect the phone before continuing.",
@@ -43,7 +43,7 @@
     "install_auto": "Install & auto-renew",
     "more_install": "More installation options",
     "install_once": "Install once",
-    "consent": "Install an iPhone app and renew it automatically over Wi-Fi using your saved account. Keep iLoader running and your PC awake.",
+    "consent": "Install an iPhone app and renew it automatically over Wi-Fi using your saved account. Keep WatchBridge running and your PC awake.",
     "requirements": "Sign in and select your iPhone over Wi-Fi to install a new app.",
     "unavailable": "Automatic renewal is unavailable in this build. Install once remains available.",
     "running": "Renewing an app…",
@@ -88,7 +88,7 @@
     "next_check": "Next local check",
     "waiting_history": "Phone locked or unreachable during connection check",
     "waiting_next": "Retry scheduled {{date}}",
-    "waiting_explanation": "The phone was locked or unreachable before sign-in began. iLoader will retry at the next scheduled check while your PC is awake and automatic renewal is on. Unlocking does not trigger an immediate retry.",
+    "waiting_explanation": "The phone was locked or unreachable before sign-in began. WatchBridge will retry at the next scheduled check while your PC is awake and automatic renewal is on. Unlocking does not trigger an immediate retry.",
     "waiting_paused": "The phone was locked or unreachable before sign-in began. Automatic retry is paused; resume renewal to allow scheduled checks.",
     "account": "Saved account",
     "bundle": "Bundle ID",
@@ -100,8 +100,8 @@
     "troubleshooting": "Wi-Fi troubleshooting",
     "install_once_hint": "For USB, Watch packages or a one-time install.",
     "recover_before_remove": "Recover this account from View details before removing its failing app.",
-    "startup": "Start iLoader in the tray when I sign in to Windows",
-    "startup_hint": "Uses this copy of iLoader. Your renewal and pause settings stay unchanged. Windows may delay startup; check Windows Startup settings if it does not start.",
+    "startup": "Start WatchBridge in the tray when I sign in to Windows",
+    "startup_hint": "Uses this copy of WatchBridge. Your renewal and pause settings stay unchanged. Windows may delay startup; check Windows Startup settings if it does not start.",
     "startup_read_failed": "Windows startup status could not be read. Other renewal controls remain available.",
     "pause_finished": "Paused. Any installation already in progress will finish."
   },
@@ -165,8 +165,8 @@
       "Complete": "Renewal completed"
     },
     "previous_failure": "Recorded failure history",
-    "close_to_tray": "Keep iLoader running in the tray when I close the window",
-    "tray_enabled_hint": "X hides the window only when the tray is available. Right-click the iLoader tray icon for Open iLoader, Pause/Resume renewals or Quit iLoader. Quit waits for active work and shows its status. Minimize still uses the taskbar. Opening iLoader yourself shows its window.",
+    "close_to_tray": "Keep WatchBridge running in the tray when I close the window",
+    "tray_enabled_hint": "X hides the window only when the tray is available. Right-click the WatchBridge tray icon for Open WatchBridge, Pause/Resume renewals or Quit WatchBridge. Quit waits for active work and shows its status. Minimize still uses the taskbar. Opening WatchBridge yourself shows its window.",
     "tray_disabled_hint": "X quits after active work finishes. Close-to-tray is off until you explicitly select it. This preference does not enable renewals or Windows startup."
   },
   "wifi": {
@@ -322,7 +322,7 @@
     "must_be_logged_in": "You must be logged in!",
     "must_select_device": "You must select a device!",
     "ipa_files": "IPA Files",
-    "logo_alt": "iloader logo"
+    "logo_alt": "WatchBridge logo"
   },
   "apple_id": {
     "title": "Apple ID",
@@ -353,7 +353,7 @@
     "valid_6digit": "Please enter a valid 6-digit code.",
     "submit": "Submit",
     "max_certs_title": "Maximum certificates reached",
-    "max_certs_desc": "iloader will revoke your existing certificates and generate a new one.",
+    "max_certs_desc": "WatchBridge will revoke your existing certificates and generate a new one.",
     "hide_certificate_list": "Hide certificate list",
     "choose_what_to_revoke": "Choose what to revoke",
     "continue": "Continue",
@@ -475,7 +475,7 @@
     "stored_rppairing_deleted_success": "Stored pairing deleted successfully!",
     "failed_delete_stored_rppairing": "Failed to delete stored pairing",
     "dont_use_keyring": "Don't use keyring",
-    "dont_use_keyring_message": "This makes iloader less secure by storing pairing files, anisette state, and certificates on disk. Enable this only if the default keyring storage doesn't work and you understand the risks."
+    "dont_use_keyring_message": "This makes WatchBridge less secure by storing pairing files, anisette state, and certificates on disk. Enable this only if the default keyring storage doesn't work and you understand the risks."
   },
   "dialog": {
     "confirm": "Confirm",
@@ -540,7 +540,7 @@
         "Try running the app with elevated permissions (as administrator/root)."
       ],
       "filesystem": [
-        "Make sure iloader has permission to read and write files on your system."
+        "Make sure WatchBridge has permission to read and write files on your system."
       ],
       "not_enough_app_ids": [
         "You do not have enough App IDs available to install this app.",
