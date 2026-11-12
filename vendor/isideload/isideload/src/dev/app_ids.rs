@@ -243,7 +243,9 @@ impl AppId {
         device_type: impl Into<Option<DeveloperDeviceType>> + Send,
     ) -> Result<(), Report> {
         let device_type = device_type.into();
-        let app_group_feature_enabled = self.features.get_bool("APG3427HIY")?;
+        // A missing flag means the capability is not enabled yet, which is exactly
+        // the case this call exists to fix; only a malformed value is an error.
+        let app_group_feature_enabled = self.features.get_bool("APG3427HIY").unwrap_or(false);
 
         if !app_group_feature_enabled {
             let body = plist!(dict {

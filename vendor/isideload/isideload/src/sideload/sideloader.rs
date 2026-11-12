@@ -175,10 +175,12 @@ impl Sideloader {
 
             match applied {
                 Ok(()) => {}
-                Err(error) if is_watch => {
+                Err(_) if is_watch => {
+                    // The error report can carry the attached App ID plist, so only the
+                    // outcome is logged; the profile dump below shows what was granted.
                     warn!(
-                        "Watch App ID {} did not accept the application group: {:?}",
-                        app_id.identifier, error
+                        "Watch App ID {} did not accept the application group; its profile will not grant it",
+                        app_id.identifier
                     );
                 }
                 Err(error) => return Err(error),
