@@ -96,6 +96,17 @@ fieldset.wb-card { padding: 20px; }
   border: 1px solid #d1ddd2;
   color: #215044;
 }
+/* The base hover rule paints every button dark, which would undo the light
+   theme on hover and hide the label again. */
+.wb-app .error-header button:hover,
+.wb-app .error-outer button:hover,
+.wb-app .dropdown-toggle:hover,
+.wb-app .settings-buttons button:not(.link-button):not(.action-button):hover {
+  background: #eaf1e7;
+}
+.wb-app .modal-close:hover,
+.wb-app .link-button:hover { background: transparent; }
+.wb-app .error-link:hover { color: #194c40; }
 .wb-app .modal-container button, .wb-app .modal-container input { color: #214c3f; }
 .wb-app .logged-label { color: #64766d; }
 .wb-app .stored-email { color: #214c3f; overflow-wrap: anywhere; }
