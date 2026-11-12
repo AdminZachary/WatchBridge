@@ -70,6 +70,27 @@ fieldset.wb-card { padding: 20px; }
    inside dialogs, otherwise the text areas render as solid black blocks. */
 .wb-app .error-inner, .wb-app .log-inner { background-color: #eef2ec; color: #1d3d34; border: 1px solid #dbe6d7; }
 .wb-app .link-button:hover { color: #153d36; }
+/* Settings controls and dropdowns live outside .wb-card, so they kept the dark
+   defaults and rendered unreadable on the light theme. */
+.wb-app .settings-buttons button:not(.link-button):not(.action-button),
+.wb-app .log-header button {
+  background: #f5f8f3;
+  border: 1px solid #d1ddd2;
+  color: #215044;
+}
+.wb-app .settings-buttons button:not(.link-button):not(.action-button):hover,
+.wb-app .log-header button:hover { background: #eaf1e7; }
+.wb-app .settings-container .action-button.danger { background: #fdeeec; border-color: #e3b3ad; color: #ab3535; }
+.wb-app .settings-container .action-button.primary { background: #246756; border-color: #246756; color: #fff; }
+.wb-app select { background: #fff; border-color: #cddccd; color: #153d36; }
+.wb-app select:focus { background: #f4f8f1; border-color: #246756; }
+.wb-app .dropdown-toggle { background: #fff; border-color: #cddccd; color: #153d36; }
+.wb-app .custom-dropdown.open .dropdown-toggle { background: #f4f8f1; border-color: #246756; }
+.wb-app .dropdown-caret { border-color: #45695c; }
+.wb-app .dropdown-menu { background: #fff; border-color: #dbe6d7; box-shadow: 0 18px 34px rgba(18, 63, 54, 0.18); }
+.wb-app .dropdown-option { color: #153d36; }
+.wb-app .dropdown-option:hover, .wb-app .dropdown-option:focus-visible { background: #eef4ea; }
+.wb-app .dropdown-option.selected { background: #e0edda; color: #17493c; }
 .wb-app .modal-container button, .wb-app .modal-container input { color: #214c3f; }
 .wb-app .logged-label { color: #64766d; }
 .wb-app .stored-email { color: #214c3f; overflow-wrap: anywhere; }
