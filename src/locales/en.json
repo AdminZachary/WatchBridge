@@ -354,6 +354,7 @@
     "submit": "Submit",
     "max_certs_title": "Maximum certificates reached",
     "revoke_count": "{{count}} certificate(s) will be revoked",
+    "revoke_warning": "Revoking a certificate invalidates apps already signed with it; they must be signed again.",
     "max_certs_desc": "WatchBridge will revoke your existing certificates and generate a new one.",
     "hide_certificate_list": "Hide certificate list",
     "choose_what_to_revoke": "Choose what to revoke",

@@ -349,9 +349,12 @@ export const AppleID = ({
         )}
         <div className="certs-buttons">
           {selectedSerials.length > 0 && (
-            <p className="certs-desc">
-              {t("apple_id.revoke_count", { count: selectedSerials.length })}
-            </p>
+            <>
+              <p className="certs-desc">
+                {t("apple_id.revoke_count", { count: selectedSerials.length })}
+              </p>
+              <p className="certs-desc">{t("apple_id.revoke_warning")}</p>
+            </>
           )}
           <button
             className="action-button primary"

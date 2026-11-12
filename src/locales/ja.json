@@ -76,6 +76,7 @@
     "submit": "送信",
     "max_certs_title": "証明書の上限に達しました",
     "revoke_count": "{{count}} 件の証明書を取り消します",
+    "revoke_warning": "取り消すと、その証明書で署名済みのアプリは無効になり、再署名が必要です。",
     "max_certs_desc": "iloaderは既存の証明書を無効化（Revoke）し、新しいものを生成します。",
     "hide_certificate_list": "証明書リストを隠す",
     "choose_what_to_revoke": "無効化するものを選択",

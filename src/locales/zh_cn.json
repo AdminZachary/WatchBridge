@@ -76,6 +76,7 @@
     "submit": "提交",
     "max_certs_title": "已达到证书数量上限",
     "revoke_count": "将撤销 {{count}} 个证书",
+    "revoke_warning": "撤销后，此前用该证书签名的应用将失效，需要重新签名。",
     "max_certs_desc": "WatchBridge 将撤销您现有的证书并生成一个新的。",
     "hide_certificate_list": "隐藏证书列表",
     "choose_what_to_revoke": "选择要撤销的内容",

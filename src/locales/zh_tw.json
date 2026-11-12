@@ -76,6 +76,7 @@
     "submit": "提交",
     "max_certs_title": "已達到憑證數量上限",
     "revoke_count": "將撤銷 {{count}} 個憑證",
+    "revoke_warning": "撤銷後，先前用該憑證簽署的應用程式將失效，需要重新簽署。",
     "max_certs_desc": "iloader 將撤銷您現有的憑證並產生一個新的。",
     "hide_certificate_list": "隱藏憑證列表",
     "choose_what_to_revoke": "選擇要撤銷的內容",
