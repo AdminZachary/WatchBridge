@@ -46,8 +46,11 @@ artifacts="$repository/artifacts/macos"
 mkdir -p "$artifacts"
 # Clear only this helper's own output, so a failed run cannot leave an older
 # artifact looking like the result of this one.
-rm -f "$artifacts/WatchBridge.zip" "$artifacts/BUILD.json" \
-      "$artifacts/SHA256SUMS.txt" "$artifacts/LICENSES.zip"
+rm -f "$artifacts"/WatchBridge*.zip "$artifacts"/WatchBridge*.dmg \
+      "$artifacts/BUILD.json" "$artifacts/SHA256SUMS.txt" "$artifacts/LICENSES.zip"
+
+version="$(python3 -c 'import json,sys; print(json.load(open("src-tauri/tauri.conf.json"))["version"])')"
+arch="$(uname -m)"
 
 bun install --frozen-lockfile --ignore-scripts
 bun run build
@@ -61,6 +64,7 @@ fi
 python3 scripts/Collect-Licenses.py --output "$artifacts/LICENSES.zip"
 
 app_zip=""
+app_dmg=""
 if [[ $build_executable -eq 1 ]]; then
     bun run tauri build --bundles app --config src-tauri/ci.conf.json -- --locked
     app_path="$repository/src-tauri/target/release/bundle/macos/WatchBridge.app"
@@ -77,6 +81,12 @@ if [[ $build_executable -eq 1 ]]; then
     # ditto keeps bundle metadata and the executable bit; plain zip does not.
     ditto -c -k --sequesterRsrc --keepParent "$app_path" "$artifacts/WatchBridge.zip"
     app_zip="$artifacts/WatchBridge.zip"
+
+    # Build the disk image from the already signed bundle, so the DMG contains the
+    # signed app rather than a copy made before signing.
+    app_dmg="$artifacts/WatchBridge-${version}-${arch}.dmg"
+    hdiutil create -quiet -volname "WatchBridge" -srcfolder "$app_path" \
+        -ov -format UDZO "$app_dmg"
 fi
 
 sha256() {
@@ -87,13 +97,12 @@ commit_date="$(git show -s --format=%cI HEAD)"
 rust_version="$(rustc --version)"
 bun_version="$(bun --version)"
 macos_version="$(sw_vers -productVersion)"
-arch="$(uname -m)"
 
 python3 - "$artifacts" "$commit" "$dirty" "$commit_date" "$rust_version" \
-    "$bun_version" "$macos_version" "$arch" "$app_zip" <<'PY'
+    "$bun_version" "$macos_version" "$arch" "$app_zip" "$app_dmg" <<'PY'
 import hashlib, json, pathlib, sys
 
-artifacts, commit, dirty, commit_date, rust_version, bun_version, macos_version, arch, app_zip = sys.argv[1:]
+artifacts, commit, dirty, commit_date, rust_version, bun_version, macos_version, arch, app_zip, app_dmg = sys.argv[1:]
 root = pathlib.Path(artifacts)
 
 def digest(path: pathlib.Path) -> str:
@@ -116,6 +125,8 @@ report = {
     "licensesSha256": digest(root / "LICENSES.zip"),
     "appArchive": "WatchBridge.zip" if app_zip else None,
     "appArchiveSha256": digest(root / "WatchBridge.zip") if app_zip else None,
+    "diskImage": pathlib.Path(app_dmg).name if app_dmg else None,
+    "diskImageSha256": digest(pathlib.Path(app_dmg)) if app_dmg else None,
 }
 (root / "BUILD.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
 
@@ -123,10 +134,13 @@ lines = [f'{digest(root / "BUILD.json")}  BUILD.json',
          f'{digest(root / "LICENSES.zip")}  LICENSES.zip']
 if app_zip:
     lines.append(f'{digest(root / "WatchBridge.zip")}  WatchBridge.zip')
+if app_dmg:
+    dmg = pathlib.Path(app_dmg)
+    lines.append(f'{digest(dmg)}  {dmg.name}')
 (root / "SHA256SUMS.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 PY
 
 echo "Build checks passed. Report: $artifacts/BUILD.json"
-if [[ -n "$app_zip" ]]; then
-    echo "App archive: $app_zip"
+if [[ -n "$app_dmg" ]]; then
+    echo "Disk image: $app_dmg"
 fi
