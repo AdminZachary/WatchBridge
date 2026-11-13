@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B%20%C2%B7%20Linux-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
 
@@ -27,7 +27,7 @@
 
 ## 무엇인가
 
-Windows에서 자체 서명 iOS 앱(SideStore 등)을 설치하려면 세 가지가 필요합니다. Apple ID 서명, 대상 기기를 개발용 기기로 등록, 기기의 개발자 모드 활성화입니다. 공식 도구 체인은 Xcode이며 macOS에만 있습니다. 이 앱은 그 부분을 채워 워치 개발자 모드 활성화와 설치의 전체 과정을 Windows와 macOS에서 수행합니다.
+Windows에서 자체 서명 iOS 앱(SideStore 등)을 설치하려면 세 가지가 필요합니다. Apple ID 서명, 대상 기기를 개발용 기기로 등록, 기기의 개발자 모드 활성화입니다. 공식 도구 체인은 Xcode이며 macOS에만 있습니다. 이 앱은 그 부분을 채워 워치 개발자 모드 활성화와 설치의 전체 과정을 Windows, macOS, Linux에서 수행합니다.
 
 ## 기능
 
@@ -71,6 +71,12 @@ Windows에서 자체 서명 iOS 앱(SideStore 등)을 설치하려면 세 가지
 - 드라이버 설치 불필요: 시스템 `usbmuxd`를 그대로 사용합니다
 - Xcode 불필요: DMG는 바로 실행됩니다. 소스에서 빌드할 때만 Xcode Command Line Tools가 필요합니다
 
+**Linux**
+
+- 시스템 `usbmuxd` 데몬 실행 중(`usbmuxd` 패키지; 다른 드라이버 불필요)
+- 실행 시 WebKitGTK 4.1과 Secret Service 키링(예: GNOME Keyring) 필요
+- 패키지: Linux 빌드 아티팩트의 `.deb` / `.rpm`; 직접 빌드는 `./scripts/Build-Linux.sh --build-executable`
+
 **공통**
 
 - 대상 워치와 이미 페어링된 아이폰; 준비 단계에는 케이블이 필요합니다
@@ -80,6 +86,8 @@ Windows에서 자체 서명 iOS 앱(SideStore 등)을 설치하려면 세 가지
 **Windows**: [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest)에서 `watchbridge-windows.zip`을 내려받아 압축을 풀고 `WatchBridge.exe`를 실행하세요.
 
 **macOS**: 아키텍처에 맞는 DMG(Apple Silicon은 `arm64`, Intel은 `x86_64`)를 내려받아 `WatchBridge.app`을 「응용 프로그램」으로 옮기세요. 첫 실행은 Gatekeeper가 차단하므로 「시스템 설정 → 개인정보 보호 및 보안」에서 한 번 「그래도 열기」를 선택합니다.
+
+**Linux**: Linux 빌드 아티팩트의 `.deb` 또는 `.rpm`을 설치하고(`sudo dnf install ./WatchBridge-*.rpm` / `sudo apt install ./WatchBridge_*.deb`) `sudo systemctl enable --now usbmuxd` 후 `watchbridge`를 실행하세요.
 
 Windows 압축 파일 구성:
 

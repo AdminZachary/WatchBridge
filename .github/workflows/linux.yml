@@ -1,0 +1,45 @@
+name: Build Linux
+
+on:
+  push:
+    # Branch pushes only: releases create tags, and a tag push must not start a
+    # second identical build for the same commit.
+    branches: ["**"]
+    # Documentation changes do not affect the binaries.
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linux-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Tauri system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libdbus-1-dev libsecret-1-dev rpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test and build Linux packages
+        run: ./scripts/Build-Linux.sh --build-executable
+      - uses: actions/upload-artifact@v4
+        with:
+          name: watchbridge-linux-x86_64
+          if-no-files-found: error
+          path: artifacts/linux/*
