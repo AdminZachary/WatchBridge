@@ -5,6 +5,10 @@ on:
     # Branch pushes only: releases create tags, and a tag push must not start a
     # second identical build for the same commit.
     branches: ["**"]
+    # Documentation changes do not affect the binaries.
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
   pull_request:
   workflow_dispatch:
 
