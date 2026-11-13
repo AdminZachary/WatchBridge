@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
-![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-lightgrey)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
 
 </div>
 
@@ -61,7 +61,7 @@ Installing a self-signed iOS app on Windows (SideStore and the like) takes three
 **Windows**
 
 - Windows 10 22H2 / Windows 11 (x86_64)
-- **Apple Mobile Device Service**: shipped with [iTunes](https://www.apple.com/itunes/) or the Apple Devices app from the Microsoft Store. Without it neither USB nor Wi-Fi works
+- **Apple Mobile Device Service**: shipped with [iTunes](https://www.apple.com/itunes/) or the [Apple Devices app](https://apps.microsoft.com/detail/9np83lwlpz9k) from the Microsoft Store. Without it neither USB nor Wi-Fi works
 - WebView2 runtime (built into Windows 11)
 
 **macOS**

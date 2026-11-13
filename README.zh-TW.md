@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
-![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-lightgrey)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
 
 </div>
 
@@ -61,7 +61,7 @@
 **Windows**
 
 - Windows 10 22H2 / Windows 11（x86_64）
-- **Apple Mobile Device Service**：來自 [iTunes](https://www.apple.com/itunes/) 或 Microsoft Store 的 Apple Devices App。沒有它，USB 與 Wi-Fi 兩條路都不通
+- **Apple Mobile Device Service**：來自 [iTunes](https://www.apple.com/itunes/) 或 [Microsoft Store 的 Apple Devices App](https://apps.microsoft.com/detail/9np83lwlpz9k)。沒有它，USB 與 Wi-Fi 兩條路都不通
 - WebView2 執行階段（Windows 11 已內建）
 
 **macOS**

@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
-![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-lightgrey)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
 
 </div>
 
@@ -61,7 +61,7 @@ Instalar una app iOS autofirmada en Windows (SideStore y similares) requiere tre
 **Windows**
 
 - Windows 10 22H2 / Windows 11 (x86_64)
-- **Apple Mobile Device Service**: incluido en [iTunes](https://www.apple.com/itunes/) o en la app Apple Devices de Microsoft Store. Sin él no funcionan ni USB ni Wi-Fi
+- **Apple Mobile Device Service**: incluido en [iTunes](https://www.apple.com/itunes/) o en la [app Apple Devices](https://apps.microsoft.com/detail/9np83lwlpz9k) de Microsoft Store. Sin él no funcionan ni USB ni Wi-Fi
 - Runtime de WebView2 (incluido en Windows 11)
 
 **macOS**

@@ -12,7 +12,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
-![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-lightgrey)
+![Version](https://img.shields.io/badge/version-0.1.0-blue)
 
 </div>
 
@@ -61,7 +61,7 @@ Windows 上装自签 iOS 应用（SideStore 之类）需要三件事：Apple ID 
 **Windows**
 
 - Windows 10 22H2 / Windows 11（x86_64）
-- **Apple Mobile Device Service**：来自 [iTunes](https://www.apple.com/itunes/) 或 Microsoft Store 的 Apple Devices 应用。没有它，USB 和 Wi-Fi 两条路都不通
+- **Apple Mobile Device Service**：来自 [iTunes](https://www.apple.com/itunes/) 或 [Microsoft Store 的 Apple Devices 应用](https://apps.microsoft.com/detail/9np83lwlpz9k)。没有它，USB 和 Wi-Fi 两条路都不通
 - WebView2 运行时（Windows 11 已内置）
 
 **macOS**
