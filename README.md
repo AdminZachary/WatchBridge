@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B%20%C2%B7%20Linux-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.1-blue)
 
@@ -71,7 +71,13 @@ Installing a self-signed iOS app on Windows (SideStore and the like) takes three
 - No driver install: the build uses the system `usbmuxd`
 - No Xcode: the DMG runs as is; building from source only needs the Xcode command line tools
 
-**Both**
+**Linux**
+
+- The system `usbmuxd` daemon running (package `usbmuxd`; no other driver)
+- WebKitGTK 4.1 and a Secret Service keyring (e.g. GNOME Keyring) at runtime
+- Packages: `.deb` / `.rpm` from the Linux build artifact; build with `./scripts/Build-Linux.sh --build-executable`
+
+**All**
 
 - An iPhone already paired with the target Watch; preparation requires a cable
 
@@ -80,6 +86,8 @@ Installing a self-signed iOS app on Windows (SideStore and the like) takes three
 **Windows**: download `watchbridge-windows.zip` from [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest), extract it and run `WatchBridge.exe`.
 
 **macOS**: download the DMG for your architecture (`arm64` for Apple Silicon, `x86_64` for Intel) and drag `WatchBridge.app` into Applications. The first launch is blocked by Gatekeeper; allow it once in **System Settings → Privacy & Security → Open Anyway**.
+
+**Linux**: install the `.deb` or `.rpm` from the Linux build artifact (`sudo dnf install ./WatchBridge-*.rpm` / `sudo apt install ./WatchBridge_*.deb`), run `sudo systemctl enable --now usbmuxd`, then start `watchbridge`.
 
 The Windows archive contains:
 
