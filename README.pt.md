@@ -8,7 +8,7 @@
 
 [English](README.en.md) · [简体中文](README.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
-[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
+[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
@@ -76,7 +76,7 @@ Instalar um app iOS assinado por conta própria no Windows (SideStore e afins) e
 
 ## Instalação e execução
 
-**Windows**: baixe `watchbridge-windows.zip` em [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) e execute `WatchBridge.exe` após descompactar.
+**Windows**: baixe `watchbridge-windows.zip` em [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest) e execute `WatchBridge.exe` após descompactar.
 
 **macOS**: baixe o DMG da sua arquitetura (`arm64` para Apple Silicon, `x86_64` para Intel) e arraste `WatchBridge.app` para Aplicativos. A primeira abertura é bloqueada pelo Gatekeeper; permita uma vez em «Ajustes do Sistema → Privacidade e Segurança → Abrir assim mesmo».
 

@@ -8,7 +8,7 @@
 
 [English](README.en.md) · [简体中文](README.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
-[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
+[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
@@ -76,7 +76,7 @@ Um unter Windows eine selbstsignierte iOS-App (etwa SideStore) zu installieren, 
 
 ## Installation und Start
 
-**Windows**: Lade `watchbridge-windows.zip` von [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) und starte nach dem Entpacken `WatchBridge.exe`.
+**Windows**: Lade `watchbridge-windows.zip` von [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest) und starte nach dem Entpacken `WatchBridge.exe`.
 
 **macOS**: Lade das DMG für deine Architektur (`arm64` für Apple Silicon, `x86_64` für Intel) und ziehe `WatchBridge.app` in «Programme». Der erste Start wird von Gatekeeper blockiert; erlaube ihn einmal unter «Systemeinstellungen → Datenschutz & Sicherheit → Trotzdem öffnen».
 

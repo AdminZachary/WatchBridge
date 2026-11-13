@@ -8,7 +8,7 @@
 
 [English](README.en.md) · [简体中文](README.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
-[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
+[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
@@ -76,7 +76,7 @@ Windows에서 자체 서명 iOS 앱(SideStore 등)을 설치하려면 세 가지
 
 ## 설치와 실행
 
-**Windows**: [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest)에서 `watchbridge-windows.zip`을 내려받아 압축을 풀고 `WatchBridge.exe`를 실행하세요.
+**Windows**: [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest)에서 `watchbridge-windows.zip`을 내려받아 압축을 풀고 `WatchBridge.exe`를 실행하세요.
 
 **macOS**: 아키텍처에 맞는 DMG(Apple Silicon은 `arm64`, Intel은 `x86_64`)를 내려받아 `WatchBridge.app`을 「응용 프로그램」으로 옮기세요. 첫 실행은 Gatekeeper가 차단하므로 「시스템 설정 → 개인정보 보호 및 보안」에서 한 번 「그래도 열기」를 선택합니다.
 

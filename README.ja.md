@@ -8,7 +8,7 @@
 
 [English](README.en.md) · [简体中文](README.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
-[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
+[![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 ![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
@@ -76,7 +76,7 @@ Windows で自己署名の iOS アプリ（SideStore など）を入れるには
 
 ## インストールと実行
 
-**Windows**: [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) から `watchbridge-windows.zip` を取得し、展開して `WatchBridge.exe` を実行します。
+**Windows**: [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest) から `watchbridge-windows.zip` を取得し、展開して `WatchBridge.exe` を実行します。
 
 **macOS**: アーキテクチャに合った DMG（Apple Silicon は `arm64`、Intel は `x86_64`）を取得し、`WatchBridge.app` を「アプリケーション」へドラッグします。初回起動は Gatekeeper に阻止されるので、「システム設定 → プライバシーとセキュリティ」で一度「このまま開く」を選びます。
 
