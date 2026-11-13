@@ -67,15 +67,11 @@ Three behaviours differ on macOS today:
 - The bundle is **ad-hoc signed**, not signed with a Developer ID and not
   notarized. Apple Silicon refuses to execute an unsigned binary, which is why
   the build signs it; but Gatekeeper still treats a downloaded copy as
-  untrusted. After moving it to `/Applications`, clear the quarantine flag once:
-
-  ```bash
-  xattr -dr com.apple.quarantine /Applications/WatchBridge.app
-  ```
-
-  Without that step macOS reports the app as damaged, because a quarantined,
-  ad-hoc-signed bundle fails validation. Distributing to other people requires a
-  Developer ID certificate plus notarization; that is not part of this build.
+  untrusted. The first launch is blocked, so approve it once under
+  **System Settings → Privacy & Security → Open Anyway**. From a terminal the
+  same result is `xattr -dr com.apple.quarantine /Applications/WatchBridge.app`.
+  Distributing to other people without that prompt requires a Developer ID
+  certificate plus notarization; that is not part of this build.
 - Automatic renewal's "start at login" option is Windows-only; on macOS the
   control reports that it is unavailable. Renewal itself works while the app runs.
 - The device side uses the system `usbmuxd` socket, so no driver install is
