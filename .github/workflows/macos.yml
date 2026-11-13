@@ -2,6 +2,10 @@ name: Build macOS
 
 on:
   push:
+    # The scheduled chart job commits only these files; do not rebuild for them.
+    paths-ignore:
+      - "docs/downloads.json"
+      - "docs/downloads.svg"
   pull_request:
   workflow_dispatch:
 

@@ -14,6 +14,8 @@
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.0-blue)
 
+![Downloads over time](docs/downloads.svg)
+
 </div>
 
 > [!IMPORTANT]
