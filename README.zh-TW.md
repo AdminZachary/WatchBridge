@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-lightgrey)
 
@@ -26,7 +26,7 @@
 
 ## 這是什麼
 
-在 Windows 上安裝自簽 iOS App（SideStore 之類）需要三件事：Apple ID 簽章、將目標裝置註冊為開發裝置、裝置開啟開發者模式。官方工具鏈是 Xcode，只有 macOS 有。本程式補上這一塊，把手錶開發者模式開啟與安裝的完整流程帶到 Windows。
+在 Windows 上安裝自簽 iOS App（SideStore 之類）需要三件事：Apple ID 簽章、將目標裝置註冊為開發裝置、裝置開啟開發者模式。官方工具鏈是 Xcode，只有 macOS 有。本程式補上這一塊，把手錶開發者模式開啟與安裝的完整流程帶到 Windows 與 macOS。
 
 ## 功能
 
@@ -58,23 +58,29 @@
 
 ## 系統需求
 
+**Windows**
+
 - Windows 10 22H2 / Windows 11（x86_64）
 - **Apple Mobile Device Service**：來自 [iTunes](https://www.apple.com/itunes/) 或 Microsoft Store 的 Apple Devices App。沒有它，USB 與 Wi-Fi 兩條路都不通
 - WebView2 執行階段（Windows 11 已內建）
+
+**macOS**
+
+- macOS 11 或更新（Apple Silicon 原生，Intel 亦可）
+- 無需安裝驅動程式：直接使用系統內建的 `usbmuxd`
+- 無需 Xcode：DMG 開箱即用；自行建置也只需要 Xcode Command Line Tools
+
+**通用**
+
 - iPhone 已與目標手錶配對；準備階段需要傳輸線
 
 ## 安裝與執行
 
-從 [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) 下載 `watchbridge-windows.zip`，解壓縮後直接執行 `WatchBridge.exe`。
+**Windows**：從 [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) 下載 `watchbridge-windows.zip`，解壓縮後直接執行 `WatchBridge.exe`。
 
-壓縮檔包含：
+**macOS**：下載對應架構的 DMG（Apple Silicon 用 `arm64`，Intel 用 `x86_64`），把 `WatchBridge.app` 拖進「應用程式」。首次開啟會被 Gatekeeper 攔截，到「系統設定 → 隱私權與安全性」點一次「仍要打開」即可。
 
-| 檔案 | 內容 |
-|---|---|
-| `WatchBridge.exe` | 主程式，**未簽章**，首次執行會有 SmartScreen 提示 |
-| `BUILD.json` | 原始碼提交、建置是否含未提交變更、鎖檔雜湊、工具鏈版本、exe 的 SHA-256 |
-| `SHA256SUMS.txt` | 上述檔案的校驗和 |
-| `LICENSES.zip` | 第三方授權原文 + 相依清單（`inventory.json`） |
+Windows 壓縮檔包含：
 
 ## 從原始碼建置
 

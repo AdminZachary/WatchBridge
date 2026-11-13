@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-lightgrey)
 
@@ -26,7 +26,7 @@
 
 ## 무엇인가
 
-Windows에서 자체 서명 iOS 앱(SideStore 등)을 설치하려면 세 가지가 필요합니다. Apple ID 서명, 대상 기기를 개발용 기기로 등록, 기기의 개발자 모드 활성화입니다. 공식 도구 체인은 Xcode이며 macOS에만 있습니다. 이 앱은 그 부분을 채워 워치 개발자 모드 활성화와 설치의 전체 과정을 Windows에서 수행합니다.
+Windows에서 자체 서명 iOS 앱(SideStore 등)을 설치하려면 세 가지가 필요합니다. Apple ID 서명, 대상 기기를 개발용 기기로 등록, 기기의 개발자 모드 활성화입니다. 공식 도구 체인은 Xcode이며 macOS에만 있습니다. 이 앱은 그 부분을 채워 워치 개발자 모드 활성화와 설치의 전체 과정을 Windows와 macOS에서 수행합니다.
 
 ## 기능
 
@@ -58,23 +58,29 @@ Windows에서 자체 서명 iOS 앱(SideStore 등)을 설치하려면 세 가지
 
 ## 시스템 요구 사항
 
+**Windows**
+
 - Windows 10 22H2 / Windows 11 (x86_64)
 - **Apple Mobile Device Service**: [iTunes](https://www.apple.com/itunes/) 또는 Microsoft Store의 Apple Devices 앱에 포함됩니다. 없으면 USB와 Wi-Fi 모두 동작하지 않습니다
 - WebView2 런타임(Windows 11에 기본 포함)
+
+**macOS**
+
+- macOS 11 이상(Apple Silicon 네이티브, Intel도 지원)
+- 드라이버 설치 불필요: 시스템 `usbmuxd`를 그대로 사용합니다
+- Xcode 불필요: DMG는 바로 실행됩니다. 소스에서 빌드할 때만 Xcode Command Line Tools가 필요합니다
+
+**공통**
+
 - 대상 워치와 이미 페어링된 아이폰; 준비 단계에는 케이블이 필요합니다
 
 ## 설치와 실행
 
-[Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest)에서 `watchbridge-windows.zip`을 내려받아 압축을 풀고 `WatchBridge.exe`를 실행하세요.
+**Windows**: [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest)에서 `watchbridge-windows.zip`을 내려받아 압축을 풀고 `WatchBridge.exe`를 실행하세요.
 
-압축 파일 구성:
+**macOS**: 아키텍처에 맞는 DMG(Apple Silicon은 `arm64`, Intel은 `x86_64`)를 내려받아 `WatchBridge.app`을 「응용 프로그램」으로 옮기세요. 첫 실행은 Gatekeeper가 차단하므로 「시스템 설정 → 개인정보 보호 및 보안」에서 한 번 「그래도 열기」를 선택합니다.
 
-| 파일 | 내용 |
-|---|---|
-| `WatchBridge.exe` | 본 프로그램, **서명되지 않음**, 첫 실행 시 SmartScreen 경고가 표시됩니다 |
-| `BUILD.json` | 소스 커밋, 작업 트리 변경 여부, 락 파일 해시, 도구 체인 버전, exe의 SHA-256 |
-| `SHA256SUMS.txt` | 위 파일들의 체크섬 |
-| `LICENSES.zip` | 서드파티 라이선스 원문과 의존성 목록(`inventory.json`) |
+Windows 압축 파일 구성:
 
 ## 소스에서 빌드
 

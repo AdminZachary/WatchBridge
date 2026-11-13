@@ -72,6 +72,11 @@ if [[ $build_executable -eq 1 ]]; then
         echo "expected app bundle at $app_path" >&2
         exit 1
     fi
+    # Ship the licence inventory inside the bundle so the disk image is
+    # self-contained; this has to happen before signing so the seal covers it.
+    mkdir -p "$app_path/Contents/Resources"
+    cp "$artifacts/LICENSES.zip" "$app_path/Contents/Resources/LICENSES.zip"
+
     # Apple Silicon refuses to execute an unsigned binary, and Gatekeeper reports
     # the missing signature as "damaged". Ad-hoc signing makes the bundle
     # runnable; it does not make it trusted, so a downloaded copy still needs the

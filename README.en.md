@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-lightgrey)
 
@@ -26,7 +26,7 @@
 
 ## What it is
 
-Installing a self-signed iOS app on Windows (SideStore and the like) takes three things: an Apple ID signature, registering the target device as a development device, and enabling developer mode on the device. The official toolchain is Xcode, which only runs on macOS. This app fills that gap: it brings the whole workflow for enabling developer mode on the Watch and installing apps onto it to Windows.
+Installing a self-signed iOS app on Windows (SideStore and the like) takes three things: an Apple ID signature, registering the target device as a development device, and enabling developer mode on the device. The official toolchain is Xcode, which only runs on macOS. This app fills that gap: it brings the whole workflow for enabling developer mode on the Watch and installing apps onto it to both Windows and macOS.
 
 ## Features
 
@@ -58,16 +58,29 @@ Installing a self-signed iOS app on Windows (SideStore and the like) takes three
 
 ## Requirements
 
+**Windows**
+
 - Windows 10 22H2 / Windows 11 (x86_64)
 - **Apple Mobile Device Service**: shipped with [iTunes](https://www.apple.com/itunes/) or the Apple Devices app from the Microsoft Store. Without it neither USB nor Wi-Fi works
 - WebView2 runtime (built into Windows 11)
+
+**macOS**
+
+- macOS 11 or newer (native on Apple Silicon, Intel works too)
+- No driver install: the build uses the system `usbmuxd`
+- No Xcode: the DMG runs as is; building from source only needs the Xcode command line tools
+
+**Both**
+
 - An iPhone already paired with the target Watch; preparation requires a cable
 
 ## Install and run
 
-Download `watchbridge-windows.zip` from [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest), extract it and run `WatchBridge.exe`.
+**Windows**: download `watchbridge-windows.zip` from [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest), extract it and run `WatchBridge.exe`.
 
-The archive contains:
+**macOS**: download the DMG for your architecture (`arm64` for Apple Silicon, `x86_64` for Intel) and drag `WatchBridge.app` into Applications. The first launch is blocked by Gatekeeper; allow it once in **System Settings → Privacy & Security → Open Anyway**.
+
+The Windows archive contains:
 
 | File | Contents |
 |---|---|

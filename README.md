@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-lightgrey)
 
@@ -26,7 +26,7 @@
 
 ## 这是什么
 
-Windows 上装自签 iOS 应用（SideStore 之类）需要三件事：Apple ID 签名、将目标设备注册为开发设备、设备开启开发者模式。官方工具链是 Xcode，只有 macOS 有。此 APP 解决这个问题，实现手表开发者模式开启与安装全 Windows 流程。
+Windows 上装自签 iOS 应用（SideStore 之类）需要三件事：Apple ID 签名、将目标设备注册为开发设备、设备开启开发者模式。官方工具链是 Xcode，只有 macOS 有。此 APP 解决这个问题，实现手表开发者模式开启与安装的完整流程，Windows 与 macOS 皆可。
 
 ## 功能
 
@@ -58,16 +58,29 @@ Windows 上装自签 iOS 应用（SideStore 之类）需要三件事：Apple ID 
 
 ## 系统要求
 
+**Windows**
+
 - Windows 10 22H2 / Windows 11（x86_64）
 - **Apple Mobile Device Service**：来自 [iTunes](https://www.apple.com/itunes/) 或 Microsoft Store 的 Apple Devices 应用。没有它，USB 和 Wi-Fi 两条路都不通
 - WebView2 运行时（Windows 11 已内置）
+
+**macOS**
+
+- macOS 11 或更新（Apple Silicon 原生，Intel 亦可）
+- 无需安装驱动：直接使用系统自带的 `usbmuxd`
+- 无需 Xcode：DMG 开箱即用；自行构建也只需要 Xcode Command Line Tools
+
+**通用**
+
 - iPhone 已与目标手表配对；准备阶段需要数据线
 
 ## 安装与运行
 
-从 [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) 下载 `watchbridge-windows.zip`，解压后直接运行 `WatchBridge.exe`。
+**Windows**：从 [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) 下载 `watchbridge-windows.zip`，解压后直接运行 `WatchBridge.exe`。
 
-压缩包里包含：
+**macOS**：下载对应架构的 DMG（Apple Silicon 用 `arm64`，Intel 用 `x86_64`），把 `WatchBridge.app` 拖进「应用程序」。首次打开会被 Gatekeeper 拦截，到「系统设置 → 隐私与安全性」点一次「仍要打开」即可。
+
+Windows 压缩包里包含：
 
 | 文件 | 内容 |
 |---|---|

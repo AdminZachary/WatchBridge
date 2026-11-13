@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/iloader-for-windows/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/iloader-for-windows/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.0--alpha.5-lightgrey)
 
@@ -26,7 +26,7 @@
 
 ## O que é
 
-Instalar um app iOS assinado por conta própria no Windows (SideStore e afins) exige três coisas: assinatura com Apple ID, registro do dispositivo de destino como dispositivo de desenvolvimento e modo desenvolvedor ativado no dispositivo. A cadeia oficial é o Xcode, que só existe no macOS. Este app cobre essa lacuna: leva para o Windows todo o fluxo de ativação do modo desenvolvedor do relógio e de instalação.
+Instalar um app iOS assinado por conta própria no Windows (SideStore e afins) exige três coisas: assinatura com Apple ID, registro do dispositivo de destino como dispositivo de desenvolvimento e modo desenvolvedor ativado no dispositivo. A cadeia oficial é o Xcode, que só existe no macOS. Este app cobre essa lacuna: leva para o Windows e o macOS todo o fluxo de ativação do modo desenvolvedor do relógio e de instalação.
 
 ## Recursos
 
@@ -58,23 +58,29 @@ Instalar um app iOS assinado por conta própria no Windows (SideStore e afins) e
 
 ## Requisitos
 
+**Windows**
+
 - Windows 10 22H2 / Windows 11 (x86_64)
 - **Apple Mobile Device Service**: incluso no [iTunes](https://www.apple.com/itunes/) ou no app Apple Devices da Microsoft Store. Sem ele, nem USB nem Wi-Fi funcionam
 - Runtime do WebView2 (já incluído no Windows 11)
+
+**macOS**
+
+- macOS 11 ou mais recente (nativo em Apple Silicon, também em Intel)
+- Sem instalar driver: usa o `usbmuxd` do sistema
+- Sem Xcode: o DMG funciona como está; compilar do código exige apenas as Xcode Command Line Tools
+
+**Ambos**
+
 - Um iPhone já pareado com o relógio de destino; a preparação exige cabo
 
 ## Instalação e execução
 
-Baixe `watchbridge-windows.zip` em [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest), descompacte e execute `WatchBridge.exe`.
+**Windows**: baixe `watchbridge-windows.zip` em [Releases](https://github.com/AdminZachary/iloader-for-windows/releases/latest) e execute `WatchBridge.exe` após descompactar.
 
-O arquivo contém:
+**macOS**: baixe o DMG da sua arquitetura (`arm64` para Apple Silicon, `x86_64` para Intel) e arraste `WatchBridge.app` para Aplicativos. A primeira abertura é bloqueada pelo Gatekeeper; permita uma vez em «Ajustes do Sistema → Privacidade e Segurança → Abrir assim mesmo».
 
-| Arquivo | Conteúdo |
-|---|---|
-| `WatchBridge.exe` | O aplicativo, **sem assinatura**; o SmartScreen avisa na primeira execução |
-| `BUILD.json` | Commit de origem, se a árvore estava modificada, hashes dos lockfiles, versões das ferramentas e SHA-256 do exe |
-| `SHA256SUMS.txt` | Somas de verificação dos arquivos acima |
-| `LICENSES.zip` | Textos de licenças de terceiros e inventário de dependências (`inventory.json`) |
+O arquivo do Windows contém:
 
 ## Compilar a partir do código
 
