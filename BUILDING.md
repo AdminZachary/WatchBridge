@@ -62,12 +62,24 @@ to `artifacts/macos/`:
 `.github/workflows/macos.yml` runs the same script on `macos-14` (arm64) and
 `macos-15-intel` (x86_64) and uploads one artifact per architecture.
 
-Two behaviours differ on macOS today:
+Three behaviours differ on macOS today:
 
-- The app is **not signed or notarized**, so Gatekeeper blocks the first launch
-  until you allow it (right-click → Open, or `xattr -dr com.apple.quarantine`).
+- The bundle is **ad-hoc signed**, not signed with a Developer ID and not
+  notarized. Apple Silicon refuses to execute an unsigned binary, which is why
+  the build signs it; but Gatekeeper still treats a downloaded copy as
+  untrusted. After moving it to `/Applications`, clear the quarantine flag once:
+
+  ```bash
+  xattr -dr com.apple.quarantine /Applications/WatchBridge.app
+  ```
+
+  Without that step macOS reports the app as damaged, because a quarantined,
+  ad-hoc-signed bundle fails validation. Distributing to other people requires a
+  Developer ID certificate plus notarization; that is not part of this build.
 - Automatic renewal's "start at login" option is Windows-only; on macOS the
   control reports that it is unavailable. Renewal itself works while the app runs.
+- The device side uses the system `usbmuxd` socket, so no driver install is
+  needed and no Apple Mobile Device Service equivalent must be running.
 
 ## Dependencies
 

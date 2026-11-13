@@ -68,6 +68,12 @@ if [[ $build_executable -eq 1 ]]; then
         echo "expected app bundle at $app_path" >&2
         exit 1
     fi
+    # Apple Silicon refuses to execute an unsigned binary, and Gatekeeper reports
+    # the missing signature as "damaged". Ad-hoc signing makes the bundle
+    # runnable; it does not make it trusted, so a downloaded copy still needs the
+    # quarantine attribute removed.
+    codesign --force --deep --sign - "$app_path"
+    codesign --verify --deep --strict "$app_path"
     # ditto keeps bundle metadata and the executable bit; plain zip does not.
     ditto -c -k --sequesterRsrc --keepParent "$app_path" "$artifacts/WatchBridge.zip"
     app_zip="$artifacts/WatchBridge.zip"
