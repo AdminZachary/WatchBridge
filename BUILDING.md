@@ -1,4 +1,4 @@
-# Building on Windows
+# Building on Windows or macOS
 
 Install Python 3.12, Git, Bun, Rust with the Windows MSVC toolchain, and Visual Studio Build
 Tools with "Desktop development with C++" and a Windows SDK. The app also needs
@@ -32,6 +32,54 @@ phone apps. The tests do not use a physical iPhone or Apple Watch.
 
 GitHub Actions runs the same script (`.github/workflows/windows.yml`) and uploads
 the executable as a build artifact.
+
+## Building on macOS
+
+The same sources produce a macOS application; the device side uses the system
+`usbmuxd` socket (`/var/run/usbmuxd`), so no extra driver is needed.
+
+Requirements: macOS 11 or newer, Xcode command line tools, Rust stable, Bun and
+Python 3.12.
+
+```bash
+# Checks only: frontend, Rust unit tests, licence inventory.
+./scripts/Build-macOS.sh
+
+# Also build WatchBridge.app and package it.
+./scripts/Build-macOS.sh --build-executable
+```
+
+`--skip-tests` skips the Rust unit tests for a faster build. The helper writes
+to `artifacts/macos/`:
+
+| File | Contents |
+|---|---|
+| `WatchBridge.zip` | `WatchBridge.app`, packaged with `ditto` so the bundle metadata survives |
+| `BUILD.json` | Source commit, dirty flag, lockfile hashes, toolchain versions, macOS version, architecture, SHA-256 of the archive |
+| `SHA256SUMS.txt` | Checksums of the files above |
+| `LICENSES.zip` | Third-party licence texts and the dependency inventory |
+
+`.github/workflows/macos.yml` runs the same script on `macos-14` (arm64) and
+`macos-15-intel` (x86_64) and uploads one artifact per architecture.
+
+Three behaviours differ on macOS today:
+
+- The bundle is **ad-hoc signed**, not signed with a Developer ID and not
+  notarized. Apple Silicon refuses to execute an unsigned binary, which is why
+  the build signs it; but Gatekeeper still treats a downloaded copy as
+  untrusted. After moving it to `/Applications`, clear the quarantine flag once:
+
+  ```bash
+  xattr -dr com.apple.quarantine /Applications/WatchBridge.app
+  ```
+
+  Without that step macOS reports the app as damaged, because a quarantined,
+  ad-hoc-signed bundle fails validation. Distributing to other people requires a
+  Developer ID certificate plus notarization; that is not part of this build.
+- Automatic renewal's "start at login" option is Windows-only; on macOS the
+  control reports that it is unavailable. Renewal itself works while the app runs.
+- The device side uses the system `usbmuxd` socket, so no driver install is
+  needed and no Apple Mobile Device Service equivalent must be running.
 
 ## Dependencies
 

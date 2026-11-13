@@ -1,0 +1,42 @@
+name: Build macOS
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: macos-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-15
+            arch: arm64
+          - runner: macos-15-intel
+            arch: x86_64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Test and build macOS app
+        run: ./scripts/Build-macOS.sh --build-executable
+      - uses: actions/upload-artifact@v4
+        with:
+          name: watchbridge-macos-${{ matrix.arch }}
+          if-no-files-found: error
+          path: artifacts/macos/*
