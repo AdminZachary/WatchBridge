@@ -326,7 +326,9 @@ pub async fn prepare_watch(
                 let pairing = match result {
                     Ok(Ok(record)) => record,
                     Ok(Err(IdeviceError::UserDeniedPairing)) => {
-                        return Err(fail("手表拒绝了信任请求，请再次配对并在手表上允许。"));
+                        return Err(fail(
+                            "手表拒绝了信任请求。请解锁手表并保持亮屏，等待约 1 分钟后重新点击“配对手表”；若仍然失败，长按侧边按钮与数码表冠重启手表后再试。",
+                        ));
                     }
                     _ => return Err(fail("手表配对未完成。请解锁手表并确认信任提示，然后重试。")),
                 };

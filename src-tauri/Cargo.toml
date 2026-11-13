@@ -1,6 +1,6 @@
 [package]
 name = "iloader"
-version = "0.1.0"
+version = "0.1.1"
 description = "Apple Watch developer-mode and companion installer"
 authors = ["nab138", "AndreySemjonov", "AdminZachary"]
 edition = "2024"

@@ -80,6 +80,18 @@ fieldset.wb-card { padding: 20px; }
 }
 .wb-app .settings-buttons button:not(.link-button):not(.action-button):hover,
 .wb-app .log-header button:hover { background: #eaf1e7; }
+/* Dialog buttons without their own class kept the dark base background and
+   inherited the light theme's dark text, so they rendered as black blocks.
+   Covers the confirmation dialog, the pairing progress dialog and the
+   operation/repair dialogs. */
+.wb-app .modal button:not(.action-button):not(.link-button):not(.modal-close):not(.dropdown-toggle):not(.wb-primary) {
+  background: #f5f8f3;
+  border: 1px solid #d1ddd2;
+  color: #215044;
+}
+.wb-app .modal button:not(.action-button):not(.link-button):not(.modal-close):not(.dropdown-toggle):not(.wb-primary):hover {
+  background: #eaf1e7;
+}
 .wb-app .settings-container .action-button.danger { background: #fdeeec; border-color: #e3b3ad; color: #ab3535; }
 .wb-app .settings-container .action-button.primary { background: #246756; border-color: #246756; color: #fff; }
 .wb-app select { background: #fff; border-color: #cddccd; color: #153d36; }
