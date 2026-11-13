@@ -2,10 +2,9 @@ name: Build macOS
 
 on:
   push:
-    # The scheduled chart job commits only these files; do not rebuild for them.
-    paths-ignore:
-      - "docs/downloads.json"
-      - "docs/downloads.svg"
+    # Branch pushes only: releases create tags, and a tag push must not start a
+    # second identical build for the same commit.
+    branches: ["**"]
   pull_request:
   workflow_dispatch:
 
