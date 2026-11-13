@@ -26,11 +26,7 @@
 
 ## Qué es
 
-Instalar una app iOS autofirmada (como hace SideStore) requiere tres cosas: firma con Apple ID, registrar el dispositivo de destino como dispositivo de desarrollo y activar el modo desarrollador en el dispositivo. La cadena de herramientas oficial es Xcode, que solo existe en macOS.
-
-iLoader rehízo la mitad de eso en Windows con Rust. **WatchBridge añade la otra mitad**: toma el `Watch/*.app` que va dentro de la app instalada en el iPhone y lo lleva al Apple Watch emparejado; y antes de eso hace aparecer el interruptor de modo desarrollador del reloj. Sin instalar Python y sin línea de comandos.
-
-El camino hacia el dispositivo es indirecto: Windows no ve el reloj, así que el programa usa el iPhone como enrutador, reenvía un puerto al reloj y realiza el emparejamiento, la lectura de estado y la instalación dentro de esa sesión reenviada.
+Instalar una app iOS autofirmada en Windows (SideStore y similares) requiere tres cosas: firma con Apple ID, registrar el dispositivo de destino como dispositivo de desarrollo y activar el modo desarrollador en el dispositivo. La cadena oficial es Xcode, que solo existe en macOS. Esta aplicación cubre ese hueco: lleva a Windows todo el flujo para activar el modo desarrollador del reloj e instalar apps en él.
 
 ## Funciones
 

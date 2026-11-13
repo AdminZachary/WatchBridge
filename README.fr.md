@@ -26,11 +26,7 @@
 
 ## Présentation
 
-Installer une app iOS auto-signée (comme le fait SideStore) demande trois choses : une signature Apple ID, l'enregistrement de l'appareil cible comme appareil de développement, et l'activation du mode développeur sur l'appareil. La chaîne d'outils officielle est Xcode, disponible uniquement sur macOS.
-
-iLoader a reconstruit la moitié (côté iPhone) sous Windows en Rust. **WatchBridge apporte l'autre moitié** : il récupère le `Watch/*.app` contenu dans l'app installée sur l'iPhone et l'installe sur l'Apple Watch appairée ; et avant cela, il fait apparaître l'interrupteur de mode développeur de la montre — sans Python, sans ligne de commande.
-
-Le chemin vers l'appareil est indirect : Windows ne voit pas la montre, donc le programme utilise l'iPhone comme routeur, transfère un port vers la montre, puis effectue l'appairage, la lecture d'état et l'installation dans cette session transférée.
+Installer une app iOS auto-signée sous Windows (SideStore et équivalents) demande trois choses : une signature Apple ID, l'enregistrement de l'appareil cible comme appareil de développement, et l'activation du mode développeur sur l'appareil. La chaîne officielle est Xcode, disponible uniquement sur macOS. Cette application comble ce manque : elle apporte sous Windows tout le parcours d'activation du mode développeur de la montre et d'installation.
 
 ## Fonctionnalités
 

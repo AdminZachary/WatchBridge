@@ -26,11 +26,7 @@
 
 ## 這是什麼
 
-在 Windows 上安裝自簽 iOS App（SideStore 之類）需要三件事：Apple ID 簽章、把目標裝置註冊為開發裝置、裝置開啟開發者模式。官方工具鏈是 Xcode，只有 macOS 才有。
-
-iLoader 用 Rust 把 iPhone 這一半在 Windows 上重做了一遍。**WatchBridge 補的是另外一半**：讓裝進 iPhone 的 App 裡那個 `Watch/*.app` 也能落到已配對的 Apple Watch 上，並在此之前把手錶的開發者模式開關弄出來——全程不用安裝 Python、不用開命令列。
-
-整個裝置通道是「借道」的：Windows 看不到手錶，程式讓 iPhone 當路由器，把連接埠轉發給手錶，再在轉發出來的連線裡完成配對、狀態讀取與安裝。
+在 Windows 上安裝自簽 iOS App（SideStore 之類）需要三件事：Apple ID 簽章、將目標裝置註冊為開發裝置、裝置開啟開發者模式。官方工具鏈是 Xcode，只有 macOS 有。本程式補上這一塊，把手錶開發者模式開啟與安裝的完整流程帶到 Windows。
 
 ## 功能
 
