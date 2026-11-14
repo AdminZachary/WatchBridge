@@ -64,6 +64,7 @@ pub struct RemoteV3AnisetteProvider {
     serial_number: String,
     client: reqwest_middleware::ClientWithMiddleware,
     websocket_proxy: Option<String>,
+    client_info_override: Option<AnisetteClientInfo>,
 }
 
 impl RemoteV3AnisetteProvider {
@@ -85,7 +86,24 @@ impl RemoteV3AnisetteProvider {
             serial_number,
             client: Self::build_reqwest_client(None)?,
             websocket_proxy: None,
+            client_info_override: None,
         })
+    }
+
+    /// Override the client identity (X-Mme-Client-Info / User-Agent) reported
+    /// by the anisette server. Apple rejects sign-in when the reported identity
+    /// claims an OS version it no longer accepts, so callers can force a known
+    /// modern Mac identity until servers start reporting one themselves.
+    ///
+    /// # Arguments
+    /// - `client_info_override`: Identity to use instead of the server's, or
+    ///   `None` to keep fetching the identity from the server
+    pub fn set_client_info_override(
+        mut self,
+        client_info_override: Option<AnisetteClientInfo>,
+    ) -> Self {
+        self.client_info_override = client_info_override;
+        self
     }
 
     pub fn set_websocket_proxy(mut self, websocket_proxy: Option<String>) -> Result<Self, Report> {
@@ -192,6 +210,9 @@ impl AnisetteProvider for RemoteV3AnisetteProvider {
     }
 
     async fn get_client_info(&self) -> Result<AnisetteClientInfo, Report> {
+        if let Some(client_info_override) = self.client_info_override.as_ref() {
+            return Ok(client_info_override.clone());
+        }
         // Read public identity metadata from the already selected server.
         // This GET sends no account, provisioning or device data and does not
         // change the selected server or the existing provisioning data flow.
@@ -579,6 +600,29 @@ mod client_info_tests {
         assert_eq!(second.client_info, "server-two");
         assert_eq!(second.user_agent, "agent-two");
         task.await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn explicit_client_info_override_wins_without_server_roundtrip() {
+        // Port 1 is never contacted: if get_client_info tried the server it
+        // would fail instead of returning the caller-supplied identity.
+        let provider = RemoteV3AnisetteProvider::new(
+            "http://127.0.0.1:1/test-prefix/",
+            Box::new(crate::util::storage::InMemoryStorage::new()),
+            "test".into(),
+        )
+        .unwrap()
+        .set_client_info_override(Some(AnisetteClientInfo {
+            client_info: "<Mac15,7> <macOS;27.0;26A428> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
+                .into(),
+            user_agent: "akd/1.0 CFNetwork/811.5.4".into(),
+        }));
+        let info = provider.get_client_info().await.unwrap();
+        assert_eq!(
+            info.client_info,
+            "<Mac15,7> <macOS;27.0;26A428> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
+        );
+        assert_eq!(info.user_agent, "akd/1.0 CFNetwork/811.5.4");
     }
 
     #[tokio::test]
