@@ -143,6 +143,14 @@ Older builds asked the iPhone's pairing registry for the Watch name before pairi
 See the one-Watch limit above. Confirm the target Watch in the iPhone's Watch app; powering the other Watch off or moving it away does **not** remove it from the pairing registry.
 </details>
 
+<details>
+<summary><b>Apple ID sign-in fails with <code>-23782: A Mac with macOS version 10.13 or later is required…</code></b></summary>
+
+Apple validates the OS version claimed by the client identity (`X-Mme-Client-Info`) sent with sign-in requests and rejects older ones. Public anisette servers still mostly report `Mac OS X;10.12.6` (below 10.13), so the login is turned away at the first step. This is not specific to your machine — it happens on both Windows and macOS.
+
+Current WatchBridge builds force a verified modern Mac identity when signing in (the same approach upstream iLoader uses) instead of trusting the version reported by the server. Update to a build containing this fix. If you still see the error on an older build, switch to an anisette server that reports a modern identity under Settings → Anisette server, or reset the Anisette state and try again.
+</details>
+
 ## Contributing
 
 - Contribution rules: [CONTRIBUTING.md](CONTRIBUTING.md)

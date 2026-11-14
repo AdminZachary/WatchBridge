@@ -143,6 +143,14 @@ $env:USBMUXD_SOCKET_ADDRESS                    # 应为空
 见上面的单表限制。请在 iPhone 的 Watch App 中确认目标手表；把另一块表关机或放远**不会**让它从配对注册表里消失。
 </details>
 
+<details>
+<summary><b>登录 Apple ID 报错 <code>-23782: A Mac with macOS version 10.13 or later is required…</code></b></summary>
+
+Apple 服务端会校验登录请求里声明的客户端身份（`X-Mme-Client-Info`）对应的系统版本，过旧即拒绝；而公共 anisette 服务器目前大多仍上报 `Mac OS X;10.12.6`（低于 10.13），因此登录在第一步就被 Apple 挡下。这与本机无关——Windows/macOS 上都会遇到。
+
+新版 WatchBridge 在发起登录时强制携带一套已验证的现代 Mac 身份（与上游 iLoader 相同的做法），不再依赖服务器上报的版本声明。请更新到包含此修复的构建。若仍在旧版上遇到该错误，可先在「设置 → Anisette 服务器」里换一个已上报新版身份的服务器，或重置 Anisette 状态后重试。
+</details>
+
 ## 参与贡献
 
 - 贡献规则见 [CONTRIBUTING.md](CONTRIBUTING.md)

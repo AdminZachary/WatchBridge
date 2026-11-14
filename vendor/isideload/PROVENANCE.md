@@ -37,3 +37,19 @@ sends no account/provisioning data. Local synthetic HTTP tests cover identity
 refresh, HTTP errors, malformed data and invalid headers. The user explicitly authorized `ani.jkcoxson.com` as the default for new
 installations. Existing saved preferences are not overwritten. This is protocol adaptation, not
 copied SideStore code; the original authorship and MIT license remain intact.
+
+## WatchBridge follow-up (2026-11-14)
+
+Apple rejects sign-ins with GrandSlam error -23782 ("A Mac with macOS version
+10.13 or later is required") when the `X-Mme-Client-Info` identity sent with
+the request claims an OS older than it accepts; public anisette servers
+currently report `Mac OS X;10.12.6`. The upstream `set_client_info_override`
+mechanism from `nab138/isideload` is ported to
+`anisette/remote_v3/mod.rs`: with no override set, the provider still fetches
+the identity from its selected server (unchanged behavior); when the caller
+sets an override, that identity is used instead. WatchBridge's interactive
+sign-in (`src-tauri/src/account.rs`) and saved-session renewal
+(`src-tauri/src/renewal/live/saved_session.rs`) apply the same modern Mac
+identity that upstream iLoader ships, to be dropped once servers report an
+accepted identity again. A synthetic test covers override precedence without
+network access.
