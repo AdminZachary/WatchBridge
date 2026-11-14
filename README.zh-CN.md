@@ -146,9 +146,9 @@ $env:USBMUXD_SOCKET_ADDRESS                    # 应为空
 <details>
 <summary><b>登录 Apple ID 报错 <code>-23782: A Mac with macOS version 10.13 or later is required…</code></b></summary>
 
-Apple 服务端会校验登录请求里声明的客户端身份（`X-Mme-Client-Info`）对应的系统版本，过旧即拒绝；而公共 anisette 服务器目前大多仍上报 `Mac OS X;10.12.6`（低于 10.13），因此登录在第一步就被 Apple 挡下。这与本机无关——Windows/macOS 上都会遇到。
+Apple 服务端会校验登录请求里声明的客户端身份（`X-Mme-Client-Info`）对应的系统版本，过旧即拒绝；而公共 anisette 服务器目前大多仍上报 `Mac OS X;10.12.6`（低于 10.13），受影响的登录在第一步就被 Apple 挡下。该校验**按账户启用**，仅部分账户会遇到；Windows/macOS 皆可能受影响，与本机无关。
 
-新版 WatchBridge 在发起登录时强制携带一套已验证的现代 Mac 身份（与上游 iLoader 相同的做法），不再依赖服务器上报的版本声明。请更新到包含此修复的构建。若仍在旧版上遇到该错误，可先在「设置 → Anisette 服务器」里换一个已上报新版身份的服务器，或重置 Anisette 状态后重试。
+新版 WatchBridge 在发起登录时强制携带一套已验证的现代 Mac 身份（版本声明与上游 iLoader 相同，build 号为 macOS 27.0 正式版），不再依赖服务器上报的版本声明。请更新到包含此修复的构建。若仍在旧版上遇到该错误，可先在「设置 → Anisette 服务器」里换一个已上报新版身份的服务器，或重置 Anisette 状态后重试。
 </details>
 
 ## 参与贡献

@@ -613,14 +613,14 @@ mod client_info_tests {
         )
         .unwrap()
         .set_client_info_override(Some(AnisetteClientInfo {
-            client_info: "<Mac15,7> <macOS;27.0;26A5378j> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
+            client_info: "<Mac15,7> <macOS;27.0;26A428> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
                 .into(),
             user_agent: "akd/1.0 CFNetwork/811.5.4".into(),
         }));
         let info = provider.get_client_info().await.unwrap();
         assert_eq!(
             info.client_info,
-            "<Mac15,7> <macOS;27.0;26A5378j> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
+            "<Mac15,7> <macOS;27.0;26A428> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
         );
         assert_eq!(info.user_agent, "akd/1.0 CFNetwork/811.5.4");
     }

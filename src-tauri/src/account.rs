@@ -237,11 +237,13 @@ pub fn reset_anisette_state() -> Result<bool, AppError> {
 /// report. Apple rejects sign-in (GrandSlam error -23782, "A Mac with macOS
 /// version 10.13 or later is required") when the reported client identity
 /// claims an OS older than it accepts, and public servers still report
-/// `Mac OS X;10.12.6`. Same override upstream iLoader applies; drop it once
-/// anisette servers start reporting an accepted identity themselves.
+/// `Mac OS X;10.12.6`. Same version claim as upstream iLoader, but with the
+/// shipping macOS 27.0 build (26A428) instead of upstream's beta-suffixed
+/// build; drop the override once anisette servers start reporting an accepted
+/// identity themselves.
 pub(crate) fn apple_client_identity() -> AnisetteClientInfo {
     AnisetteClientInfo {
-        client_info: "<Mac15,7> <macOS;27.0;26A5378j> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
+        client_info: "<Mac15,7> <macOS;27.0;26A428> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
             .into(),
         user_agent: "akd/1.0 CFNetwork/811.5.4".into(),
     }
