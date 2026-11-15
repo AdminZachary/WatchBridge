@@ -19,10 +19,8 @@ use crate::{SideloadError, anisette::AnisetteClientInfo, util::plist::PlistDataE
 
 const URL_BAG: &str = "https://gsa.apple.com/grandslam/GsService2/lookup";
 
-/// The GrandSlam status code Apple returns when the OS version claimed by the
-/// client identity is older than it accepts for the account ("A Mac with
-/// macOS version 10.13 or later is required to sign in with this Apple
-/// Account"). Most accounts are not subject to the check.
+/// GrandSlam status code: Apple rejects the OS version claimed by the client
+/// identity for the account ("A Mac with macOS version 10.13 or later…").
 const ERROR_STALE_CLIENT_IDENTITY: i64 = -23782;
 
 pub struct GrandSlam {
@@ -54,10 +52,8 @@ impl GrandSlam {
     ///
     /// # Arguments
     /// - `client`: The reqwest client to use for requests
-    /// - `client_info`: The client identity reported by the anisette server
     /// - `fallback_client_info`: Identity to switch to once Apple rejects the
-    ///   reported one with -23782 (the request is retried with it); most
-    ///   accounts accept the reported identity, so it stays unused for them
+    ///   reported one with -23782 (the request is retried with it)
     pub async fn new(
         client_info: AnisetteClientInfo,
         fallback_client_info: Option<AnisetteClientInfo>,
@@ -224,9 +220,8 @@ impl GrandSlam {
                     .attach(pretty_print_dictionary(&dict))
             })?;
 
-        // Most accounts accept the identity the anisette server reports. When
-        // Apple rejects it for the account being signed in, switch to the
-        // caller-supplied fallback identity once and resend this request.
+        // On -23782, Apple rejected the server-reported identity for this
+        // account: switch to the fallback once and resend the request.
         if self.fallback_client_info.is_some()
             && is_stale_identity_rejection(&response_plist)
             && !self.fallback_used.swap(true, Ordering::Relaxed)
@@ -241,15 +236,13 @@ impl GrandSlam {
         Ok(response_plist)
     }
 
-    /// The identity to sign requests with: the one the anisette server
-    /// reports, or the fallback once Apple has rejected the reported one
+    /// The identity to sign requests with: the server-reported one, or the
+    /// fallback once Apple has rejected the reported one
     fn active_client_info(&self) -> &AnisetteClientInfo {
-        match (
-            self.fallback_client_info.as_ref(),
-            self.fallback_used.load(Ordering::Relaxed),
-        ) {
-            (Some(fallback), true) => fallback,
-            _ => &self.client_info,
+        if self.fallback_used.load(Ordering::Relaxed) {
+            self.fallback_client_info.as_ref().expect("fallback identity set")
+        } else {
+            &self.client_info
         }
     }
 
@@ -344,9 +337,7 @@ impl GrandSlamErrorChecker for Dictionary {
     }
 }
 
-/// Whether the GrandSlam response carries Apple's -23782 rejection, which
-/// some accounts get when the client identity claims an OS version Apple no
-/// longer accepts for them.
+/// Whether the GrandSlam response carries Apple's -23782 rejection.
 fn is_stale_identity_rejection(response: &Dictionary) -> bool {
     let status = match response.get("Status") {
         Some(plist::Value::Dictionary(status)) => status,

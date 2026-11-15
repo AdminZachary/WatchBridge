@@ -3,11 +3,9 @@ use std::sync::Arc;
 use rootcause::prelude::*;
 use tokio::sync::RwLock;
 
+use crate::anisette::AnisetteClientInfo;
 use crate::{
-    anisette::{
-        AnisetteClientInfo, AnisetteDataGenerator, AnisetteProvider,
-        remote_v3::RemoteV3AnisetteProvider,
-    },
+    anisette::{AnisetteDataGenerator, AnisetteProvider, remote_v3::RemoteV3AnisetteProvider},
     auth::apple_account::{AppleAccount, TwoFactorCallbackParams, TwoFactorCallbackResponse},
 };
 
@@ -36,10 +34,8 @@ impl AppleAccountBuilder {
         }
     }
 
-    /// Set an identity to retry sign-in with when Apple rejects the
-    /// server-reported one for this account (GrandSlam error -23782).
-    /// Most accounts accept the server-reported identity, so this stays
-    /// unused for them.
+    /// Identity to retry sign-in with when Apple rejects the server-reported
+    /// one for this account (GrandSlam error -23782).
     pub fn fallback_client_identity(mut self, identity: Option<AnisetteClientInfo>) -> Self {
         self.fallback_client_identity = identity;
         self

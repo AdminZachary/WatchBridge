@@ -41,14 +41,11 @@ copied SideStore code; the original authorship and MIT license remain intact.
 ## WatchBridge follow-up (2026-11-15)
 
 Apple rejects sign-ins with GrandSlam error -23782 ("A Mac with macOS version
-10.13 or later is required") when the `X-Mme-Client-Info` identity sent with
-the request claims an OS older than it accepts; public anisette servers
-currently report `Mac OS X;10.12.6`, and the check applies to a subset of
-accounts. Sign-ins therefore go out with the identity the anisette server
-reports, and when Apple answers -23782, GrandSlam retries the request once
-with a caller-supplied fallback identity and keeps it for the rest of the
-session (`auth/grandslam.rs`; most accounts never hit the fallback). The
-fallback keeps upstream iLoader's macOS 27.0 version claim but uses the
-shipping RTM build `26A428` instead of upstream's beta-suffixed `26A5378j`,
-and is to be dropped once servers report an accepted identity themselves.
-Synthetic tests cover the -23782 detection.
+10.13 or later is required") when the client identity claims an OS older than
+it accepts; public anisette servers currently report `Mac OS X;10.12.6`, and
+the check applies to a subset of accounts. Sign-ins go out with the identity
+the anisette server reports; on -23782, GrandSlam retries the request once
+with a caller-supplied fallback identity and keeps it for the session
+(`auth/grandslam.rs`). The fallback uses upstream iLoader's macOS 27.0 claim
+with the shipping RTM build `26A428`, and is to be dropped once servers report
+an accepted identity themselves.

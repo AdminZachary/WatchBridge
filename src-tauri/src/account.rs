@@ -233,11 +233,9 @@ pub fn reset_anisette_state() -> Result<bool, AppError> {
     }
 }
 
-/// -23782 fallback identity: sign-ins go out with the identity the anisette
-/// server reports, and only when Apple rejects it for the account does the
-/// request retry with this one (macOS 27.0 shipping build, same version
-/// claim as upstream iLoader). Drop it once servers report an accepted
-/// identity themselves.
+/// -23782 fallback identity: used only when Apple rejects the server-reported
+/// one for the account (macOS 27.0 shipping build, same version claim as
+/// upstream iLoader). Drop it once servers report an accepted identity.
 pub(crate) fn apple_client_identity() -> AnisetteClientInfo {
     AnisetteClientInfo {
         client_info: "<Mac15,7> <macOS;27.0;26A428> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
