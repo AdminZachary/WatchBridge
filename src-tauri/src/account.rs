@@ -1,6 +1,6 @@
 use futures::FutureExt;
 use isideload::{
-    anisette::remote_v3::RemoteV3AnisetteProvider,
+    anisette::{AnisetteClientInfo, remote_v3::RemoteV3AnisetteProvider},
     auth::apple_account::{AppleAccount, TwoFactorCallbackParams, TwoFactorCallbackResponse},
     dev::{
         app_ids::{AppIdsApi, ListAppIdsResponse},
@@ -233,6 +233,17 @@ pub fn reset_anisette_state() -> Result<bool, AppError> {
     }
 }
 
+/// -23782 fallback identity: used only when Apple rejects the server-reported
+/// one for the account (macOS 27.0 shipping build, same version claim as
+/// upstream iLoader). Drop it once servers report an accepted identity.
+pub(crate) fn apple_client_identity() -> AnisetteClientInfo {
+    AnisetteClientInfo {
+        client_info: "<Mac15,7> <macOS;27.0;26A428> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
+            .into(),
+        user_agent: "akd/1.0 CFNetwork/811.5.4".into(),
+    }
+}
+
 async fn login(
     app: &AppHandle,
     window: &Window,
@@ -279,6 +290,7 @@ async fn login(
                 .set_storage(create_sideloading_storage(app)?)
                 .set_url(&anisette_url),
         )
+        .fallback_client_identity(Some(apple_client_identity()))
         .login(password, Box::new(tfa_closure))
         .await?;
 

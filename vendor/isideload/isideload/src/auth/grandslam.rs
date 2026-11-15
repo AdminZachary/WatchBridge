@@ -10,6 +10,7 @@ use reqwest::{
 };
 use reqwest_middleware::ClientBuilder as MwClientBuilder;
 use rootcause::prelude::*;
+use std::sync::atomic::{AtomicBool, Ordering};
 use tracing::{debug, warn};
 
 #[cfg(not(feature = "wasm"))]
@@ -18,9 +19,15 @@ use crate::{SideloadError, anisette::AnisetteClientInfo, util::plist::PlistDataE
 
 const URL_BAG: &str = "https://gsa.apple.com/grandslam/GsService2/lookup";
 
+/// GrandSlam status code: Apple rejects the OS version claimed by the client
+/// identity for the account ("A Mac with macOS version 10.13 or later…").
+const ERROR_STALE_CLIENT_IDENTITY: i64 = -23782;
+
 pub struct GrandSlam {
     pub client: reqwest_middleware::ClientWithMiddleware,
     pub client_info: AnisetteClientInfo,
+    fallback_client_info: Option<AnisetteClientInfo>,
+    fallback_used: AtomicBool,
     url_bag: Dictionary,
 }
 
@@ -35,6 +42,8 @@ impl GrandSlam {
                 client_info: "synthetic-test".into(),
                 user_agent: "synthetic-test".into(),
             },
+            fallback_client_info: None,
+            fallback_used: AtomicBool::new(false),
             url_bag: Dictionary::new(),
         }
     }
@@ -43,8 +52,11 @@ impl GrandSlam {
     ///
     /// # Arguments
     /// - `client`: The reqwest client to use for requests
+    /// - `fallback_client_info`: Identity to switch to once Apple rejects the
+    ///   reported one with -23782 (the request is retried with it)
     pub async fn new(
         client_info: AnisetteClientInfo,
+        fallback_client_info: Option<AnisetteClientInfo>,
         debug: bool,
         proxy_url: Option<String>,
     ) -> Result<Self, Report> {
@@ -55,6 +67,8 @@ impl GrandSlam {
         Ok(Self {
             client,
             client_info,
+            fallback_client_info,
+            fallback_used: AtomicBool::new(false),
             url_bag,
         })
     }
@@ -98,7 +112,7 @@ impl GrandSlam {
         let builder = self
             .client
             .get(url)
-            .headers(Self::base_headers(&self.client_info, false)?);
+            .headers(Self::base_headers(self.active_client_info(), false)?);
 
         Ok(builder)
     }
@@ -107,7 +121,7 @@ impl GrandSlam {
         let builder = self
             .client
             .get(url)
-            .headers(Self::base_headers(&self.client_info, true)?);
+            .headers(Self::base_headers(self.active_client_info(), true)?);
 
         Ok(builder)
     }
@@ -116,7 +130,7 @@ impl GrandSlam {
         let builder = self
             .client
             .put(url)
-            .headers(Self::base_headers(&self.client_info, true)?);
+            .headers(Self::base_headers(self.active_client_info(), true)?);
 
         Ok(builder)
     }
@@ -125,7 +139,7 @@ impl GrandSlam {
         let builder = self
             .client
             .post(url)
-            .headers(Self::base_headers(&self.client_info, false)?);
+            .headers(Self::base_headers(self.active_client_info(), false)?);
 
         Ok(builder)
     }
@@ -134,7 +148,7 @@ impl GrandSlam {
         let builder = self
             .client
             .post(url)
-            .headers(Self::base_headers(&self.client_info, true)?);
+            .headers(Self::base_headers(self.active_client_info(), true)?);
 
         Ok(builder)
     }
@@ -143,7 +157,7 @@ impl GrandSlam {
         let builder = self
             .client
             .patch(url)
-            .headers(Self::base_headers(&self.client_info, false)?);
+            .headers(Self::base_headers(self.active_client_info(), false)?);
 
         Ok(builder)
     }
@@ -206,7 +220,30 @@ impl GrandSlam {
                     .attach(pretty_print_dictionary(&dict))
             })?;
 
+        // On -23782, Apple rejected the server-reported identity for this
+        // account: switch to the fallback once and resend the request.
+        if self.fallback_client_info.is_some()
+            && is_stale_identity_rejection(&response_plist)
+            && !self.fallback_used.swap(true, Ordering::Relaxed)
+        {
+            warn!(
+                "GrandSlam rejected the reported client identity (error {}), retrying with a modern Mac identity",
+                ERROR_STALE_CLIENT_IDENTITY
+            );
+            return Box::pin(self.plist_request(url, body, additional_headers, retry_limit)).await;
+        }
+
         Ok(response_plist)
+    }
+
+    /// The identity to sign requests with: the server-reported one, or the
+    /// fallback once Apple has rejected the reported one
+    fn active_client_info(&self) -> &AnisetteClientInfo {
+        if self.fallback_used.load(Ordering::Relaxed) {
+            self.fallback_client_info.as_ref().expect("fallback identity set")
+        } else {
+            &self.client_info
+        }
     }
 
     fn base_headers(
@@ -297,5 +334,36 @@ impl GrandSlamErrorChecker for Dictionary {
         }
 
         Ok(self)
+    }
+}
+
+/// Whether the GrandSlam response carries Apple's -23782 rejection.
+fn is_stale_identity_rejection(response: &Dictionary) -> bool {
+    let status = match response.get("Status") {
+        Some(plist::Value::Dictionary(status)) => status,
+        _ => return false,
+    };
+    status.get_signed_integer("ec").ok() == Some(ERROR_STALE_CLIENT_IDENTITY)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn response_with_ec(ec: i64) -> Dictionary {
+        let mut status = Dictionary::new();
+        status.insert("ec".into(), plist::Value::Integer(ec.into()));
+        let mut response = Dictionary::new();
+        response.insert("Status".into(), plist::Value::Dictionary(status));
+        response
+    }
+
+    #[test]
+    fn stale_identity_rejection_matches_error_code_minus_23782_only() {
+        assert!(is_stale_identity_rejection(&response_with_ec(
+            ERROR_STALE_CLIENT_IDENTITY
+        )));
+        assert!(!is_stale_identity_rejection(&response_with_ec(-22421)));
+        assert!(!is_stale_identity_rejection(&Dictionary::new()));
     }
 }
