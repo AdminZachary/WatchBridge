@@ -4,7 +4,7 @@
 
 # WatchBridge
 
-**Préparer le mode développeur de l'Apple Watch et installer les apps avec Watch Companion sur la montre sous Windows, macOS ou Linux, sans Xcode.**
+**Préparer le mode développeur de l'Apple Watch et installer les apps avec Watch Companion sur la montre sous Windows, macOS (sans Xcode) ou Linux.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 

@@ -4,7 +4,7 @@
 
 # WatchBridge
 
-**Set up Apple Watch developer mode and install Watch Companion apps on your Watch — on Windows, macOS or Linux, without Xcode.**
+**Set up Apple Watch developer mode and install Watch Companion apps on your Watch — on Windows, macOS (no Xcode) or Linux.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 

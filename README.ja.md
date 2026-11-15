@@ -4,7 +4,7 @@
 
 # WatchBridge
 
-**Windows・macOS・Linux（Xcode 不要）で Apple Watch の開発者モードを準備し、Watch Companion アプリを Watch にインストールします。**
+**Windows、macOS（Xcode 不要）、Linux で Apple Watch の開発者モードを準備し、Watch Companion アプリを Watch にインストールします。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 

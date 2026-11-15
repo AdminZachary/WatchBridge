@@ -4,7 +4,7 @@
 
 # WatchBridge
 
-**在 Windows、macOS 或 Linux 上（無需 Xcode）準備 Apple Watch 開發者模式，並把帶 Watch Companion 的 App 裝到手錶上。**
+**在 Windows、macOS（無需 Xcode）或 Linux 上準備 Apple Watch 開發者模式，並把帶 Watch Companion 的 App 裝到手錶上。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
