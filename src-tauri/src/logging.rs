@@ -12,8 +12,11 @@ pub fn safe_log_metadata(metadata: &tracing::Metadata<'_>) -> bool {
         .any(|prefix| {
             metadata.target() == *prefix || metadata.target().starts_with(&format!("{prefix}::"))
         });
+    let install_progress = ["isideload::sideload::sideloader", "isideload::sideload::watch_install"]
+        .contains(&metadata.target())
+        && *metadata.level() <= tracing::Level::INFO;
     *metadata.level() <= tracing::Level::DEBUG
-        && !(protocol_dependency && *metadata.level() > tracing::Level::WARN)
+        && (install_progress || !(protocol_dependency && *metadata.level() > tracing::Level::WARN))
 }
 
 #[cfg(test)]
@@ -63,13 +66,16 @@ mod tests {
             tracing::trace!(target: "idevice::remote_pairing::socket", payload = ?MustNotFormat, "test-pairing-wire-sentinel");
             tracing::debug!(target: "isideload::anisette::remote_v3", payload = ?MustNotFormat, "test-provisioning-sentinel");
             tracing::debug!(target: "isideload::auth::apple_account", payload = ?MustNotFormat, "test-auth-sentinel");
+            tracing::debug!(target: "isideload::sideload::watch_install", payload = ?MustNotFormat, "test-watch-debug-sentinel");
             tracing::info!(target: "iloader", "safe-operation-progress");
+            tracing::info!(target: "isideload::sideload::watch_install", "watch-install-progress");
         });
         let bytes = output.lock().unwrap();
         let text = String::from_utf8_lossy(&bytes);
         assert!(!text.contains("test-sensitive-dictionary-sentinel"));
         assert!(text.contains("safe-operation-progress"));
-        assert_eq!(frontend_records.lock().unwrap().len(), 1);
+        assert!(text.contains("watch-install-progress"));
+        assert_eq!(frontend_records.lock().unwrap().len(), 2);
         assert!(
             frontend_records.lock().unwrap()[0]
                 .message

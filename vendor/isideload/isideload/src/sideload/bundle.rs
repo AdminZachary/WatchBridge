@@ -47,7 +47,7 @@ impl Bundle {
         ))?;
 
         let plug_ins_dir = bundle_path.join("PlugIns");
-        let app_extensions = if isideload_vfs::fs::metadata(&plug_ins_dir).is_ok() {
+        let app_extensions = if isideload_vfs::fs::metadata(&plug_ins_dir).is_ok_and(|m| m.is_dir()) {
             isideload_vfs::fs::read_dir(&plug_ins_dir)
                 .context(SideloadError::InvalidBundle(
                     "Failed to read PlugIns directory".to_string(),
@@ -64,7 +64,7 @@ impl Bundle {
         };
 
         let frameworks_dir = bundle_path.join("Frameworks");
-        let frameworks = if isideload_vfs::fs::metadata(&frameworks_dir).is_ok() {
+        let frameworks = if isideload_vfs::fs::metadata(&frameworks_dir).is_ok_and(|m| m.is_dir()) {
             isideload_vfs::fs::read_dir(&frameworks_dir)
                 .context(SideloadError::InvalidBundle(
                     "Failed to read Frameworks directory".to_string(),
@@ -81,7 +81,7 @@ impl Bundle {
         };
 
         let watch_dir = bundle_path.join("Watch");
-        let watch_apps = if isideload_vfs::fs::metadata(&watch_dir).is_ok() {
+        let watch_apps = if isideload_vfs::fs::metadata(&watch_dir).is_ok_and(|m| m.is_dir()) {
             isideload_vfs::fs::read_dir(&watch_dir)
                 .context(SideloadError::InvalidBundle(
                     "Failed to read Watch directory".to_string(),
@@ -394,6 +394,20 @@ mod tests {
             watch_apps: Vec::new(),
             _libraries: Vec::new(),
         }
+    }
+
+    #[test]
+    fn finds_watch_app_whose_executable_is_named_watch() {
+        let root = std::env::temp_dir().join(format!("isideload-watch-exe-{}", std::process::id()));
+        let watch = root.join("Main.app/Watch/Watch.app");
+        std::fs::create_dir_all(&watch).unwrap();
+        plist::to_file_xml(root.join("Main.app/Info.plist"), &test_bundle("com.example.app", "Main").app_info).unwrap();
+        plist::to_file_xml(watch.join("Info.plist"), &test_bundle("com.example.app.watchkitapp", "Watch").app_info).unwrap();
+        std::fs::write(watch.join("Watch"), b"").unwrap();
+
+        let bundle = Bundle::new(root.join("Main.app"));
+        std::fs::remove_dir_all(&root).unwrap();
+        assert_eq!(bundle.unwrap().watch_apps().len(), 1);
     }
 
     #[test]

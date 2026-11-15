@@ -27,6 +27,13 @@ const WATCH_INSTALL_MAX_RETRY_DELAY_MS: u64 = 2500;
 /// the Watch is unreachable (asleep, out of range) and would otherwise leave the
 /// install waiting forever.
 const WATCH_RESPONSE_TIMEOUT: Duration = Duration::from_secs(180);
+const WATCH_STEP_TIMEOUT: Duration = Duration::from_secs(30);
+const WATCH_STALLED: &str = "The Apple Watch stopped answering";
+const WATCH_SESSION_ATTEMPTS: usize = 3;
+const WATCH_SEND_CHUNK: usize = 32 * 1024;
+// ponytail: fixed pace sized for the Bluetooth link. The iPhone's identityservicesd buffers whatever the link can't
+// carry yet and iOS kills it past 60 MB. WATCHBRIDGE_WATCH_KBPS overrides it when the Watch is on Wi-Fi (0 = no limit).
+const WATCH_SEND_KBPS: u64 = 128;
 const CENTRAL_DIRECTORY_HEADER: &[u8] = &[0x50, 0x4b, 0x01, 0x02];
 const ZIP_EXTRA: &[u8] = &[
     0x55, 0x54, 0x0d, 0x00, 0x07, 0xf3, 0xa2, 0xec, 0x60, 0xf6, 0xa2, 0xec, 0x60, 0xf3,
@@ -50,6 +57,36 @@ pub async fn install_watch_apps(
         return Ok(());
     }
 
+    for attempt in 1..=WATCH_SESSION_ATTEMPTS {
+        match install_watch_apps_once(device_provider, watch_apps, host_name, &progress_callback)
+            .await
+        {
+            Err(error) if attempt < WATCH_SESSION_ATTEMPTS => {
+                warn!("Apple Watch install failed (attempt {attempt}/{WATCH_SESSION_ATTEMPTS}); reconnecting: {error}");
+                tokio::time::sleep(Duration::from_secs(3)).await;
+            }
+            result => return result,
+        }
+    }
+
+    unreachable!("bounded Watch session retry loop must return")
+}
+
+async fn watch_step<T>(
+    step: impl std::future::Future<Output = Result<T, idevice::IdeviceError>>,
+) -> Result<T, Report> {
+    match tokio::time::timeout(WATCH_STEP_TIMEOUT, step).await {
+        Ok(result) => Ok(result.map_err(Error::IdeviceError)?),
+        Err(_) => bail!("{WATCH_STALLED}"),
+    }
+}
+
+async fn install_watch_apps_once(
+    device_provider: &impl IdeviceProvider,
+    watch_apps: &[Bundle],
+    host_name: &str,
+    progress_callback: &(impl Fn(u64) + Send + Sync),
+) -> Result<(), Report> {
     let iphone_pairing = device_provider
         .get_pairing_file()
         .await
@@ -81,20 +118,16 @@ pub async fn install_watch_apps(
         .await?;
         let mut watch_lockdown = LockdownClient::new(watch_connection);
 
-        let watch_pairing = watch_lockdown
-            .pair(
-                iphone_pairing.host_id.clone(),
-                iphone_pairing.system_buid.clone(),
-                Some(host_name),
-            )
-            .await
-            .map_err(Error::IdeviceError)
-            .context("Failed to pair with the Apple Watch through companion proxy")?;
+        let watch_pairing = watch_step(watch_lockdown.pair(
+            iphone_pairing.host_id.clone(),
+            iphone_pairing.system_buid.clone(),
+            Some(host_name),
+        ))
+        .await
+        .context("Failed to pair with the Apple Watch through companion proxy")?;
 
-        let legacy = watch_lockdown
-            .start_session(&watch_pairing)
+        let legacy = watch_step(watch_lockdown.start_session(&watch_pairing))
             .await
-            .map_err(Error::IdeviceError)
             .context("Failed to start Apple Watch lockdown session")?;
 
         for watch_app in watch_apps {
@@ -104,7 +137,7 @@ pub async fn install_watch_apps(
                 &watch_pairing,
                 legacy,
                 watch_app,
-                &progress_callback,
+                progress_callback,
             )
             .await?;
         }
@@ -486,10 +519,8 @@ async fn install_watch_app_zip_conduit(
     watch_app: &Bundle,
     progress_callback: &(impl Fn(u64) + Send + Sync),
 ) -> Result<(), Report> {
-    let (remote_port, ssl) = watch_lockdown
-        .start_service(WATCH_ZIP_SERVICE)
+    let (remote_port, ssl) = watch_step(watch_lockdown.start_service(WATCH_ZIP_SERVICE))
         .await
-        .map_err(Error::IdeviceError)
         .context("Failed to start Apple Watch streaming_zip_conduit")?;
 
     let forwarded_port = {
@@ -499,7 +530,7 @@ async fn install_watch_app_zip_conduit(
             .context("Failed to connect to fresh Apple Watch companion proxy for streaming_zip_conduit forwarding")?;
 
         companion_proxy
-            .start_forwarding_service_port(remote_port, Some(WATCH_ZIP_SERVICE), None)
+            .start_forwarding_service_port(remote_port, Some(WATCH_ZIP_SERVICE), Some(prefer_wifi()))
             .await
             .map_err(Error::IdeviceError)
             .context("Failed to forward Apple Watch streaming_zip_conduit")?
@@ -514,10 +545,8 @@ async fn install_watch_app_zip_conduit(
         .await?;
 
         if ssl {
-            connection
-                .start_session(watch_pairing, legacy)
+            watch_step(connection.start_session(watch_pairing, legacy))
                 .await
-                .map_err(Error::IdeviceError)
                 .context("Failed to secure Apple Watch streaming_zip_conduit connection")?;
         }
 
@@ -563,7 +592,7 @@ async fn install_watch_app_zip_conduit_rsd(
             )?;
 
         companion_proxy
-            .start_forwarding_service_port(remote_port, Some(WATCH_ZIP_SERVICE), None)
+            .start_forwarding_service_port(remote_port, Some(WATCH_ZIP_SERVICE), Some(prefer_wifi()))
             .await
             .map_err(Error::IdeviceError)
             .context("Failed to forward Apple Watch streaming_zip_conduit over RSD")?
@@ -685,9 +714,17 @@ async fn stream_watch_app(
     )
     .await?;
 
+    let mut sent = 0u64;
+    let mut logged = 0u64;
     for (source, destination) in entries {
         let data = isideload_vfs::fs::read(&source)?;
         send_zip_file(connection, &destination, &data).await?;
+        sent += data.len() as u64;
+        let percent = sent * 100 / total_uncompressed.max(1);
+        if percent >= logged + 5 {
+            logged = percent;
+            info!("Sending Apple Watch app: {percent}%");
+        }
     }
 
     connection
@@ -818,10 +855,17 @@ async fn send_zip_file(connection: &mut Idevice, name: &str, data: &[u8]) -> Res
         .send_raw(&header)
         .await
         .map_err(Error::IdeviceError)?;
-    connection
-        .send_raw(data)
-        .await
-        .map_err(Error::IdeviceError)?;
+    let kbps = std::env::var("WATCHBRIDGE_WATCH_KBPS")
+        .ok()
+        .and_then(|v| v.trim().parse::<u64>().ok())
+        .unwrap_or(WATCH_SEND_KBPS);
+    for chunk in data.chunks(WATCH_SEND_CHUNK) {
+        watch_step(connection.send_raw(chunk)).await?;
+        if kbps > 0 {
+            tokio::time::sleep(Duration::from_millis(chunk.len() as u64 * 1000 / (kbps * 1024)))
+                .await;
+        }
+    }
     Ok(())
 }
 
@@ -857,6 +901,12 @@ fn push_u32_le(buffer: &mut Vec<u8>, value: u32) {
 
 fn insert_string(dictionary: &mut Dictionary, key: &str, value: impl Into<String>) {
     dictionary.insert(key.to_string(), Value::String(value.into()));
+}
+
+fn prefer_wifi() -> Dictionary {
+    let mut options = Dictionary::new();
+    options.insert("PreferWifi".to_string(), Value::Boolean(true));
+    options
 }
 
 fn insert_integer(dictionary: &mut Dictionary, key: &str, value: i64) {
