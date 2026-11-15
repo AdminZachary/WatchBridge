@@ -10,10 +10,7 @@ use reqwest::{
 };
 use reqwest_middleware::ClientBuilder as MwClientBuilder;
 use rootcause::prelude::*;
-use std::sync::{
-    Mutex,
-    atomic::{AtomicBool, Ordering},
-};
+use std::sync::atomic::{AtomicBool, Ordering};
 use tracing::{debug, warn};
 
 #[cfg(not(feature = "wasm"))]
@@ -26,11 +23,11 @@ const URL_BAG: &str = "https://gsa.apple.com/grandslam/GsService2/lookup";
 /// client identity is older than it accepts for the account ("A Mac with
 /// macOS version 10.13 or later is required to sign in with this Apple
 /// Account"). Most accounts are not subject to the check.
-pub const ERROR_STALE_CLIENT_IDENTITY: i64 = -23782;
+const ERROR_STALE_CLIENT_IDENTITY: i64 = -23782;
 
 pub struct GrandSlam {
     pub client: reqwest_middleware::ClientWithMiddleware,
-    client_info: Mutex<AnisetteClientInfo>,
+    pub client_info: AnisetteClientInfo,
     fallback_client_info: Option<AnisetteClientInfo>,
     fallback_used: AtomicBool,
     url_bag: Dictionary,
@@ -43,10 +40,10 @@ impl GrandSlam {
     ) -> Self {
         Self {
             client,
-            client_info: Mutex::new(AnisetteClientInfo {
+            client_info: AnisetteClientInfo {
                 client_info: "synthetic-test".into(),
                 user_agent: "synthetic-test".into(),
-            }),
+            },
             fallback_client_info: None,
             fallback_used: AtomicBool::new(false),
             url_bag: Dictionary::new(),
@@ -59,7 +56,7 @@ impl GrandSlam {
     /// - `client`: The reqwest client to use for requests
     /// - `client_info`: The client identity reported by the anisette server
     /// - `fallback_client_info`: Identity to switch to once Apple rejects the
-    ///   reported one with -23782 (requests are retried with it); most
+    ///   reported one with -23782 (the request is retried with it); most
     ///   accounts accept the reported identity, so it stays unused for them
     pub async fn new(
         client_info: AnisetteClientInfo,
@@ -73,7 +70,7 @@ impl GrandSlam {
         let url_bag = Self::fetch_url_bag(&client, base_headers).await?;
         Ok(Self {
             client,
-            client_info: Mutex::new(client_info),
+            client_info,
             fallback_client_info,
             fallback_used: AtomicBool::new(false),
             url_bag,
@@ -119,7 +116,7 @@ impl GrandSlam {
         let builder = self
             .client
             .get(url)
-            .headers(self.request_headers(false)?);
+            .headers(Self::base_headers(self.active_client_info(), false)?);
 
         Ok(builder)
     }
@@ -128,7 +125,7 @@ impl GrandSlam {
         let builder = self
             .client
             .get(url)
-            .headers(self.request_headers(true)?);
+            .headers(Self::base_headers(self.active_client_info(), true)?);
 
         Ok(builder)
     }
@@ -137,7 +134,7 @@ impl GrandSlam {
         let builder = self
             .client
             .put(url)
-            .headers(self.request_headers(true)?);
+            .headers(Self::base_headers(self.active_client_info(), true)?);
 
         Ok(builder)
     }
@@ -146,7 +143,7 @@ impl GrandSlam {
         let builder = self
             .client
             .post(url)
-            .headers(self.request_headers(false)?);
+            .headers(Self::base_headers(self.active_client_info(), false)?);
 
         Ok(builder)
     }
@@ -155,7 +152,7 @@ impl GrandSlam {
         let builder = self
             .client
             .post(url)
-            .headers(self.request_headers(true)?);
+            .headers(Self::base_headers(self.active_client_info(), true)?);
 
         Ok(builder)
     }
@@ -164,7 +161,7 @@ impl GrandSlam {
         let builder = self
             .client
             .patch(url)
-            .headers(self.request_headers(false)?);
+            .headers(Self::base_headers(self.active_client_info(), false)?);
 
         Ok(builder)
     }
@@ -230,7 +227,7 @@ impl GrandSlam {
         // Most accounts accept the identity the anisette server reports. When
         // Apple rejects it for the account being signed in, switch to the
         // caller-supplied fallback identity once and resend this request.
-        if let Some(fallback_client_info) = self.fallback_client_info.as_ref()
+        if self.fallback_client_info.is_some()
             && is_stale_identity_rejection(&response_plist)
             && !self.fallback_used.swap(true, Ordering::Relaxed)
         {
@@ -238,23 +235,22 @@ impl GrandSlam {
                 "GrandSlam rejected the reported client identity (error {}), retrying with a modern Mac identity",
                 ERROR_STALE_CLIENT_IDENTITY
             );
-            *self
-                .client_info
-                .lock()
-                .unwrap_or_else(|poisoned| poisoned.into_inner()) = fallback_client_info.clone();
             return Box::pin(self.plist_request(url, body, additional_headers, retry_limit)).await;
         }
 
         Ok(response_plist)
     }
 
-    /// Build the request headers from the currently active client identity
-    fn request_headers(&self, sms: bool) -> Result<HeaderMap, Report> {
-        let client_info = self
-            .client_info
-            .lock()
-            .unwrap_or_else(|poisoned| poisoned.into_inner());
-        Self::base_headers(&client_info, sms)
+    /// The identity to sign requests with: the one the anisette server
+    /// reports, or the fallback once Apple has rejected the reported one
+    fn active_client_info(&self) -> &AnisetteClientInfo {
+        match (
+            self.fallback_client_info.as_ref(),
+            self.fallback_used.load(Ordering::Relaxed),
+        ) {
+            (Some(fallback), true) => fallback,
+            _ => &self.client_info,
+        }
     }
 
     fn base_headers(

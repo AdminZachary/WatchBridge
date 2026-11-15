@@ -38,26 +38,17 @@ refresh, HTTP errors, malformed data and invalid headers. The user explicitly au
 installations. Existing saved preferences are not overwritten. This is protocol adaptation, not
 copied SideStore code; the original authorship and MIT license remain intact.
 
-## WatchBridge follow-up (2026-11-14)
+## WatchBridge follow-up (2026-11-15)
 
 Apple rejects sign-ins with GrandSlam error -23782 ("A Mac with macOS version
 10.13 or later is required") when the `X-Mme-Client-Info` identity sent with
 the request claims an OS older than it accepts; public anisette servers
-currently report `Mac OS X;10.12.6`. The upstream `set_client_info_override`
-mechanism from `nab138/isideload` is ported to
-`anisette/remote_v3/mod.rs`: with no override set, the provider still fetches
-the identity from its selected server (unchanged behavior); when the caller
-sets an override, that identity is used instead. WatchBridge's interactive
-sign-in (`src-tauri/src/account.rs`) and saved-session renewal
-(`src-tauri/src/renewal/live/saved_session.rs`) apply the same modern Mac
-identity that upstream iLoader ships, to be dropped once servers report an
-accepted identity again. A synthetic test covers override precedence without
-network access.
-
-Update (2026-11-15): per review feedback the modern identity is a fallback
-instead of the default: sign-in requests go out with the identity the
-anisette server reports, and only when Apple answers -23782 does GrandSlam
-retry the request with the caller-supplied fallback
-(`auth/grandslam.rs`, `ERROR_STALE_CLIENT_IDENTITY`, one-shot swap). The
-fallback identity keeps upstream's macOS 27.0 version claim but uses the
-shipping RTM build `26A428` instead of upstream's beta-suffixed `26A5378j`.
+currently report `Mac OS X;10.12.6`, and the check applies to a subset of
+accounts. Sign-ins therefore go out with the identity the anisette server
+reports, and when Apple answers -23782, GrandSlam retries the request once
+with a caller-supplied fallback identity and keeps it for the rest of the
+session (`auth/grandslam.rs`; most accounts never hit the fallback). The
+fallback keeps upstream iLoader's macOS 27.0 version claim but uses the
+shipping RTM build `26A428` instead of upstream's beta-suffixed `26A5378j`,
+and is to be dropped once servers report an accepted identity themselves.
+Synthetic tests cover the -23782 detection.

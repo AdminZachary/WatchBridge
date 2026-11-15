@@ -233,14 +233,11 @@ pub fn reset_anisette_state() -> Result<bool, AppError> {
     }
 }
 
-/// Modern Mac identity used as the -23782 fallback: sign-ins go out with the
-/// identity the anisette server reports, and only when Apple rejects that for
-/// the account (GrandSlam error -23782, "A Mac with macOS version 10.13 or
-/// later is required") does the request retry with this one. Public servers
-/// currently report `Mac OS X;10.12.6`. Same version claim as upstream
-/// iLoader, but with the shipping macOS 27.0 build (26A428) instead of
-/// upstream's beta-suffixed build; drop the fallback once servers report an
-/// accepted identity themselves.
+/// -23782 fallback identity: sign-ins go out with the identity the anisette
+/// server reports, and only when Apple rejects it for the account does the
+/// request retry with this one (macOS 27.0 shipping build, same version
+/// claim as upstream iLoader). Drop it once servers report an accepted
+/// identity themselves.
 pub(crate) fn apple_client_identity() -> AnisetteClientInfo {
     AnisetteClientInfo {
         client_info: "<Mac15,7> <macOS;27.0;26A428> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
