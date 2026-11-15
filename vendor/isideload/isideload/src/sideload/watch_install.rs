@@ -31,8 +31,10 @@ const WATCH_STEP_TIMEOUT: Duration = Duration::from_secs(30);
 const WATCH_STALLED: &str = "The Apple Watch stopped answering";
 const WATCH_SESSION_ATTEMPTS: usize = 3;
 const WATCH_SEND_CHUNK: usize = 32 * 1024;
-// ponytail: fixed pace sized for the Bluetooth link. The iPhone's identityservicesd buffers whatever the link can't
-// carry yet and iOS kills it past 60 MB. WATCHBRIDGE_WATCH_KBPS overrides it when the Watch is on Wi-Fi (0 = no limit).
+// ponytail: the iPhone's identityservicesd buffers whatever the Bluetooth link can't carry yet and iOS kills it past
+// 60 MB. The first 32 MB go out at full speed, the rest at a fixed pace sized for Bluetooth.
+// WATCHBRIDGE_WATCH_KBPS overrides the pace when the Watch is on Wi-Fi (0 = no limit).
+const WATCH_UNPACED_BYTES: u64 = 32 * 1024 * 1024;
 const WATCH_SEND_KBPS: u64 = 128;
 const CENTRAL_DIRECTORY_HEADER: &[u8] = &[0x50, 0x4b, 0x01, 0x02];
 const ZIP_EXTRA: &[u8] = &[
@@ -711,6 +713,7 @@ async fn stream_watch_app(
         connection,
         "META-INF/com.apple.ZipMetadata.plist",
         &metadata_bytes,
+        0,
     )
     .await?;
 
@@ -718,7 +721,7 @@ async fn stream_watch_app(
     let mut logged = 0u64;
     for (source, destination) in entries {
         let data = isideload_vfs::fs::read(&source)?;
-        send_zip_file(connection, &destination, &data).await?;
+        send_zip_file(connection, &destination, &data, sent).await?;
         sent += data.len() as u64;
         let percent = sent * 100 / total_uncompressed.max(1);
         if percent >= logged + 5 {
@@ -847,7 +850,12 @@ async fn send_zip_directory(connection: &mut Idevice, name: &str) -> Result<(), 
     Ok(())
 }
 
-async fn send_zip_file(connection: &mut Idevice, name: &str, data: &[u8]) -> Result<(), Report> {
+async fn send_zip_file(
+    connection: &mut Idevice,
+    name: &str,
+    data: &[u8],
+    mut sent: u64,
+) -> Result<(), Report> {
     let size = u32::try_from(data.len()).context("Watch app file is too large")?;
     let header = zip_header(name, size, crc32_ieee(data))?;
 
@@ -861,7 +869,8 @@ async fn send_zip_file(connection: &mut Idevice, name: &str, data: &[u8]) -> Res
         .unwrap_or(WATCH_SEND_KBPS);
     for chunk in data.chunks(WATCH_SEND_CHUNK) {
         watch_step(connection.send_raw(chunk)).await?;
-        if kbps > 0 {
+        sent += chunk.len() as u64;
+        if kbps > 0 && sent > WATCH_UNPACED_BYTES {
             tokio::time::sleep(Duration::from_millis(chunk.len() as u64 * 1000 / (kbps * 1024)))
                 .await;
         }
