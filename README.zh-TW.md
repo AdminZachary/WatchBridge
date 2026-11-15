@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B%20%C2%B7%20Linux-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.2-blue)
 
@@ -71,6 +71,12 @@
 - 無需安裝驅動程式：直接使用系統內建的 `usbmuxd`
 - 無需 Xcode：DMG 開箱即用；自行建置也只需要 Xcode Command Line Tools
 
+**Linux**
+
+- 系統 `usbmuxd` 守護程序正在執行（`usbmuxd` 套件；不需要其他驅動）
+- 執行時需要 WebKitGTK 4.1 與 Secret Service 密鑰環（例如 GNOME Keyring）
+- 安裝包：Linux 建置產物中的 `.deb` / `.rpm`；自行建置請用 `./scripts/Build-Linux.sh --build-executable`
+
 **通用**
 
 - iPhone 已與目標手錶配對；準備階段需要傳輸線
@@ -80,6 +86,8 @@
 **Windows**：從 [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest) 下載 `watchbridge-windows.zip`，解壓縮後直接執行 `WatchBridge.exe`。
 
 **macOS**：下載對應架構的 DMG（Apple Silicon 用 `arm64`，Intel 用 `x86_64`），把 `WatchBridge.app` 拖進「應用程式」。首次開啟會被 Gatekeeper 攔截，到「系統設定 → 隱私權與安全性」點一次「仍要打開」即可。
+
+**Linux**：安裝 Linux 建置產物中的 `.deb` 或 `.rpm`（`sudo dnf install ./WatchBridge-*.rpm` / `sudo apt install ./WatchBridge_*.deb`），執行 `sudo systemctl enable --now usbmuxd`，然後啟動 `watchbridge`。
 
 Windows 壓縮檔包含：
 

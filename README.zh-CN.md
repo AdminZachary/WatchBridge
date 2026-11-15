@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B%20%C2%B7%20Linux-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.2-blue)
 
@@ -71,6 +71,12 @@ Windows 上装自签 iOS 应用（SideStore 之类）需要三件事：Apple ID 
 - 无需安装驱动：直接使用系统自带的 `usbmuxd`
 - 无需 Xcode：DMG 开箱即用；自行构建也只需要 Xcode Command Line Tools
 
+**Linux**
+
+- 系统 `usbmuxd` 守护进程正在运行（`usbmuxd` 包；不需要其他驱动）
+- 运行时需要 WebKitGTK 4.1 和 Secret Service 密钥环（例如 GNOME Keyring）
+- 安装包：Linux 构建产物中的 `.deb` / `.rpm`；自行构建用 `./scripts/Build-Linux.sh --build-executable`
+
 **通用**
 
 - iPhone 已与目标手表配对；准备阶段需要数据线
@@ -80,6 +86,8 @@ Windows 上装自签 iOS 应用（SideStore 之类）需要三件事：Apple ID 
 **Windows**：从 [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest) 下载 `watchbridge-windows.zip`，解压后直接运行 `WatchBridge.exe`。
 
 **macOS**：下载对应架构的 DMG（Apple Silicon 用 `arm64`，Intel 用 `x86_64`），把 `WatchBridge.app` 拖进「应用程序」。首次打开会被 Gatekeeper 拦截，到「系统设置 → 隐私与安全性」点一次「仍要打开」即可。
+
+**Linux**：安装 Linux 构建产物中的 `.deb` 或 `.rpm`（`sudo dnf install ./WatchBridge-*.rpm` / `sudo apt install ./WatchBridge_*.deb`），执行 `sudo systemctl enable --now usbmuxd`，然后启动 `watchbridge`。
 
 Windows 压缩包里包含：
 

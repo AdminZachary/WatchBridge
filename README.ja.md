@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B%20%C2%B7%20Linux-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.2-blue)
 
@@ -71,6 +71,12 @@ Windows で自己署名の iOS アプリ（SideStore など）を入れるには
 - ドライバのインストール不要: システムの `usbmuxd` をそのまま使用します
 - Xcode 不要: DMG はそのまま実行できます。ソースからビルドする場合のみ Xcode Command Line Tools が必要です
 
+**Linux**
+
+- システムの `usbmuxd` デーモンが動作していること（`usbmuxd` パッケージ。他のドライバは不要）
+- 実行時に WebKitGTK 4.1 と Secret Service キーリング（GNOME Keyring など）が必要
+- パッケージ: Linux ビルド成果物の `.deb` / `.rpm`。自分でビルドする場合は `./scripts/Build-Linux.sh --build-executable`
+
 **共通**
 
 - 対象の Watch とペアリング済みの iPhone。準備段階ではケーブルが必要です
@@ -80,6 +86,8 @@ Windows で自己署名の iOS アプリ（SideStore など）を入れるには
 **Windows**: [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest) から `watchbridge-windows.zip` を取得し、展開して `WatchBridge.exe` を実行します。
 
 **macOS**: アーキテクチャに合った DMG（Apple Silicon は `arm64`、Intel は `x86_64`）を取得し、`WatchBridge.app` を「アプリケーション」へドラッグします。初回起動は Gatekeeper に阻止されるので、「システム設定 → プライバシーとセキュリティ」で一度「このまま開く」を選びます。
+
+**Linux**: Linux ビルド成果物の `.deb` または `.rpm` をインストールし（`sudo dnf install ./WatchBridge-*.rpm` / `sudo apt install ./WatchBridge_*.deb`）、`sudo systemctl enable --now usbmuxd` を実行してから `watchbridge` を起動します。
 
 Windows のアーカイブの内容:
 

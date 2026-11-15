@@ -10,7 +10,7 @@
 
 [![Build Windows](https://img.shields.io/github/actions/workflow/status/AdminZachary/WatchBridge/windows.yml?branch=main&label=windows&logo=github)](https://github.com/AdminZachary/WatchBridge/actions/workflows/windows.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B-0078D4)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11%20%C2%B7%20macOS%2011%2B%20%C2%B7%20Linux-0078D4)
 ![Status](https://img.shields.io/badge/hardware%20validated-2026--11--12-brightgreen)
 ![Version](https://img.shields.io/badge/version-0.1.2-blue)
 
@@ -71,7 +71,13 @@ Um unter Windows eine selbstsignierte iOS-App (etwa SideStore) zu installieren, 
 - Kein Treiber nötig: nutzt das `usbmuxd` des Systems
 - Kein Xcode: das DMG läuft sofort; nur ein Build aus den Quellen braucht die Xcode Command Line Tools
 
-**Beide**
+**Linux**
+
+- Der `usbmuxd`-Daemon des Systems muss laufen (Paket `usbmuxd`; kein weiterer Treiber nötig)
+- Zur Laufzeit: WebKitGTK 4.1 und ein Secret-Service-Schlüsselbund (z. B. GNOME Keyring)
+- Pakete: `.deb` / `.rpm` aus dem Linux-Build; zum Selbstbauen `./scripts/Build-Linux.sh --build-executable`
+
+**Alle Plattformen**
 
 - Ein iPhone, das bereits mit der Zieluhr gekoppelt ist; die Vorbereitung braucht ein Kabel
 
@@ -80,6 +86,8 @@ Um unter Windows eine selbstsignierte iOS-App (etwa SideStore) zu installieren, 
 **Windows**: Lade `watchbridge-windows.zip` von [Releases](https://github.com/AdminZachary/WatchBridge/releases/latest) und starte nach dem Entpacken `WatchBridge.exe`.
 
 **macOS**: Lade das DMG für deine Architektur (`arm64` für Apple Silicon, `x86_64` für Intel) und ziehe `WatchBridge.app` in «Programme». Der erste Start wird von Gatekeeper blockiert; erlaube ihn einmal unter «Systemeinstellungen → Datenschutz & Sicherheit → Trotzdem öffnen».
+
+**Linux**: Installiere das `.deb` oder `.rpm` aus dem Linux-Build (`sudo dnf install ./WatchBridge-*.rpm` / `sudo apt install ./WatchBridge_*.deb`), führe `sudo systemctl enable --now usbmuxd` aus und starte dann `watchbridge`.
 
 Das Windows-Archiv enthält:
 
