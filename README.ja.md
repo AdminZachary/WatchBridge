@@ -4,7 +4,7 @@
 
 # WatchBridge
 
-**Windows で Apple Watch の開発者モードを準備し、Watch Companion アプリを Watch にインストールします。**
+**Windows・macOS・Linux（Xcode 不要）で Apple Watch の開発者モードを準備し、Watch Companion アプリを Watch にインストールします。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
@@ -27,7 +27,7 @@
 
 ## これは何か
 
-Windows で自己署名の iOS アプリ（SideStore など）を入れるには 3 つが必要です。Apple ID による署名、対象端末の開発用端末としての登録、端末の開発者モード有効化です。公式のツールチェーンは Xcode で、macOS にしかありません。本アプリはその部分を埋め、ウォッチの開発者モード有効化とインストールの一連の流れを Windows と macOS で完結させます。
+Windows で自己署名の iOS アプリ（SideStore など）を入れるには 3 つが必要です。Apple ID による署名、対象端末の開発用端末としての登録、端末の開発者モード有効化です。公式のツールチェーンは Xcode で、macOS にしかありません。本アプリはその部分を埋め、ウォッチの開発者モード有効化とインストールの一連の流れを Windows・macOS・Linux で完結させます。
 
 ## 機能
 

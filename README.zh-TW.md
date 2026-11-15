@@ -4,7 +4,7 @@
 
 # WatchBridge
 
-**在 Windows 上準備 Apple Watch 開發者模式，並把帶 Watch Companion 的 App 裝到手錶上。**
+**在 Windows、macOS 或 Linux 上（無需 Xcode）準備 Apple Watch 開發者模式，並把帶 Watch Companion 的 App 裝到手錶上。**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
@@ -27,7 +27,7 @@
 
 ## 這是什麼
 
-在 Windows 上安裝自簽 iOS App（SideStore 之類）需要三件事：Apple ID 簽章、將目標裝置註冊為開發裝置、裝置開啟開發者模式。官方工具鏈是 Xcode，只有 macOS 有。本程式補上這一塊，把手錶開發者模式開啟與安裝的完整流程帶到 Windows 與 macOS。
+在 Windows 上安裝自簽 iOS App（SideStore 之類）需要三件事：Apple ID 簽章、將目標裝置註冊為開發裝置、裝置開啟開發者模式。官方工具鏈是 Xcode，只有 macOS 有。本程式補上這一塊，把手錶開發者模式開啟與安裝的完整流程帶到 Windows、macOS 與 Linux。
 
 ## 功能
 

@@ -4,7 +4,7 @@
 
 # WatchBridge
 
-**Préparer le mode développeur de l'Apple Watch et installer les apps avec Watch Companion sur la montre, depuis Windows.**
+**Préparer le mode développeur de l'Apple Watch et installer les apps avec Watch Companion sur la montre sous Windows, macOS ou Linux, sans Xcode.**
 
 [English](README.md) · [简体中文](README.zh-CN.md) · [한국어](README.ko.md) · [繁體中文](README.zh-TW.md) · [日本語](README.ja.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt.md)
 
@@ -27,7 +27,7 @@
 
 ## Présentation
 
-Installer une app iOS auto-signée sous Windows (SideStore et équivalents) demande trois choses : une signature Apple ID, l'enregistrement de l'appareil cible comme appareil de développement, et l'activation du mode développeur sur l'appareil. La chaîne officielle est Xcode, disponible uniquement sur macOS. Cette application comble ce manque : elle apporte sous Windows et macOS tout le parcours d'activation du mode développeur de la montre et d'installation.
+Installer une app iOS auto-signée sous Windows (SideStore et équivalents) demande trois choses : une signature Apple ID, l'enregistrement de l'appareil cible comme appareil de développement, et l'activation du mode développeur sur l'appareil. La chaîne officielle est Xcode, disponible uniquement sur macOS. Cette application comble ce manque : elle apporte sous Windows, macOS et Linux tout le parcours d'activation du mode développeur de la montre et d'installation.
 
 ## Fonctionnalités
 
