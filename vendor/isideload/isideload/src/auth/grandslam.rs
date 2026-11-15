@@ -339,11 +339,13 @@ impl GrandSlamErrorChecker for Dictionary {
 
 /// Whether the GrandSlam response carries Apple's -23782 rejection.
 fn is_stale_identity_rejection(response: &Dictionary) -> bool {
-    let status = match response.get("Status") {
+    // Mirror `check_grandslam_error`: the status code sits in a nested `Status`
+    // dictionary for some endpoints and at the top level for others.
+    let result = match response.get("Status") {
         Some(plist::Value::Dictionary(status)) => status,
-        _ => return false,
+        _ => response,
     };
-    status.get_signed_integer("ec").ok() == Some(ERROR_STALE_CLIENT_IDENTITY)
+    result.get_signed_integer("ec").ok() == Some(ERROR_STALE_CLIENT_IDENTITY)
 }
 
 #[cfg(test)]
@@ -365,5 +367,15 @@ mod tests {
         )));
         assert!(!is_stale_identity_rejection(&response_with_ec(-22421)));
         assert!(!is_stale_identity_rejection(&Dictionary::new()));
+    }
+
+    #[test]
+    fn stale_identity_rejection_accepts_a_top_level_status_code() {
+        let mut response = Dictionary::new();
+        response.insert(
+            "ec".into(),
+            plist::Value::Integer(ERROR_STALE_CLIENT_IDENTITY.into()),
+        );
+        assert!(is_stale_identity_rejection(&response));
     }
 }
