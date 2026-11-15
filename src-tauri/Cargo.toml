@@ -32,7 +32,6 @@ keyring = { version = "3.6.3", features = ["apple-native", "windows-native", "li
 tauri-plugin-store = "2"
 futures = "0.3.31"
 once_cell = "1.21.3"
-tauri-plugin-dialog = { version = "2", default-features = false, features = ["xdg-portal"] }
 reqwest = "0.13.2"
 tokio = "1.49.0"
 tauri-plugin-process = "2"
@@ -57,3 +56,12 @@ tauri-plugin-updater = "2"
 
 [target.'cfg(windows)'.dependencies]
 winreg = "=0.55.0"
+
+# rfd's GTK backend is the default and does not work on every Linux desktop, so
+# Linux goes through xdg-desktop-portal instead. macOS and Windows keep the
+# stock plugin, which resolves to the native dialogs either way.
+[target.'cfg(target_os = "linux")'.dependencies]
+tauri-plugin-dialog = { version = "2", default-features = false, features = ["xdg-portal"] }
+
+[target.'cfg(not(target_os = "linux"))'.dependencies]
+tauri-plugin-dialog = "2"
