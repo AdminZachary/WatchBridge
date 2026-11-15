@@ -77,6 +77,25 @@ Three behaviours differ on macOS today:
 - The device side uses the system `usbmuxd` socket, so no driver install is
   needed and no Apple Mobile Device Service equivalent must be running.
 
+## Building on Linux
+
+Uses the system `usbmuxd` daemon (socket `/var/run/usbmuxd`); install and start it
+(`usbmuxd` package, normally udev-activated when an iPhone is plugged in).
+
+Requirements: Rust stable, Bun, Python 3.12 and the Tauri system libraries.
+Debian/Ubuntu: `libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+libssl-dev libdbus-1-dev libsecret-1-dev rpm`. Fedora: `webkit2gtk4.1-devel
+libappindicator-gtk3-devel librsvg2-devel openssl-devel dbus-devel libsecret-devel rpm-build`.
+
+```bash
+./scripts/Build-Linux.sh                      # checks only
+./scripts/Build-Linux.sh --build-executable   # also build .deb and .rpm
+```
+
+Output goes to `artifacts/linux/` (`.deb`, `.rpm`, `BUILD.json`, `SHA256SUMS.txt`,
+`LICENSES.zip`). `.github/workflows/linux.yml` runs it on `ubuntu-22.04` (x86_64).
+"Start at login" is Windows-only; it reports unavailable on Linux.
+
 ## Dependencies
 
 `vendor/isideload/isideload` is a modified copy of the isideload crate and is
