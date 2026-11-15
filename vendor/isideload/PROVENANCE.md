@@ -54,6 +54,10 @@ identity that upstream iLoader ships, to be dropped once servers report an
 accepted identity again. A synthetic test covers override precedence without
 network access.
 
-Update (2026-11-14): the identity uses the same macOS 27.0 version claim as
-upstream, but with the shipping RTM build `26A428` instead of upstream's
-beta-suffixed `26A5378j`.
+Update (2026-11-15): per review feedback the modern identity is a fallback
+instead of the default: sign-in requests go out with the identity the
+anisette server reports, and only when Apple answers -23782 does GrandSlam
+retry the request with the caller-supplied fallback
+(`auth/grandslam.rs`, `ERROR_STALE_CLIENT_IDENTITY`, one-shot swap). The
+fallback identity keeps upstream's macOS 27.0 version claim but uses the
+shipping RTM build `26A428` instead of upstream's beta-suffixed `26A5378j`.

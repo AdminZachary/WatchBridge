@@ -243,7 +243,6 @@ impl Provider for NativeProvider<'_> {
             .map_err(|e| SessionError::external(&e))?
             .set_serial_number("0".into())
             .set_storage(Box::new(KeyringStorage::new(crate::secure_storage::KEYRING_SERVICE.into())))
-            .set_client_info_override(Some(crate::account::apple_client_identity()))
             .set_url(self.anisette_url))
     }
     async fn account(
@@ -253,6 +252,7 @@ impl Provider for NativeProvider<'_> {
     ) -> Result<AppleAccount, SessionError> {
         AppleAccount::builder(email)
             .anisette_provider(anisette)
+            .fallback_client_identity(Some(crate::account::apple_client_identity()))
             .build()
             .await
             .map_err(|e| SessionError::external(&e))

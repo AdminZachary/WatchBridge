@@ -4,7 +4,10 @@ use rootcause::prelude::*;
 use tokio::sync::RwLock;
 
 use crate::{
-    anisette::{AnisetteDataGenerator, AnisetteProvider, remote_v3::RemoteV3AnisetteProvider},
+    anisette::{
+        AnisetteClientInfo, AnisetteDataGenerator, AnisetteProvider,
+        remote_v3::RemoteV3AnisetteProvider,
+    },
     auth::apple_account::{AppleAccount, TwoFactorCallbackParams, TwoFactorCallbackResponse},
 };
 
@@ -12,6 +15,7 @@ pub struct AppleAccountBuilder {
     email: String,
     debug: Option<bool>,
     anisette_generator: Option<AnisetteDataGenerator>,
+    fallback_client_identity: Option<AnisetteClientInfo>,
     proxy_url: Option<String>,
     err_429_retries: Option<u32>,
 }
@@ -26,9 +30,19 @@ impl AppleAccountBuilder {
             email: email.to_string(),
             debug: None,
             anisette_generator: None,
+            fallback_client_identity: None,
             proxy_url: None,
             err_429_retries: Some(10),
         }
+    }
+
+    /// Set an identity to retry sign-in with when Apple rejects the
+    /// server-reported one for this account (GrandSlam error -23782).
+    /// Most accounts accept the server-reported identity, so this stays
+    /// unused for them.
+    pub fn fallback_client_identity(mut self, identity: Option<AnisetteClientInfo>) -> Self {
+        self.fallback_client_identity = identity;
+        self
     }
 
     /// DANGER Set whether to enable debug mode
@@ -79,6 +93,7 @@ impl AppleAccountBuilder {
         AppleAccount::new(
             &self.email,
             anisette_generator,
+            self.fallback_client_identity,
             debug,
             self.proxy_url,
             self.err_429_retries,

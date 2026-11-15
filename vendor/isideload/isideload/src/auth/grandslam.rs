@@ -10,6 +10,10 @@ use reqwest::{
 };
 use reqwest_middleware::ClientBuilder as MwClientBuilder;
 use rootcause::prelude::*;
+use std::sync::{
+    Mutex,
+    atomic::{AtomicBool, Ordering},
+};
 use tracing::{debug, warn};
 
 #[cfg(not(feature = "wasm"))]
@@ -18,9 +22,17 @@ use crate::{SideloadError, anisette::AnisetteClientInfo, util::plist::PlistDataE
 
 const URL_BAG: &str = "https://gsa.apple.com/grandslam/GsService2/lookup";
 
+/// The GrandSlam status code Apple returns when the OS version claimed by the
+/// client identity is older than it accepts for the account ("A Mac with
+/// macOS version 10.13 or later is required to sign in with this Apple
+/// Account"). Most accounts are not subject to the check.
+pub const ERROR_STALE_CLIENT_IDENTITY: i64 = -23782;
+
 pub struct GrandSlam {
     pub client: reqwest_middleware::ClientWithMiddleware,
-    pub client_info: AnisetteClientInfo,
+    client_info: Mutex<AnisetteClientInfo>,
+    fallback_client_info: Option<AnisetteClientInfo>,
+    fallback_used: AtomicBool,
     url_bag: Dictionary,
 }
 
@@ -31,10 +43,12 @@ impl GrandSlam {
     ) -> Self {
         Self {
             client,
-            client_info: AnisetteClientInfo {
+            client_info: Mutex::new(AnisetteClientInfo {
                 client_info: "synthetic-test".into(),
                 user_agent: "synthetic-test".into(),
-            },
+            }),
+            fallback_client_info: None,
+            fallback_used: AtomicBool::new(false),
             url_bag: Dictionary::new(),
         }
     }
@@ -43,8 +57,13 @@ impl GrandSlam {
     ///
     /// # Arguments
     /// - `client`: The reqwest client to use for requests
+    /// - `client_info`: The client identity reported by the anisette server
+    /// - `fallback_client_info`: Identity to switch to once Apple rejects the
+    ///   reported one with -23782 (requests are retried with it); most
+    ///   accounts accept the reported identity, so it stays unused for them
     pub async fn new(
         client_info: AnisetteClientInfo,
+        fallback_client_info: Option<AnisetteClientInfo>,
         debug: bool,
         proxy_url: Option<String>,
     ) -> Result<Self, Report> {
@@ -54,7 +73,9 @@ impl GrandSlam {
         let url_bag = Self::fetch_url_bag(&client, base_headers).await?;
         Ok(Self {
             client,
-            client_info,
+            client_info: Mutex::new(client_info),
+            fallback_client_info,
+            fallback_used: AtomicBool::new(false),
             url_bag,
         })
     }
@@ -98,7 +119,7 @@ impl GrandSlam {
         let builder = self
             .client
             .get(url)
-            .headers(Self::base_headers(&self.client_info, false)?);
+            .headers(self.request_headers(false)?);
 
         Ok(builder)
     }
@@ -107,7 +128,7 @@ impl GrandSlam {
         let builder = self
             .client
             .get(url)
-            .headers(Self::base_headers(&self.client_info, true)?);
+            .headers(self.request_headers(true)?);
 
         Ok(builder)
     }
@@ -116,7 +137,7 @@ impl GrandSlam {
         let builder = self
             .client
             .put(url)
-            .headers(Self::base_headers(&self.client_info, true)?);
+            .headers(self.request_headers(true)?);
 
         Ok(builder)
     }
@@ -125,7 +146,7 @@ impl GrandSlam {
         let builder = self
             .client
             .post(url)
-            .headers(Self::base_headers(&self.client_info, false)?);
+            .headers(self.request_headers(false)?);
 
         Ok(builder)
     }
@@ -134,7 +155,7 @@ impl GrandSlam {
         let builder = self
             .client
             .post(url)
-            .headers(Self::base_headers(&self.client_info, true)?);
+            .headers(self.request_headers(true)?);
 
         Ok(builder)
     }
@@ -143,7 +164,7 @@ impl GrandSlam {
         let builder = self
             .client
             .patch(url)
-            .headers(Self::base_headers(&self.client_info, false)?);
+            .headers(self.request_headers(false)?);
 
         Ok(builder)
     }
@@ -206,7 +227,34 @@ impl GrandSlam {
                     .attach(pretty_print_dictionary(&dict))
             })?;
 
+        // Most accounts accept the identity the anisette server reports. When
+        // Apple rejects it for the account being signed in, switch to the
+        // caller-supplied fallback identity once and resend this request.
+        if let Some(fallback_client_info) = self.fallback_client_info.as_ref()
+            && is_stale_identity_rejection(&response_plist)
+            && !self.fallback_used.swap(true, Ordering::Relaxed)
+        {
+            warn!(
+                "GrandSlam rejected the reported client identity (error {}), retrying with a modern Mac identity",
+                ERROR_STALE_CLIENT_IDENTITY
+            );
+            *self
+                .client_info
+                .lock()
+                .unwrap_or_else(|poisoned| poisoned.into_inner()) = fallback_client_info.clone();
+            return Box::pin(self.plist_request(url, body, additional_headers, retry_limit)).await;
+        }
+
         Ok(response_plist)
+    }
+
+    /// Build the request headers from the currently active client identity
+    fn request_headers(&self, sms: bool) -> Result<HeaderMap, Report> {
+        let client_info = self
+            .client_info
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        Self::base_headers(&client_info, sms)
     }
 
     fn base_headers(
@@ -297,5 +345,38 @@ impl GrandSlamErrorChecker for Dictionary {
         }
 
         Ok(self)
+    }
+}
+
+/// Whether the GrandSlam response carries Apple's -23782 rejection, which
+/// some accounts get when the client identity claims an OS version Apple no
+/// longer accepts for them.
+fn is_stale_identity_rejection(response: &Dictionary) -> bool {
+    let status = match response.get("Status") {
+        Some(plist::Value::Dictionary(status)) => status,
+        _ => return false,
+    };
+    status.get_signed_integer("ec").ok() == Some(ERROR_STALE_CLIENT_IDENTITY)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn response_with_ec(ec: i64) -> Dictionary {
+        let mut status = Dictionary::new();
+        status.insert("ec".into(), plist::Value::Integer(ec.into()));
+        let mut response = Dictionary::new();
+        response.insert("Status".into(), plist::Value::Dictionary(status));
+        response
+    }
+
+    #[test]
+    fn stale_identity_rejection_matches_error_code_minus_23782_only() {
+        assert!(is_stale_identity_rejection(&response_with_ec(
+            ERROR_STALE_CLIENT_IDENTITY
+        )));
+        assert!(!is_stale_identity_rejection(&response_with_ec(-22421)));
+        assert!(!is_stale_identity_rejection(&Dictionary::new()));
     }
 }

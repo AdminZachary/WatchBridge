@@ -5,7 +5,7 @@ pub use noninteractive::NoninteractiveLoginError;
 
 use crate::{
     SideloadError,
-    anisette::{AnisetteData, AnisetteDataGenerator},
+    anisette::{AnisetteClientInfo, AnisetteData, AnisetteDataGenerator},
     auth::{
         builder::AppleAccountBuilder,
         grandslam::{GrandSlam, GrandSlamErrorChecker},
@@ -133,10 +133,13 @@ impl AppleAccount {
     /// # Arguments
     /// - `email`: The Apple ID email address
     /// - `anisette_provider`: The anisette provider to use
+    /// - `fallback_client_identity`: Identity to retry with when Apple rejects
+    ///   the server-reported one for this account (-23782)
     /// - `debug`: DANGER, If true, accept invalid certificates and enable verbose connection
     pub async fn new(
         email: &str,
         anisette_generator: AnisetteDataGenerator,
+        fallback_client_identity: Option<AnisetteClientInfo>,
         debug: bool,
         proxy_url: Option<String>,
         err_429_retries: Option<u32>,
@@ -150,7 +153,8 @@ impl AppleAccount {
             .await
             .context("Failed to get anisette client info")?;
 
-        let grandslam_client = GrandSlam::new(client_info, debug, proxy_url.clone()).await?;
+        let grandslam_client =
+            GrandSlam::new(client_info, fallback_client_identity, debug, proxy_url.clone()).await?;
 
         Ok(AppleAccount {
             email: email.to_string(),

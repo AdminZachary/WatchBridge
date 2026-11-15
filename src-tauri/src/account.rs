@@ -233,14 +233,14 @@ pub fn reset_anisette_state() -> Result<bool, AppError> {
     }
 }
 
-/// Modern Mac identity sent instead of the one anisette servers currently
-/// report. Apple rejects sign-in (GrandSlam error -23782, "A Mac with macOS
-/// version 10.13 or later is required") when the reported client identity
-/// claims an OS older than it accepts, and public servers still report
-/// `Mac OS X;10.12.6`. Same version claim as upstream iLoader, but with the
-/// shipping macOS 27.0 build (26A428) instead of upstream's beta-suffixed
-/// build; drop the override once anisette servers start reporting an accepted
-/// identity themselves.
+/// Modern Mac identity used as the -23782 fallback: sign-ins go out with the
+/// identity the anisette server reports, and only when Apple rejects that for
+/// the account (GrandSlam error -23782, "A Mac with macOS version 10.13 or
+/// later is required") does the request retry with this one. Public servers
+/// currently report `Mac OS X;10.12.6`. Same version claim as upstream
+/// iLoader, but with the shipping macOS 27.0 build (26A428) instead of
+/// upstream's beta-suffixed build; drop the fallback once servers report an
+/// accepted identity themselves.
 pub(crate) fn apple_client_identity() -> AnisetteClientInfo {
     AnisetteClientInfo {
         client_info: "<Mac15,7> <macOS;27.0;26A428> <com.apple.AuthKit/1 (com.apple.akd/1.0)>"
@@ -293,9 +293,9 @@ async fn login(
             RemoteV3AnisetteProvider::default()?
                 .set_serial_number("0".to_string())
                 .set_storage(create_sideloading_storage(app)?)
-                .set_client_info_override(Some(apple_client_identity()))
                 .set_url(&anisette_url),
         )
+        .fallback_client_identity(Some(apple_client_identity()))
         .login(password, Box::new(tfa_closure))
         .await?;
 

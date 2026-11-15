@@ -148,7 +148,7 @@ See the one-Watch limit above. Confirm the target Watch in the iPhone's Watch ap
 
 Apple validates the OS version claimed by the client identity (`X-Mme-Client-Info`) sent with sign-in requests and rejects older ones. Public anisette servers still mostly report `Mac OS X;10.12.6` (below 10.13), so affected sign-ins are turned away at the first step. Apple applies this check to a **subset of accounts**; both Windows and macOS can be affected — it is not specific to your machine.
 
-Current WatchBridge builds force a verified modern Mac identity when signing in (the same version claim upstream iLoader uses, with the shipping macOS 27.0 build number) instead of trusting the version reported by the server. Update to a build containing this fix. If you still see the error on an older build, switch to an anisette server that reports a modern identity under Settings → Anisette server, or reset the Anisette state and try again.
+Current WatchBridge builds sign in with the identity the anisette server reports, and only retry with a verified modern Mac identity (the same version claim upstream iLoader uses, with the shipping macOS 27.0 build number) when Apple rejects it with -23782 — behavior is unchanged for unaffected accounts. Update to a build containing this fix. If you still see the error on an older build, switch to an anisette server that reports a modern identity under Settings → Anisette server, or reset the Anisette state and try again.
 </details>
 
 ## Contributing
