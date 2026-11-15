@@ -74,7 +74,7 @@ Um unter Windows eine selbstsignierte iOS-App (etwa SideStore) zu installieren, 
 **Linux**
 
 - Der `usbmuxd`-Daemon des Systems muss laufen (Paket `usbmuxd`; kein weiterer Treiber nötig)
-- Zur Laufzeit: WebKitGTK 4.1 und ein Secret-Service-Schlüsselbund (z. B. GNOME Keyring)
+- Zur Laufzeit: WebKitGTK 4.1, ein Secret-Service-Schlüsselbund (z. B. GNOME Keyring) und xdg-desktop-portal für die Dateiauswahl (die letzten beiden sind bei GNOME und KDE dabei)
 - Pakete: `.deb` / `.rpm` aus dem Linux-Build; zum Selbstbauen `./scripts/Build-Linux.sh --build-executable`
 
 **Alle Plattformen**

@@ -74,7 +74,8 @@ Installing a self-signed iOS app on Windows (SideStore and the like) takes three
 **Linux**
 
 - The system `usbmuxd` daemon running (package `usbmuxd`; no other driver)
-- WebKitGTK 4.1 and a Secret Service keyring (e.g. GNOME Keyring) at runtime
+- At runtime: WebKitGTK 4.1 and a Secret Service keyring (e.g. GNOME Keyring), plus
+  xdg-desktop-portal for the file picker (the last two ship with GNOME and KDE)
 - Packages: `.deb` / `.rpm` from the Linux build artifact; build with `./scripts/Build-Linux.sh --build-executable`
 
 **All**

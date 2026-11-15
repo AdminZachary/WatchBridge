@@ -74,7 +74,7 @@ Instalar um app iOS assinado por conta própria no Windows (SideStore e afins) e
 **Linux**
 
 - O daemon `usbmuxd` do sistema em execução (pacote `usbmuxd`; nenhum outro driver necessário)
-- Em tempo de execução: WebKitGTK 4.1 e um chaveiro Secret Service (por exemplo GNOME Keyring)
+- Em tempo de execução: WebKitGTK 4.1, um chaveiro Secret Service (por exemplo GNOME Keyring) e xdg-desktop-portal para o seletor de arquivos (os dois últimos vêm com GNOME e KDE)
 - Pacotes: `.deb` / `.rpm` do artefato de build Linux; para compilar, `./scripts/Build-Linux.sh --build-executable`
 
 **Todas as plataformas**

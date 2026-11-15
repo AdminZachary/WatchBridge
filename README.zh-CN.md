@@ -74,7 +74,7 @@ Windows 上装自签 iOS 应用（SideStore 之类）需要三件事：Apple ID 
 **Linux**
 
 - 系统 `usbmuxd` 守护进程正在运行（`usbmuxd` 包；不需要其他驱动）
-- 运行时需要 WebKitGTK 4.1 和 Secret Service 密钥环（例如 GNOME Keyring）
+- 运行时需要 WebKitGTK 4.1 和 Secret Service 密钥环（例如 GNOME Keyring），以及用于文件选择器的 xdg-desktop-portal（后两者 GNOME 和 KDE 自带）
 - 安装包：Linux 构建产物中的 `.deb` / `.rpm`；自行构建用 `./scripts/Build-Linux.sh --build-executable`
 
 **通用**

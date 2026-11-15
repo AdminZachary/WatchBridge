@@ -74,7 +74,7 @@ Windows에서 자체 서명 iOS 앱(SideStore 등)을 설치하려면 세 가지
 **Linux**
 
 - 시스템 `usbmuxd` 데몬 실행 중(`usbmuxd` 패키지; 다른 드라이버 불필요)
-- 실행 시 WebKitGTK 4.1과 Secret Service 키링(예: GNOME Keyring) 필요
+- 실행 시 WebKitGTK 4.1과 Secret Service 키링(예: GNOME Keyring), 파일 선택기용 xdg-desktop-portal 필요(뒤의 둘은 GNOME과 KDE에 기본 포함)
 - 패키지: Linux 빌드 아티팩트의 `.deb` / `.rpm`; 직접 빌드는 `./scripts/Build-Linux.sh --build-executable`
 
 **공통**

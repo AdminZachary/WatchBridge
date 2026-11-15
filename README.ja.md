@@ -74,7 +74,7 @@ Windows で自己署名の iOS アプリ（SideStore など）を入れるには
 **Linux**
 
 - システムの `usbmuxd` デーモンが動作していること（`usbmuxd` パッケージ。他のドライバは不要）
-- 実行時に WebKitGTK 4.1 と Secret Service キーリング（GNOME Keyring など）が必要
+- 実行時に WebKitGTK 4.1 と Secret Service キーリング（GNOME Keyring など）、ファイル選択に使う xdg-desktop-portal が必要（後者 2 つは GNOME と KDE に同梱）
 - パッケージ: Linux ビルド成果物の `.deb` / `.rpm`。自分でビルドする場合は `./scripts/Build-Linux.sh --build-executable`
 
 **共通**

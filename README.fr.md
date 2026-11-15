@@ -74,7 +74,7 @@ Installer une app iOS auto-signée sous Windows (SideStore et équivalents) dema
 **Linux**
 
 - Le démon `usbmuxd` du système en cours d'exécution (paquet `usbmuxd` ; aucun autre pilote requis)
-- À l'exécution : WebKitGTK 4.1 et un trousseau Secret Service (par exemple GNOME Keyring)
+- À l'exécution : WebKitGTK 4.1, un trousseau Secret Service (par exemple GNOME Keyring) et xdg-desktop-portal pour le sélecteur de fichiers (les deux derniers sont fournis avec GNOME et KDE)
 - Paquets : `.deb` / `.rpm` de l'artefact de compilation Linux ; pour compiler, `./scripts/Build-Linux.sh --build-executable`
 
 **Toutes les plateformes**

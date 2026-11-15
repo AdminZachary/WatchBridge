@@ -74,7 +74,7 @@
 **Linux**
 
 - 系統 `usbmuxd` 守護程序正在執行（`usbmuxd` 套件；不需要其他驅動）
-- 執行時需要 WebKitGTK 4.1 與 Secret Service 密鑰環（例如 GNOME Keyring）
+- 執行時需要 WebKitGTK 4.1 與 Secret Service 密鑰環（例如 GNOME Keyring），以及供檔案選擇器使用的 xdg-desktop-portal（後兩者 GNOME 與 KDE 內建）
 - 安裝包：Linux 建置產物中的 `.deb` / `.rpm`；自行建置請用 `./scripts/Build-Linux.sh --build-executable`
 
 **通用**

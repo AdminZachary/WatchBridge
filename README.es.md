@@ -74,7 +74,7 @@ Instalar una app iOS autofirmada en Windows (SideStore y similares) requiere tre
 **Linux**
 
 - El demonio `usbmuxd` del sistema en ejecución (paquete `usbmuxd`; no hace falta otro controlador)
-- En tiempo de ejecución: WebKitGTK 4.1 y un llavero Secret Service (por ejemplo GNOME Keyring)
+- En tiempo de ejecución: WebKitGTK 4.1, un llavero Secret Service (por ejemplo GNOME Keyring) y xdg-desktop-portal para el selector de archivos (los dos últimos vienen con GNOME y KDE)
 - Paquetes: `.deb` / `.rpm` del artefacto de compilación de Linux; para compilar, `./scripts/Build-Linux.sh --build-executable`
 
 **Todas las plataformas**
