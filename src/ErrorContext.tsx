@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 import { Modal } from "./components/Modal";
+import { localizeError } from "./errorText";
 import "./ErrorContext.css";
 import { toast } from "sonner";
 import { openUrl } from "@tauri-apps/plugin-opener";
@@ -54,7 +55,7 @@ export const ErrorProvider: React.FC<{ children: React.ReactNode }> = ({
     setSuggestions(getSuggestions(error.type));
     // a little bit gross but it gets the job done.
     let lines =
-      error?.message.split("\n").filter((line) => line.includes("●")) ?? [];
+      localizeError(error).split("\n").filter((line) => line.includes("●")) ?? [];
     if (lines.length > 0) {
       setSimpleError(lines[lines.length - 1].replace(/●\s*/, "").trim());
     }
@@ -88,7 +89,7 @@ export const ErrorProvider: React.FC<{ children: React.ReactNode }> = ({
               onClick={() => {
                 navigator.clipboard.writeText(
                   "```\n" +
-                    (error?.message.replace(/^\n+/, "") ??
+                    (localizeError(error).replace(/^\n+/, "") ??
                       t("common.no_error")) +
                     "\n```",
                 );
@@ -111,14 +112,14 @@ export const ErrorProvider: React.FC<{ children: React.ReactNode }> = ({
           )}
           {simpleError && !moreDetailsOpen && (
             <pre className="error-inner error-details-measure">
-              {error?.message.replace(/^\n+/, "")}
+              {localizeError(error).replace(/^\n+/, "")}
             </pre>
           )}
           {(moreDetailsOpen || !simpleError) && (
             <pre
               className={`error-inner${simpleError ? " error-details" : ""}`}
             >
-              {error?.message.replace(/^\n+/, "")}
+              {localizeError(error).replace(/^\n+/, "")}
             </pre>
           )}
           <div className="suggestions">

@@ -59,10 +59,10 @@ async fn step<T>(
     match tokio::time::timeout(SERVICE_TIMEOUT, work).await {
         Ok(Ok(value)) => Ok(value),
         Ok(Err(IdeviceError::UserDeniedPairing)) => {
-            Err(fail("手表拒绝了信任请求。请在手表上确认后重试。"))
+            Err(fail("err.watch_denied_retry"))
         }
         Ok(Err(IdeviceError::PasswordProtected | IdeviceError::DeviceLocked)) => {
-            Err(fail("请解锁 iPhone 和 Apple Watch，保持手表亮屏后重试。"))
+            Err(fail("err.watch_locked"))
         }
         Ok(Err(error)) => {
             tracing::warn!(target: "watch_setup", kind = %error_kind(&error), "watch step failed");
@@ -91,10 +91,10 @@ fn single_watch(registry: &[String]) -> Result<&str, AppError> {
     match registry {
         [id] => Ok(id),
         [] => Err(fail(
-            "这台 iPhone 没有可用的配对手表。请先在 iPhone 的 Watch App 中完成配对。",
+            "err.watch_none_paired",
         )),
         _ => Err(fail(
-            "发现多块配对手表。第一版只支持一块手表，请先在 iPhone 中确认目标手表。",
+            "err.watch_multiple",
         )),
     }
 }
@@ -102,7 +102,7 @@ fn single_watch(registry: &[String]) -> Result<&str, AppError> {
 fn developer_mode(value: &Value) -> Result<bool, AppError> {
     value
         .as_boolean()
-        .ok_or_else(|| fail("手表没有返回可识别的开发者模式状态。请重新配对并检查。"))
+        .ok_or_else(|| fail("err.watch_state_unknown"))
 }
 
 fn reveal_request() -> Dictionary {
@@ -149,12 +149,12 @@ async fn forward(
     service: &str,
 ) -> Result<u16, AppError> {
     let mut proxy = step(
-        "无法连接手表转发服务。请保持手表解锁、靠近 iPhone 后重试。",
+        "err.watch_proxy_connect",
         CompanionProxy::connect(provider),
     )
     .await?;
     step(
-        "无法转发手表服务。这套系统可能需要不同的传输路径。",
+        "err.watch_forward_unsupported",
         proxy.start_forwarding_service_port(port, Some(service), None),
     )
     .await
@@ -162,12 +162,12 @@ async fn forward(
 
 async fn close_forward(provider: &impl IdeviceProvider, port: u16) -> Result<(), AppError> {
     let mut proxy = step(
-        "无法关闭手表转发，请断开并重新连接 iPhone。",
+        "err.watch_forward_close",
         CompanionProxy::connect(provider),
     )
     .await?;
     step(
-        "无法关闭手表转发，请断开并重新连接 iPhone。",
+        "err.watch_forward_close",
         proxy.stop_forwarding_service_port(port),
     )
     .await
@@ -187,7 +187,7 @@ async fn connect_forwarded(
         tokio::time::sleep(Duration::from_millis(50)).await;
     }
     Err(fail(
-        "手表服务连接超时。请保持手表解锁、靠近 iPhone 后重试。",
+        "err.watch_service_timeout",
     ))
 }
 
@@ -249,11 +249,11 @@ pub async fn prepare_watch(
 ) -> Result<WatchStatus, AppError> {
     let _selection = operation
         .try_lock()
-        .map_err(|_| fail("设备正在准备中，请稍后重试。"))?;
+        .map_err(|_| fail("err.device_busy"))?;
     let directory = app
         .path()
         .app_data_dir()
-        .map_err(|_| fail("无法访问应用数据目录。"))?;
+        .map_err(|_| fail("err.app_data_dir"))?;
     let _lease = InstallLease::acquire(&directory)?;
     let selected = device_state
         .lock()
@@ -263,16 +263,16 @@ pub async fn prepare_watch(
         .ok_or(AppError::NoDeviceSelected)?;
     if selected.connection_type != "USB" || selected.network_address.is_some() {
         return Err(fail(
-            "开发者模式准备需要 USB 连接。请连接 iPhone 数据线并选择 USB 设备。",
+            "err.watch_usb_required",
         ));
     }
     let provider = get_provider(&selected).await?;
     let mut proxy = step(
-        "无法连接配对手表，请检查 iPhone 信任和 USB 连接。",
+        "err.watch_pair_connect",
         CompanionProxy::connect(&provider),
     )
     .await?;
-    let registry = step("无法读取配对手表列表。", proxy.get_device_registry()).await?;
+    let registry = step("err.watch_registry_read", proxy.get_device_registry()).await?;
     let watch_id = single_watch(&registry)?.to_owned();
     drop(proxy);
     let cache_key = (selected.udid, watch_id.clone());
@@ -286,7 +286,7 @@ pub async fn prepare_watch(
         });
     }
     if action == Action::Reveal && cached.is_none() {
-        return Err(fail("请先点击“配对手表”，在手表上确认信任后再显示开关。"));
+        return Err(fail("err.watch_pair_first"));
     }
     let port = forward(&provider, LOCKDOWN, "com.apple.mobile.lockdownd").await?;
     let result = async {
@@ -297,7 +297,7 @@ pub async fn prepare_watch(
         let mut reused = None;
         if let Some(session) = cached.as_ref() {
             if let Ok(legacy) = step(
-                "无法验证手表信任，请重新配对手表。",
+                "err.watch_trust_invalid",
                 lockdown.start_session(&session.pairing),
             )
             .await
@@ -310,10 +310,10 @@ pub async fn prepare_watch(
             None => {
                 if action != Action::Pair {
                     sessions.0.lock().unwrap().remove(&cache_key);
-                    return Err(fail("手表信任已失效，请点击“配对手表”重新建立会话。"));
+                    return Err(fail("err.watch_trust_lost"));
                 }
                 let phone_pairing =
-                    step("无法读取 iPhone 配对信息。", provider.get_pairing_file()).await?;
+                    step("err.watch_phone_pairing", provider.get_pairing_file()).await?;
                 let result = tokio::time::timeout(
                     Duration::from_secs(45),
                     lockdown.pair(
@@ -327,14 +327,14 @@ pub async fn prepare_watch(
                     Ok(Ok(record)) => record,
                     Ok(Err(IdeviceError::UserDeniedPairing)) => {
                         return Err(fail(
-                            "手表拒绝了信任请求。请解锁手表并保持亮屏，等待约 1 分钟后重新点击“配对手表”；若仍然失败，长按侧边按钮与数码表冠重启手表后再试。",
+                            "err.watch_pair_denied",
                         ));
                     }
-                    _ => return Err(fail("手表配对未完成。请解锁手表并确认信任提示，然后重试。")),
+                    _ => return Err(fail("err.watch_pair_incomplete")),
                 };
                 // A record is admitted only after a successful authenticated session.
                 let legacy = match step(
-                    "无法验证手表信任，请重新配对手表。",
+                    "err.watch_trust_invalid",
                     lockdown.start_session(&pairing),
                 )
                 .await
@@ -349,13 +349,13 @@ pub async fn prepare_watch(
             }
         };
         let actual_id = step(
-            "无法验证目标手表。",
+            "err.watch_target_invalid",
             lockdown.get_value(Some("UniqueDeviceID"), None),
         )
         .await?;
         if actual_id.as_string() != Some(watch_id.as_str()) {
             sessions.0.lock().unwrap().remove(&cache_key);
-            return Err(fail("转发目标与选择的手表不一致，请断开连接后重试。"));
+            return Err(fail("err.watch_forward_mismatch"));
         }
         // Read the identity from the forwarded Watch instead of the companion-proxy
         // registry: the registry answers the device list reliably, but not value
@@ -364,7 +364,7 @@ pub async fn prepare_watch(
         if let Some(device_class) = watch_class(&mut lockdown).await {
             if device_class != "Watch" {
                 sessions.0.lock().unwrap().remove(&cache_key);
-                return Err(fail("转发到的设备不是 Apple Watch，请断开连接后重试。"));
+                return Err(fail("err.watch_forward_not_watch"));
             }
         }
         sessions.0.lock().unwrap().insert(
@@ -376,7 +376,7 @@ pub async fn prepare_watch(
         );
         let enabled = developer_mode(
             &step(
-                "无法读取开发者模式状态，请解锁手表后重试。",
+                "err.watch_dev_mode_read",
                 lockdown.get_value(
                     Some("DeveloperModeStatus"),
                     Some("com.apple.security.mac.amfi"),
@@ -387,19 +387,19 @@ pub async fn prepare_watch(
         let mut revealed = false;
         if action == Action::Reveal && !enabled {
             let (remote_port, ssl) =
-                step("无法启动手表开发者模式服务。", lockdown.start_service(AMFI)).await?;
+                step("err.watch_dev_service_start", lockdown.start_service(AMFI)).await?;
             let local_port = forward(&provider, remote_port, AMFI).await?;
             let result = async {
                 let mut connection = connect_forwarded(&provider, local_port).await?;
                 if ssl {
                     step(
-                        "无法建立手表安全连接。",
+                        "err.watch_secure_session",
                         connection.start_session(&pairing, legacy),
                     )
                     .await?;
                 }
                 step(
-                    "手表未确认显示开发者模式开关，请检查系统兼容性后重试。",
+                    "err.watch_switch_not_revealed",
                     reveal(&mut connection),
                 )
                 .await

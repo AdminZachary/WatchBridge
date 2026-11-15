@@ -187,13 +187,21 @@
     "services": "AFC read: {{afc}} · Installation service lookup: {{proxy}}",
     "checked": "passed",
     "not_checked": "not confirmed",
-    "transport": { "appleDaemonNetwork": "Route: Apple device service over Wi-Fi", "remotePairingRsd": "Route: separate RemotePairing/RSD transport" },
+    "transport": {
+      "appleDaemonNetwork": "Route: Apple device service over Wi-Fi",
+      "remotePairingRsd": "Route: separate RemotePairing/RSD transport"
+    },
     "stage": {
-      "selection": "Wi-Fi device selection", "networkInventory": "Apple service Network device lookup",
-      "pairingRecord": "Saved host pairing record", "identity": "Authenticated phone identity",
-      "afcStart": "Start AFC service", "afcRead": "Read AFC device information",
-      "installationProxyStart": "Start installation service", "installationProxyRead": "Read-only installation service lookup",
-      "watchTransport": "Separate Watch transport", "complete": "Phone service checks complete"
+      "selection": "Wi-Fi device selection",
+      "networkInventory": "Apple service Network device lookup",
+      "pairingRecord": "Saved host pairing record",
+      "identity": "Authenticated phone identity",
+      "afcStart": "Start AFC service",
+      "afcRead": "Read AFC device information",
+      "installationProxyStart": "Start installation service",
+      "installationProxyRead": "Read-only installation service lookup",
+      "watchTransport": "Separate Watch transport",
+      "complete": "Phone service checks complete"
     },
     "connection_problem": {
       "wifiRequired": "Select the phone's Wi-Fi entry; a USB connection cannot be used for this check.",
@@ -215,7 +223,15 @@
     "installation_platform_code": "Platform error code: {{code}}",
     "installation_unclassified": "The phone gave no recognized reason for the rejection. See the log for details.",
     "installation_uncertain": "The install request may have reached the phone before communication stopped. Check installed state before retrying; a visible icon alone does not prove installation or launch.",
-    "installStage": { "starting": "Installer start (precise phase unavailable)", "afcConnect": "Connect to AFC upload service", "localPreparation": "Prepare local staging path", "upload": "Upload signed app through AFC", "proxyConnect": "Connect to installation proxy", "proxyInstall": "Submit Install and await device completion", "complete": "Device reported installation complete" },
+    "installStage": {
+      "starting": "Installer start (precise phase unavailable)",
+      "afcConnect": "Connect to AFC upload service",
+      "localPreparation": "Prepare local staging path",
+      "upload": "Upload signed app through AFC",
+      "proxyConnect": "Connect to installation proxy",
+      "proxyInstall": "Submit Install and await device completion",
+      "complete": "Device reported installation complete"
+    },
     "installCause": {
       "deviceRejected": "The phone rejected an installer request. Review its error name and codes before changing the app or signing setup.",
       "deviceLocked": "The phone reported that it is locked. Installation did not complete.",
@@ -231,12 +247,33 @@
       "deviceUnavailable": "The required device or service was unavailable at the displayed phase.",
       "unknown": "The installer returned an unclassified failure. Copy the safe report; do not retry or change account settings blindly."
     },
-    "installContext": { "profileNotFound": "Device description: a valid provisioning profile was not found.", "invalidEntitlements": "Device description: the executable has invalid entitlements.", "signatureVersionUnsupported": "Device description: the code signature version is unsupported.", "signingIdentityInvalid": "Device description: the signing identity is no longer valid.", "freeAppLimit": "Device description: the free developer app installation limit was reached.", "developerModeDisabled": "Device description: Developer Mode is disabled.", "missingExecutableUuid": "Device description: the executable has no LC_UUID load command." },
+    "installContext": {
+      "profileNotFound": "Device description: a valid provisioning profile was not found.",
+      "invalidEntitlements": "Device description: the executable has invalid entitlements.",
+      "signatureVersionUnsupported": "Device description: the code signature version is unsupported.",
+      "signingIdentityInvalid": "Device description: the signing identity is no longer valid.",
+      "freeAppLimit": "Device description: the free developer app installation limit was reached.",
+      "developerModeDisabled": "Device description: Developer Mode is disabled.",
+      "missingExecutableUuid": "Device description: the executable has no LC_UUID load command."
+    },
     "signing_stage": "Signing stage: {{stage}} · {{component}}",
     "http_status": "HTTP status: {{code}}",
     "service_code": "Service error code: {{code}}",
-    "signingStage": { "certificatePolicy": "Enforce existing certificate", "teamLookup": "Find signing team", "deviceRegistration": "Check/register phone with signing team", "signApp": "Prepare profiles and sign app" },
-    "signingComponent": { "certificate": "Saved signing identity", "anisette": "Account request headers (anisette)", "developerApi": "Developer account service", "provisioningProfile": "Provisioning profile", "bundle": "App archive or bundle", "codeSigning": "Code signing", "unknown": "Unclassified operation" },
+    "signingStage": {
+      "certificatePolicy": "Enforce existing certificate",
+      "teamLookup": "Find signing team",
+      "deviceRegistration": "Check/register phone with signing team",
+      "signApp": "Prepare profiles and sign app"
+    },
+    "signingComponent": {
+      "certificate": "Saved signing identity",
+      "anisette": "Account request headers (anisette)",
+      "developerApi": "Developer account service",
+      "provisioningProfile": "Provisioning profile",
+      "bundle": "App archive or bundle",
+      "codeSigning": "Code signing",
+      "unknown": "Unclassified operation"
+    },
     "signingCause": {
       "policyUnavailable": "This build cannot enforce existing-certificate-only signing.",
       "savedKeyMissing": "No saved private signing key is available to this app. An existing certificate alone is insufficient. Review the existing signing setup; no certificate was created or revoked.",
@@ -267,7 +304,13 @@
     "profile_expiry": "Signed profile expiry",
     "evidence": "These expiry dates come from the signed app, not a readback of the devices. Installed means the installer returned success. Verify that the app opens on both devices; Watch launch and survival beyond the previous expiry still need checking.",
     "copy_report": "Copy safe result report",
-    "status": { "notAttempted": "Not attempted", "failed": "Failed", "installed": "Installed", "signed": "Signed", "notIncluded": "No Watch app included" },
+    "status": {
+      "notAttempted": "Not attempted",
+      "failed": "Failed",
+      "installed": "Installed",
+      "signed": "Signed",
+      "notIncluded": "No Watch app included"
+    },
     "problem": {
       "wifiRequired": "Select a direct Wi-Fi device. This action never falls back to USB.",
       "signInRequired": "Sign in before renewing.",
@@ -528,8 +571,12 @@
         "Ensure your device is properly connected to your computer.",
         "Unplug and reconnect the device. If the issue persists, try a different USB port and cable."
       ],
-      "not_logged_in": ["Sign in to your Apple ID first."],
-      "no_device_selected": ["Select a device before continuing."],
+      "not_logged_in": [
+        "Sign in to your Apple ID first."
+      ],
+      "no_device_selected": [
+        "Select a device before continuing."
+      ],
       "anisette": [
         "Ensure your computer is connected to the internet.",
         "Change your anisette server. Try several different servers.",
@@ -616,5 +663,36 @@
     "btn_settings": "Settings and logs",
     "headline": "One computer,<br />connect your watch.",
     "footer": "Independent community project, based on <l1>nab138 / iLoader</l1>, <l2>Andrey's fork</l2>, Rzbck's Watch install contribution and <l3>oacevedo / xtool</l3>. Not an official upstream release."
+  },
+  "err": {
+    "watch_denied_retry": "The Watch rejected the trust request. Confirm it on the Watch and try again.",
+    "watch_locked": "Unlock the iPhone and the Apple Watch, keep the Watch screen on, and try again.",
+    "watch_none_paired": "This iPhone has no paired Watch. Pair one in the Watch app on the iPhone first.",
+    "watch_multiple": "More than one Watch is paired. This version supports one Watch; confirm the target in the iPhone first.",
+    "watch_state_unknown": "The Watch did not report a recognisable developer mode state. Pair again and check.",
+    "watch_proxy_connect": "Could not connect to the Watch relay service. Keep the Watch unlocked and close to the iPhone, then try again.",
+    "watch_forward_unsupported": "Could not forward the Watch service. This system may need a different transport path.",
+    "watch_forward_close": "Could not close the Watch relay. Disconnect and reconnect the iPhone.",
+    "watch_service_timeout": "The Watch service timed out. Keep the Watch unlocked and close to the iPhone, then try again.",
+    "device_busy": "The device is already being prepared. Try again in a moment.",
+    "app_data_dir": "Could not open the application data folder.",
+    "watch_usb_required": "Preparing developer mode needs a USB connection. Connect the iPhone cable and select the USB device.",
+    "watch_pair_connect": "Could not connect to the paired Watch. Check the iPhone trust prompt and the USB connection.",
+    "watch_registry_read": "Could not read the paired Watch list.",
+    "watch_pair_first": "Click “Pair Watch” and confirm the trust prompt first, then reveal the switch.",
+    "watch_trust_invalid": "Could not verify the Watch trust. Pair the Watch again.",
+    "watch_trust_lost": "The Watch trust expired. Click “Pair Watch” to start a new session.",
+    "watch_phone_pairing": "Could not read the iPhone pairing information.",
+    "watch_pair_denied": "The Watch rejected the trust request. Unlock the Watch, keep the screen on, wait about a minute and click “Pair Watch” again. If it still fails, restart the Watch by holding the side button and the Digital Crown.",
+    "watch_pair_incomplete": "Watch pairing did not finish. Unlock the Watch, confirm the trust prompt, and try again.",
+    "watch_target_invalid": "Could not verify the target Watch.",
+    "watch_forward_mismatch": "The relay target does not match the selected Watch. Disconnect and try again.",
+    "watch_forward_not_watch": "The relay reached a device that is not an Apple Watch. Disconnect and try again.",
+    "watch_dev_mode_read": "Could not read the developer mode state. Unlock the Watch and try again.",
+    "watch_dev_service_start": "Could not start the Watch developer mode service.",
+    "watch_secure_session": "Could not establish a secure session with the Watch.",
+    "watch_switch_not_revealed": "The Watch did not confirm the developer mode switch was revealed. Check the system version and try again.",
+    "log_empty": "There are no logs to export yet.",
+    "install_no_watch_app": "This IPA has no embedded Watch app. This version needs the original IPA containing both the iPhone host and the Watch companion."
   }
 }

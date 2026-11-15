@@ -201,17 +201,12 @@ export default ({
               <Trans
                 i18nKey="error.support_message"
                 components={{
-                  discord: (
-                    <span
-                      onClick={() => openUrl("https://discord.gg/EA6yVgydBz")}
-                      role="link"
-                      className="error-link"
-                    />
-                  ),
                   github: (
                     <span
                       onClick={() =>
-                        openUrl("https://github.com/nab138/iloader/issues")
+                        openUrl(
+                          "https://github.com/AdminZachary/WatchBridge/issues",
+                        )
                       }
                       role="link"
                       className="error-link"

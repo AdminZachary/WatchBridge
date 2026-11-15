@@ -1,5 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: Discord Support
-    url: https://discord.gg/EA6yVgydBz
-    about: You can get more immediate support here.
+  - name: Installation and troubleshooting FAQ
+    url: https://github.com/AdminZachary/WatchBridge/blob/main/README.md#faq
+    about: Most setup problems are answered here first — the -23782 sign-in error, a missing pairing record, and the macOS Gatekeeper prompt.
+  - name: Download the latest release
+    url: https://github.com/AdminZachary/WatchBridge/releases/latest
+    about: Please check you are on the current version before opening an issue.
