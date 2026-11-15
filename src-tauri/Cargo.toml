@@ -32,7 +32,7 @@ keyring = { version = "3.6.3", features = ["apple-native", "windows-native", "li
 tauri-plugin-store = "2"
 futures = "0.3.31"
 once_cell = "1.21.3"
-tauri-plugin-dialog = "2"
+tauri-plugin-dialog = { version = "2", default-features = false, features = ["xdg-portal"] }
 reqwest = "0.13.2"
 tokio = "1.49.0"
 tauri-plugin-process = "2"
