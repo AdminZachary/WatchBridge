@@ -1,0 +1,52 @@
+name: Release Linux
+
+# Builds the Linux packages when a release is published and attaches them to it.
+# The tag is created from the commit that produced the Windows and macOS assets,
+# so all three platforms for a release come from the same tree.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-linux-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+      - name: Install Tauri system libraries
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev \
+            patchelf libssl-dev libdbus-1-dev libsecret-1-dev rpm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build the Linux packages
+        run: ./scripts/Build-Linux.sh --build-executable
+      - name: Collect the release assets
+        run: |
+          mkdir -p upload
+          cp artifacts/linux/*.deb upload/
+          cp artifacts/linux/*.rpm upload/
+          cp artifacts/linux/BUILD.json upload/watchbridge-linux-BUILD.json
+          cp artifacts/linux/SHA256SUMS.txt upload/watchbridge-linux-SHA256SUMS.txt
+          cp artifacts/linux/LICENSES.zip upload/watchbridge-linux-LICENSES.zip
+          ls -l upload
+      - name: Attach the packages to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: upload/*
