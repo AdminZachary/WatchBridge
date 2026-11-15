@@ -1,9 +1,9 @@
 name: Bug Report/Support
-description: Report a bug or get help with iloader
+description: Report a bug or get help with WatchBridge
 body:
 - type: markdown
   attributes:
-    value: "Thank you for helping iloader improve! To help us track down the bug, please fill out the following information:"
+    value: "Thank you for helping WatchBridge improve! To help us track down the bug, please fill out the following information:"
 - type: markdown
   attributes:
     value: "## Bug Information"
@@ -19,15 +19,15 @@ body:
   id: error
   attributes:
     label: Error message
-    description: "If this issue has an error message, click \"Copy to Clipboard\" in iloader and paste here. You can also upload screenshots, paste logs, or upload logfiles here."
+    description: "If this issue has an error message, click \"Copy to Clipboard\" in WatchBridge and paste here. You can also upload screenshots, paste logs, or upload logfiles here."
     placeholder: Paste error here
 - type: checkboxes
   id: suggestions
   attributes:
-    label: "Please read and follow any suggestions iloader gives before making this issue."
-    description: iloader gives intelligent suggestions for many common errors. If you open an issue about one of these errors and did not try the suggestions, you will simply be told to follow the suggestions.
+    label: "Please read and follow any suggestions WatchBridge gives before making this issue."
+    description: WatchBridge gives suggestions for many common errors. If you open an issue about one of these errors and did not try the suggestions, you will simply be told to follow the suggestions.
     options:
-      - label: I followed ALL suggestions given by iloader
+      - label: I followed ALL suggestions given by WatchBridge
         required: true
 - type: markdown
   attributes:
@@ -36,41 +36,36 @@ body:
   id: os
   attributes:
     label: Computer OS
-    description: What operating system is the computer you're running iloader on using and what version is it? (Windows 11, Ubuntu, etc)
+    description: Which operating system and version are you running WatchBridge on? (Windows 11, macOS 15, etc)
     placeholder: Windows 11
   validations:
     required: true
 - type: input
   id: version
   attributes:
-    label: iloader version
-    description: What version of iloader are you experiencing this problem with?
-    placeholder: v2.0.0
+    label: WatchBridge version
+    description: Which version of WatchBridge are you experiencing this problem with? (shown in the app header, e.g. v0.1.1)
+    placeholder: v0.1.1
   validations:
     required: true
 - type: dropdown
   id: package
   attributes:
-    label: What distribution of iloader did you download?
-    description: "Most Windows users use `.msi`. If unsure, check the extension of the file you downloaded to install iloader."
+    label: Which WatchBridge download did you use?
+    description: "Windows ships as a .zip; macOS ships as a .dmg, one per architecture. Check the file you actually downloaded."
     options:
-      - .msi (Windows)
-      - .exe (Windows)
-      - .dmg (macOS)
-      - .app (macOS)
-      - .deb (Linux)
-      - .rpm (Linux)
-      - .AppImage(Linux)
-      - AUR (Linux) (Unofficial)
-      - Homebrew (Linux) (Unofficial)
-      - Other (Specify in additional info)
+      - .zip (Windows)
+      - .dmg (macOS, Apple Silicon / arm64)
+      - .dmg (macOS, Intel / x86_64)
+      - Built from source
+      - Other (specify in additional info)
   validations:
     required: true
 - type: checkboxes
   id: computerceritifcation
   attributes:
-    label: Please certify that if you use Windows, you have iTunes or Apple Mobile Devices installed, or if you use Linux, you have usbmuxd installed.
-    description: If you are on macOS, you do not need any additional software.
+    label: Please certify that you have the Apple software your platform needs.
+    description: On Windows you need iTunes or the Apple Devices app (Apple Mobile Device Service). On macOS no extra software is required.
     options:
       - label: I certify the above is true
         required: true

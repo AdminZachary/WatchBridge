@@ -45,17 +45,17 @@ pub fn export_logs(app: AppHandle, destination: String) -> Result<ExportReport, 
     let directory = app
         .path()
         .app_data_dir()
-        .map_err(|_| AppError::Misc("无法访问应用数据目录。".into()))?
+        .map_err(|_| AppError::Misc("err.app_data_dir".into()))?
         .join("logs");
     let mut paths: Vec<PathBuf> = std::fs::read_dir(&directory)
-        .map_err(|_| AppError::Misc("还没有可导出的日志。".into()))?
+        .map_err(|_| AppError::Misc("err.log_empty".into()))?
         .filter_map(Result::ok)
         .map(|entry| entry.path())
         .filter(|path| is_log_file(path))
         .collect();
     paths.sort();
     if paths.is_empty() {
-        return Err(AppError::Misc("还没有可导出的日志。".into()));
+        return Err(AppError::Misc("err.log_empty".into()));
     }
 
     let mut out = String::new();
@@ -71,7 +71,7 @@ pub fn export_logs(app: AppHandle, destination: String) -> Result<ExportReport, 
     let mut truncated = false;
     for path in &paths {
         let raw = std::fs::read(path).map_err(|error| {
-            AppError::Misc(format!("无法读取日志 {}: {error}", path.display()))
+            AppError::Misc(format!("Failed to read log {}: {error}", path.display()))
         })?;
         let text = String::from_utf8_lossy(&raw).into_owned();
         let (piece, cut) = take_within(&text, MAX_BYTES.saturating_sub(bytes));
@@ -92,7 +92,7 @@ pub fn export_logs(app: AppHandle, destination: String) -> Result<ExportReport, 
     }
 
     std::fs::write(&destination, out)
-        .map_err(|error| AppError::Misc(format!("无法写入目标文件: {error}")))?;
+        .map_err(|error| AppError::Misc(format!("Failed to write the target file: {error}")))?;
     Ok(ExportReport {
         files,
         bytes,

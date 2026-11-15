@@ -252,6 +252,7 @@ impl Provider for NativeProvider<'_> {
     ) -> Result<AppleAccount, SessionError> {
         AppleAccount::builder(email)
             .anisette_provider(anisette)
+            .fallback_client_identity(Some(crate::account::apple_client_identity()))
             .build()
             .await
             .map_err(|e| SessionError::external(&e))

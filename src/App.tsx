@@ -5,6 +5,7 @@ import { open as openFileDialog } from "@tauri-apps/plugin-dialog";
 import { openUrl } from "@tauri-apps/plugin-opener";
 import { listen, UnlistenFn } from "@tauri-apps/api/event";
 import { toast } from "sonner";
+import { localizeError } from "./errorText";
 import { Trans, useTranslation } from "react-i18next";
 import { AppleID } from "./AppleID";
 import { Device, DeviceInfo } from "./Device";
@@ -19,7 +20,7 @@ type WatchStatus = { name: string; paired: boolean; developerMode: boolean | nul
 type InstallUpdate = { updateType: "started" | "finished" | "failed"; stepId: string; extraDetails?: { message: string } };
 type InstallState = "idle" | "validating" | "installing" | "done" | "failed";
 const repo = "https://github.com/AdminZachary/WatchBridge";
-const message = (error: unknown): string => typeof error === "object" && error !== null && "message" in error ? String(error.message) : String(error);
+const message = (error: unknown): string => localizeError(error);
 
 export default function App() {
   const [account, setAccount] = useState<string | null>(null);

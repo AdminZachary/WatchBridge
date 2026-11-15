@@ -350,8 +350,8 @@ pub async fn watch_sideload_operation(
 ) -> Result<(), AppError> {
     let op = Operation::new("watch_sideload".into(), &window);
     op.start("validate")?;
-    let _selection = op.fail_if_err("validate", operation.try_lock().map_err(|_| AppError::Misc("设备正在准备中，请稍后重试。".into())))?;
-    let directory = op.fail_if_err("validate", window.app_handle().path().app_data_dir().map_err(|_| AppError::Misc("无法访问应用数据目录。".into())))?;
+    let _selection = op.fail_if_err("validate", operation.try_lock().map_err(|_| AppError::Misc("err.device_busy".into())))?;
+    let directory = op.fail_if_err("validate", window.app_handle().path().app_data_dir().map_err(|_| AppError::Misc("err.app_data_dir".into())))?;
     let original = op.fail_if_err("validate", crate::manual_wifi::Original::retain(std::path::Path::new(&app_path), &directory))?;
     op.fail_if_err("validate", require_companion(original.has_watch()))?;
     op.complete("validate")?;
@@ -362,7 +362,7 @@ pub async fn watch_sideload_operation(
 }
 
 fn require_companion(has_watch: bool) -> Result<(), AppError> {
-    if has_watch { Ok(()) } else { Err(AppError::Misc("此 IPA 没有嵌入 Watch App。第一版需要同时包含 iPhone 宿主和 Watch Companion 的原始 IPA。".into())) }
+    if has_watch { Ok(()) } else { Err(AppError::Misc("err.install_no_watch_app".into())) }
 }
 
 #[cfg(test)]
