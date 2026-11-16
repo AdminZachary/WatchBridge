@@ -35,7 +35,7 @@ const WATCH_SEND_CHUNK: usize = 32 * 1024;
 // 60 MB. The first 32 MB go out at full speed, the rest at a fixed pace sized for Bluetooth.
 // WATCHBRIDGE_WATCH_KBPS overrides the pace when the Watch is on Wi-Fi (0 = no limit).
 const WATCH_UNPACED_BYTES: u64 = 32 * 1024 * 1024;
-const WATCH_SEND_KBPS: u64 = 128;
+const WATCH_SEND_KBPS: u64 = 256;
 const CENTRAL_DIRECTORY_HEADER: &[u8] = &[0x50, 0x4b, 0x01, 0x02];
 const ZIP_EXTRA: &[u8] = &[
     0x55, 0x54, 0x0d, 0x00, 0x07, 0xf3, 0xa2, 0xec, 0x60, 0xf6, 0xa2, 0xec, 0x60, 0xf3,
