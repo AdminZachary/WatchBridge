@@ -63,7 +63,7 @@ pub async fn install_watch_apps(
         match install_watch_apps_once(device_provider, watch_apps, host_name, &progress_callback)
             .await
         {
-            Err(error) if attempt < WATCH_SESSION_ATTEMPTS => {
+            Err(error) if attempt < WATCH_SESSION_ATTEMPTS && is_transient_watch_error(&error) => {
                 warn!("Apple Watch install failed (attempt {attempt}/{WATCH_SESSION_ATTEMPTS}); reconnecting: {error}");
                 tokio::time::sleep(Duration::from_secs(3)).await;
             }
@@ -505,6 +505,13 @@ async fn install_watch_app_with_retry_rsd(
     unreachable!("bounded Watch RSD install retry loop must return")
 }
 
+fn is_transient_watch_error(error: &Report) -> bool {
+    let message = format!("{error:?}\n{error}");
+    [WATCH_STALLED, "device socket io failed", "Operation Timeout", "no established connection"]
+        .iter()
+        .any(|transient| message.contains(transient))
+}
+
 fn is_watch_coordinator_conflict(error: &Report) -> bool {
     let message = format!("{error:?}\n{error}");
     message.contains("IXErrorDomain Code=48")
@@ -934,4 +941,24 @@ fn crc32_ieee(data: &[u8]) -> u32 {
     }
 
     !crc
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn retries_only_transient_watch_errors() {
+        let dropped = (|| -> Result<(), Report> {
+            Err(Error::IdeviceError(idevice::IdeviceError::Socket(
+                std::io::ErrorKind::ConnectionReset.into(),
+            )))
+            .context("Failed to send Apple Watch app")?;
+            Ok(())
+        })()
+        .unwrap_err();
+        assert!(is_transient_watch_error(&dropped));
+        assert!(is_transient_watch_error(&report!("{WATCH_STALLED}")));
+        assert!(!is_transient_watch_error(&report!("ApplicationVerificationFailed")));
+    }
 }
