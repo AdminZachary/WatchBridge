@@ -27,7 +27,7 @@ use rootcause::prelude::*;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use srp::{ClientVerifier, groups::G2048};
-use tracing::{debug, info, warn};
+use tracing::{debug, error, info, warn};
 
 pub struct AppleAccount {
     pub email: String,
@@ -93,6 +93,9 @@ pub struct SMSTwoFactorError {
 enum SmsSendOutcome {
     Sent,
     ActiveChallenge,
+    /// Apple answered with a challenge for another trusted number than the one
+    /// we asked about; the caller retries once with that id.
+    DifferentNumber(u32),
     ServiceError(SMSTwoFactorError),
 }
 
@@ -265,9 +268,10 @@ impl AppleAccount {
                     return Ok(());
                 }
                 LoginState::NeedsDevice2FA => {
-                    if self.trusted_phone_numbers.is_none() {
-                        self.trusted_phone_numbers = Some(self.get_trusted_numbers().await?);
-                    }
+                    // A missing phone-number list only matters for the SMS fallback.
+                    // Users with a trusted device sign in without it, so a failure
+                    // here must not abort the login.
+                    self.update_trusted_numbers().await;
                     self.send_trusted_device_2fa()
                         .await
                         .context("Failed to complete trusted device 2FA")?;
@@ -303,12 +307,20 @@ impl AppleAccount {
                     }
                 }
                 LoginState::NeedsSMS2FA(id) => {
-                    if self.trusted_phone_numbers.is_none() {
-                        self.trusted_phone_numbers = Some(self.get_trusted_numbers().await?);
-                    }
-                    info!("SMS 2FA required");
+                    self.update_trusted_numbers().await;
+                    let numbers = self.trusted_phone_numbers.clone().unwrap_or_default();
+                    // `0` means "not chosen yet": fall back to the first number the
+                    // account actually has instead of assuming id 1 exists.
+                    let target = numbers
+                        .iter()
+                        .find(|number| number.id == id)
+                        .or_else(|| numbers.first())
+                        .ok_or_else(|| {
+                            report!("This Apple ID has no trusted phone number for SMS 2FA")
+                        })?;
+                    info!("SMS 2FA required (phone number id {})", target.id);
                     self.login_state = self
-                        .send_sms_2fa(id)
+                        .send_sms_2fa(target.id, true)
                         .await
                         .context("Failed to complete SMS 2FA")?;
                 }
@@ -498,7 +510,11 @@ impl AppleAccount {
         Ok(LoginState::NeedsLogin)
     }
 
-    async fn send_sms_2fa(&mut self, id: u32) -> Result<LoginState, Report> {
+    async fn send_sms_2fa(
+        &mut self,
+        id: u32,
+        retry_on_other_number: bool,
+    ) -> Result<LoginState, Report> {
         let anisette_data = self
             .anisette_generator
             .get_anisette_data(self.grandslam_client.clone())
@@ -547,6 +563,19 @@ impl AppleAccount {
             }
             SmsSendOutcome::ActiveChallenge => {
                 info!("SMS 2FA challenge already active, proceeding to verification");
+            }
+            SmsSendOutcome::DifferentNumber(other_id) => {
+                let known = self
+                    .trusted_phone_numbers
+                    .as_ref()
+                    .is_some_and(|numbers| numbers.iter().any(|number| number.id == other_id));
+                if !retry_on_other_number || !known {
+                    bail!(
+                        "SMS 2FA request was answered for trusted number id {other_id}, which is not one of this account's numbers"
+                    );
+                }
+                info!("Apple answered for trusted number id {other_id}; retrying with it");
+                return Box::pin(self.send_sms_2fa(other_id, false)).await;
             }
             SmsSendOutcome::ServiceError(error) => {
                 if error.code == "-28248" {
@@ -648,18 +677,23 @@ impl AppleAccount {
             && challenge.mode == "sms"
             && challenge.challenge_type == "verification"
             && challenge.authentication_type == "hsa2"
-            && challenge.trusted_phone_number.id == requested_number_id
             && challenge
                 .trusted_phone_numbers
                 .iter()
-                .any(|number| number.id == requested_number_id)
+                .any(|number| number.id == challenge.trusted_phone_number.id)
             && challenge.security_code.length == 6
             && !challenge.security_code.too_many_codes_sent
             && !challenge.security_code.too_many_codes_validated
             && !challenge.security_code.security_code_locked
             && !challenge.security_code.security_code_cooldown
         {
-            return Ok(SmsSendOutcome::ActiveChallenge);
+            if challenge.trusted_phone_number.id == requested_number_id {
+                return Ok(SmsSendOutcome::ActiveChallenge);
+            }
+            // Apple answered for a different number than the one requested.
+            return Ok(SmsSendOutcome::DifferentNumber(
+                challenge.trusted_phone_number.id,
+            ));
         }
 
         bail!(
@@ -700,6 +734,18 @@ impl AppleAccount {
                 text
             )
         })
+    }
+
+    /// Refresh the trusted phone numbers, tolerating failure: the trusted-device
+    /// flow does not need them, and Apple answers 403 for some accounts.
+    async fn update_trusted_numbers(&mut self) {
+        if self.trusted_phone_numbers.is_some() {
+            return;
+        }
+        match self.get_trusted_numbers().await {
+            Ok(numbers) => self.trusted_phone_numbers = Some(numbers),
+            Err(report) => error!("Failed to retrieve trusted phone numbers: {report:#}"),
+        }
     }
 
     async fn get_trusted_numbers(&mut self) -> Result<Vec<TrustedNumber>, Report> {
@@ -921,9 +967,9 @@ impl AppleAccount {
         if let Some(plist::Value::String(s)) = status.get("au") {
             return Ok(match s.as_str() {
                 "trustedDeviceSecondaryAuth" => LoginState::NeedsDevice2FA,
-                "secondaryAuth" => LoginState::NeedsSMS2FA(
-                    1, /* Just start by trying 1, user can correct after */
-                ),
+                // The number id is resolved from the account's own list, because
+                // trusted numbers are not guaranteed to start at id 1.
+                "secondaryAuth" => LoginState::NeedsSMS2FA(0),
                 "repair" => LoginState::LoggedIn, // Just means that you don't have 2FA set up
                 unknown => LoginState::NeedsExtraStep(unknown.to_string()),
             });

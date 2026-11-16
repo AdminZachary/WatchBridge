@@ -693,6 +693,9 @@
     "watch_secure_session": "Could not establish a secure session with the Watch.",
     "watch_switch_not_revealed": "The Watch did not confirm the developer mode switch was revealed. Check the system version and try again.",
     "log_empty": "There are no logs to export yet.",
-    "install_no_watch_app": "This IPA has no embedded Watch app. This version needs the original IPA containing both the iPhone host and the Watch companion."
+    "install_no_watch_app": "This IPA has no embedded Watch app. This version needs the original IPA containing both the iPhone host and the Watch companion.",
+    "cert_limit_or_pending": "Apple refused to issue a new certificate: this Apple ID is at its certificate limit, or still has a pending request. Revoke an existing certificate and try again.",
+    "cert_pending_request": "This Apple ID has a certificate request that was never completed. It usually expires within 24 hours; until then Apple will not issue a new certificate. Another sideloading tool can clear it sooner.",
+    "cert_not_on_team": "The certificate to revoke does not belong to this team as an iOS certificate, so Apple refused. Revoke it in a different tool, or wait for it to expire."
   }
 }

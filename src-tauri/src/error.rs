@@ -90,6 +90,15 @@ impl From<Report> for AppError {
                     },
                     &SideloadError::DeveloperError(code, _) => match code {
                         1102 => return AppError::Underage(report_str),
+                        7252 => return AppError::Developer("err.cert_not_on_team".into()),
+                        7460 => {
+                            let message = if report_str.contains("pending certificate request") {
+                                "err.cert_pending_request"
+                            } else {
+                                "err.cert_limit_or_pending"
+                            };
+                            return AppError::Developer(message.into());
+                        }
                         _ => {
                             return AppError::Developer(report_str);
                         }

@@ -446,6 +446,15 @@ impl CertificateIdentity {
                                         .collect(),
                                 );
                             }
+                            let certs = existing_certs.as_mut().ok_or_report()?;
+                            if certs.is_empty() {
+                                // Nothing to revoke, so the limit is not the cause:
+                                // the account has a certificate request that was
+                                // submitted but never completed (they have no serial).
+                                bail!(
+                                    "This Apple ID has a pending certificate request that was never completed"
+                                );
+                            }
                             Self::revoke_others(
                                 developer_session,
                                 team,
@@ -454,7 +463,7 @@ impl CertificateIdentity {
                                     *code,
                                     "Maximum number of certificates reached".to_string(),
                                 ),
-                                existing_certs.as_mut().ok_or_report()?,
+                                certs,
                             )
                             .await?;
                         } else {
