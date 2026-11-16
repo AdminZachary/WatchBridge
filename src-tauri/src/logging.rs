@@ -14,7 +14,7 @@ pub fn safe_log_metadata(metadata: &tracing::Metadata<'_>) -> bool {
         });
     let install_progress = ["isideload::sideload::sideloader", "isideload::sideload::watch_install"]
         .contains(&metadata.target())
-        && *metadata.level() <= tracing::Level::INFO;
+        && *metadata.level() == tracing::Level::INFO;
     *metadata.level() <= tracing::Level::DEBUG
         && (install_progress || !(protocol_dependency && *metadata.level() > tracing::Level::WARN))
 }
