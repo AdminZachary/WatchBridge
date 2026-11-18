@@ -39,6 +39,11 @@ pub struct AppleAccount {
     debug: bool,
     last_error: Option<String>,
     err_429_retries: Option<u32>,
+    /// Why the trusted phone-number lookup failed, so the SMS path can report
+    /// the real cause instead of claiming the account has no number.
+    number_lookup_error: Option<String>,
+    /// Set once the SMS path has fallen back to a trusted-device prompt.
+    sms_device_fallback_used: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -169,6 +174,8 @@ impl AppleAccount {
             trusted_phone_numbers: None,
             last_error: None,
             err_429_retries,
+            number_lookup_error: None,
+            sms_device_fallback_used: false,
         })
     }
 
@@ -315,14 +322,36 @@ impl AppleAccount {
                         .iter()
                         .find(|number| number.id == id)
                         .or_else(|| numbers.first())
-                        .ok_or_else(|| {
-                            report!("This Apple ID has no trusted phone number for SMS 2FA")
-                        })?;
-                    info!("SMS 2FA required (phone number id {})", target.id);
-                    self.login_state = self
-                        .send_sms_2fa(target.id, true)
-                        .await
-                        .context("Failed to complete SMS 2FA")?;
+                        .cloned();
+                    match target {
+                        Some(target) => {
+                            info!("SMS 2FA required (phone number id {})", target.id);
+                            self.login_state = self
+                                .send_sms_2fa(target.id, true)
+                                .await
+                                .context("Failed to complete SMS 2FA")?;
+                        }
+                        None => {
+                            let reason = self.number_lookup_error.clone().unwrap_or_else(|| {
+                                "Apple returned an empty trusted phone number list".to_string()
+                            });
+                            if self.sms_device_fallback_used {
+                                bail!(
+                                    "SMS verification is unavailable ({reason}) and the trusted-device fallback was already used"
+                                );
+                            }
+                            // The phone-number list is not needed to ask Apple for a
+                            // push to the account's trusted devices.
+                            self.sms_device_fallback_used = true;
+                            warn!(
+                                "No usable phone number ({reason}); asking Apple to push to trusted devices instead"
+                            );
+                            self.send_trusted_device_2fa().await.context(
+                                "SMS verification is unavailable and the trusted-device fallback failed",
+                            )?;
+                            self.login_state = LoginState::NeedsDevice2FAVerification;
+                        }
+                    }
                 }
                 LoginState::NeedsSMS2FAVerification(id) => {
                     let response = two_factor_callback(TwoFactorCallbackParams {
@@ -744,7 +773,10 @@ impl AppleAccount {
         }
         match self.get_trusted_numbers().await {
             Ok(numbers) => self.trusted_phone_numbers = Some(numbers),
-            Err(report) => error!("Failed to retrieve trusted phone numbers: {report:#}"),
+            Err(report) => {
+                error!("Failed to retrieve trusted phone numbers: {report:#}");
+                self.number_lookup_error = Some(format!("{report:#}"));
+            }
         }
     }
 

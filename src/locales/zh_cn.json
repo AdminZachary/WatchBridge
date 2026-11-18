@@ -405,6 +405,7 @@
     "install_no_watch_app": "此 IPA 没有嵌入 Watch App。第一版需要同时包含 iPhone 宿主和 Watch Companion 的原始 IPA。",
     "cert_limit_or_pending": "苹果拒绝签发新证书：该 Apple ID 已达到证书上限，或仍有一个待处理的请求。请撤销一张现有证书后重试。",
     "cert_pending_request": "该 Apple ID 有一个未完成的证书请求。它通常会在 24 小时内自动过期，在此之前苹果不会签发新证书。使用其他侧载工具可以更快清除它。",
-    "cert_not_on_team": "要撤销的证书不属于本团队的 iOS 证书，苹果拒绝了该操作。请改用其他工具撤销，或等待它过期。"
+    "cert_not_on_team": "要撤销的证书不属于本团队的 iOS 证书，苹果拒绝了该操作。请改用其他工具撤销，或等待它过期。",
+    "apple_token_unavailable": "苹果暂时拒绝发放开发者令牌。请用该 Apple ID 登录 developer.apple.com 并接受相关协议，或等待数小时后重试。"
   }
 }

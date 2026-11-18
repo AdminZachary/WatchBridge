@@ -84,6 +84,10 @@ impl From<Report> for AppError {
                 match err {
                     &SideloadError::AuthWithMessage(code, _) => match code {
                         -20209 => return AppError::AccountLocked(report_str),
+                        // Apple refuses the developer token: usually the developer
+                        // agreement has not been accepted, or the account is being
+                        // throttled after repeated attempts.
+                        -22411 => return AppError::Auth("err.apple_token_unavailable".into()),
                         _ => {
                             return AppError::Auth(report_str);
                         }
