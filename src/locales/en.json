@@ -402,7 +402,8 @@
     "hide_certificate_list": "Hide certificate list",
     "choose_what_to_revoke": "Choose what to revoke",
     "continue": "Continue",
-    "no_keyring_available": "Unable to save credentials on this device."
+    "no_keyring_available": "Unable to save credentials on this device.",
+    "two_factor_no_prompt": "If no prompt appears on your devices, cancel this dialog and try again — the account may require a different verification method."
   },
   "device": {
     "title": "iDevice",

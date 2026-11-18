@@ -261,17 +261,27 @@ async fn login(
                     .emit("2fa-required", params)
                     .context("Failed to emit 2fa-required event")?;
 
-                let (tx, rx) = std::sync::mpsc::channel::<String>();
+                // The dialog can be cancelled, so the channel carries `None` for
+                // "the user gave up" and `Some(code)` for a submitted code.
+                let (tx, rx) = std::sync::mpsc::channel::<Option<String>>();
+                let tx_abort = tx.clone();
                 let handler_id = window_clone.listen("2fa-recieved", move |event| {
-                    let code = event.payload();
-                    let _ = tx.send(code.to_string());
+                    let code = event.payload().trim_matches('"').to_string();
+                    let _ = tx.send(Some(code));
+                });
+                let abort_id = window_clone.listen("2fa-aborted", move |_| {
+                    let _ = tx_abort.send(None);
                 });
 
-                let result = rx.recv_timeout(Duration::from_secs(120))?;
+                let result = rx.recv_timeout(Duration::from_secs(120));
                 window_clone.unlisten(handler_id);
+                window_clone.unlisten(abort_id);
 
-                let code = result.trim_matches('"').to_string();
-                Ok(TwoFactorCallbackResponse::SubmitCode(code))
+                match result {
+                    Ok(Some(code)) => Ok(TwoFactorCallbackResponse::SubmitCode(code)),
+                    Ok(None) => Ok(TwoFactorCallbackResponse::Abort),
+                    Err(_) => Err(report!("Timed out waiting for the two-factor code")),
+                }
             }
             .boxed()
         }

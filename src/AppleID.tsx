@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import "./AppleID.css";
 import { invoke } from "@tauri-apps/api/core";
 import { emit, listen } from "@tauri-apps/api/event";
@@ -57,6 +57,12 @@ export const AppleID = ({
   useEffect(() => {
     setSelectedSerials(certs?.map((c) => c.serialNumber) ?? []);
   }, [certs]);
+
+  const cancelTwoFactor = useCallback(() => {
+    setTfaOpen(false);
+    setTfaCode("");
+    void emit("2fa-aborted");
+  }, []);
 
   const listenerAdded = useRef<boolean>(false);
   const unlisten = useRef<() => void>(() => {});
@@ -221,13 +227,19 @@ export const AppleID = ({
                 //   return;
                 // }
                 let promise = async () => {
-                  await invoke("login_new", {
-                    email: emailInput,
-                    password: passwordInput,
-                    saveCredentials: saveCredentials,
-                    anisetteServer,
-                  });
-                  setForceUpdateIds((v) => v + 1);
+                  try {
+                    await invoke("login_new", {
+                      email: emailInput,
+                      password: passwordInput,
+                      saveCredentials: saveCredentials,
+                      anisetteServer,
+                    });
+                    setForceUpdateIds((v) => v + 1);
+                  } finally {
+                    // The dialog must never outlive the attempt that opened it.
+                    setTfaOpen(false);
+                    setTfaCode("");
+                  }
                 };
                 toast.promise(promise, {
                   loading: t("apple_id.logging_in"),
@@ -279,9 +291,15 @@ export const AppleID = ({
           </div>
         )}
       </div>
-      <Modal sizeFit isOpen={tfaOpen} zIndex={2000}>
+      <Modal
+        sizeFit
+        isOpen={tfaOpen}
+        zIndex={2000}
+        close={cancelTwoFactor}
+      >
         <h2>{t("apple_id.two_factor_title")}</h2>
         <p>{t("apple_id.two_factor_prompt")}</p>
+        <p className="tfa-hint">{t("apple_id.two_factor_no_prompt")}</p>
         <form
           onSubmit={async (e) => {
             e.preventDefault();

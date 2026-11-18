@@ -195,3 +195,5 @@
 .credentials-warning {
   margin: 0;
 }
+
+.tfa-hint { font-size: 0.85em; opacity: 0.75; margin-top: -0.4em; }

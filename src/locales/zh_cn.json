@@ -81,7 +81,8 @@
     "hide_certificate_list": "隐藏证书列表",
     "choose_what_to_revoke": "选择要撤销的内容",
     "continue": "继续",
-    "no_keyring_available": "无法在此设备上保存凭据。"
+    "no_keyring_available": "无法在此设备上保存凭据。",
+    "two_factor_no_prompt": "如果受信任设备上没有出现提示，可以取消这个对话框后重试——该账号可能需要另一种验证方式。"
   },
   "device": {
     "title": "iDevice",
