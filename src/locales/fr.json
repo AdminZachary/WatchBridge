@@ -81,7 +81,19 @@
     "continue": "Continuer",
     "no_keyring_available": "Impossible d'enregistrer les identifiants sur cet appareil.",
     "revoke_count": "{{count}} certificat(s) sera(ont) révoqué(s)",
-    "revoke_warning": "Révoquer un certificat invalide les applications déjà signées avec celui-ci ; elles doivent être signées à nouveau."
+    "revoke_warning": "Révoquer un certificat invalide les applications déjà signées avec celui-ci ; elles doivent être signées à nouveau.",
+    "two_factor_sms_prompt": "Saisissez le code de vérification reçu par SMS.",
+    "two_factor_resend": "Renvoyer le code",
+    "two_factor_use_devices": "Utiliser les appareils de confiance",
+    "two_factor_phone": "Numéro de téléphone de confiance",
+    "two_factor_phone_ending": "Numéro se terminant par {{digits}}",
+    "two_factor_send_sms": "Envoyer un SMS",
+    "two_factor_no_numbers": "Aucun numéro de confiance n’est disponible pour cette connexion. Renvoyez la demande aux appareils ou annulez et réessayez.",
+    "two_factor_action_failed": "Impossible d’envoyer la réponse de vérification. Réessayez.",
+    "two_factor_listener_failed": "Impossible de préparer la connexion. Redémarrez WatchBridge.",
+    "two_factor_choose_phone": "Choisissez un numéro, puis sélectionnez Envoyer un SMS.",
+    "two_factor_current_phone": "Réception des codes",
+    "two_factor_sent_to": "Numéro de vérification par SMS : {{number}}"
   },
   "device": {
     "title": "iDevice",

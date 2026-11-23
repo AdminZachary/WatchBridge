@@ -81,7 +81,19 @@
     "continue": "Weiter",
     "no_keyring_available": "Anmeldedaten können auf diesem Gerät nicht gespeichert werden.",
     "revoke_count": "{{count}} Zertifikat(e) werden widerrufen",
-    "revoke_warning": "Durch das Widerrufen eines Zertifikats werden bereits damit signierte Apps ungültig; sie müssen erneut signiert werden."
+    "revoke_warning": "Durch das Widerrufen eines Zertifikats werden bereits damit signierte Apps ungültig; sie müssen erneut signiert werden.",
+    "two_factor_sms_prompt": "Gib den per SMS erhaltenen Bestätigungscode ein.",
+    "two_factor_resend": "Code erneut senden",
+    "two_factor_use_devices": "Vertrauenswürdige Geräte verwenden",
+    "two_factor_phone": "Vertrauenswürdige Telefonnummer",
+    "two_factor_phone_ending": "Nummer mit den Endziffern {{digits}}",
+    "two_factor_send_sms": "SMS senden",
+    "two_factor_no_numbers": "Für diese Anmeldung sind keine vertrauenswürdigen Telefonnummern verfügbar. Sende die Geräteanfrage erneut oder brich ab und versuche es noch einmal.",
+    "two_factor_action_failed": "Die Bestätigungsantwort konnte nicht gesendet werden. Versuche es erneut.",
+    "two_factor_listener_failed": "Die Anmeldung konnte nicht vorbereitet werden. Starte WatchBridge neu.",
+    "two_factor_choose_phone": "Wähle eine Nummer und dann „SMS senden“.",
+    "two_factor_current_phone": "Empfängt Codes",
+    "two_factor_sent_to": "SMS-Verifizierungsnummer: {{number}}"
   },
   "device": {
     "title": "iDevice",

@@ -81,7 +81,19 @@
     "hide_certificate_list": "隱藏憑證列表",
     "choose_what_to_revoke": "選擇要撤銷的內容",
     "continue": "繼續",
-    "no_keyring_available": "無法在此裝置上儲存憑證。"
+    "no_keyring_available": "無法在此裝置上儲存憑證。",
+    "two_factor_sms_prompt": "請輸入簡訊中的驗證碼。",
+    "two_factor_resend": "重新傳送驗證碼",
+    "two_factor_use_devices": "使用受信任裝置",
+    "two_factor_phone": "受信任電話號碼",
+    "two_factor_phone_ending": "尾碼 {{digits}} 的號碼",
+    "two_factor_send_sms": "傳送簡訊",
+    "two_factor_no_numbers": "本次登入沒有可用的受信任電話號碼。您可以重新傳送裝置提示，或取消後重試。",
+    "two_factor_action_failed": "傳送驗證操作失敗，請重試。",
+    "two_factor_listener_failed": "登入準備失敗，請重新啟動 WatchBridge。",
+    "two_factor_choose_phone": "選擇接收驗證碼的號碼，再點選「傳送簡訊」。",
+    "two_factor_current_phone": "目前接收號碼",
+    "two_factor_sent_to": "簡訊驗證號碼：{{number}}"
   },
   "device": {
     "title": "iDevice",

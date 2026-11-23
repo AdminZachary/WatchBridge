@@ -81,7 +81,19 @@
     "hide_certificate_list": "証明書リストを隠す",
     "choose_what_to_revoke": "無効化するものを選択",
     "continue": "続行",
-    "no_keyring_available": "ログイン情報をこのデバイスに保存できません。"
+    "no_keyring_available": "ログイン情報をこのデバイスに保存できません。",
+    "two_factor_sms_prompt": "SMSで受信した確認コードを入力してください。",
+    "two_factor_resend": "コードを再送信",
+    "two_factor_use_devices": "信頼できるデバイスを使用",
+    "two_factor_phone": "信頼できる電話番号",
+    "two_factor_phone_ending": "末尾が{{digits}}の番号",
+    "two_factor_send_sms": "SMSを送信",
+    "two_factor_no_numbers": "このサインインで使用できる信頼できる電話番号がありません。デバイスへの通知を再送信するか、キャンセルしてやり直してください。",
+    "two_factor_action_failed": "確認操作を送信できませんでした。もう一度お試しください。",
+    "two_factor_listener_failed": "サインインを準備できませんでした。WatchBridgeを再起動してください。",
+    "two_factor_choose_phone": "番号を選択してから「SMS を送信」を押してください。",
+    "two_factor_current_phone": "現在の受信先",
+    "two_factor_sent_to": "SMS 認証の送信先：{{number}}"
   },
   "device": {
     "title": "デバイス",

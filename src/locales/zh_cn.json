@@ -82,7 +82,19 @@
     "choose_what_to_revoke": "选择要撤销的内容",
     "continue": "继续",
     "no_keyring_available": "无法在此设备上保存凭据。",
-    "two_factor_no_prompt": "如果受信任设备上没有出现提示，可以取消这个对话框后重试——该账号可能需要另一种验证方式。"
+    "two_factor_no_prompt": "如果受信任设备上没有出现提示，可以取消这个对话框后重试——该账号可能需要另一种验证方式。",
+    "two_factor_sms_prompt": "请输入短信中的验证码。",
+    "two_factor_resend": "重新发送验证码",
+    "two_factor_use_devices": "使用受信任设备",
+    "two_factor_phone": "受信任电话号码",
+    "two_factor_phone_ending": "尾号 {{digits}} 的号码",
+    "two_factor_send_sms": "发送短信",
+    "two_factor_no_numbers": "本次登录没有可用的受信任电话号码。您可以重新发送设备提示，或取消后重试。",
+    "two_factor_action_failed": "发送验证操作失败，请重试。",
+    "two_factor_listener_failed": "登录准备失败，请重启 WatchBridge。",
+    "two_factor_choose_phone": "选择接收验证码的号码，再点击“发送短信”。",
+    "two_factor_current_phone": "当前接收号码",
+    "two_factor_sent_to": "短信验证号码：{{number}}"
   },
   "device": {
     "title": "iDevice",

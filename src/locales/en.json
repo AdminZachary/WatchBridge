@@ -403,7 +403,19 @@
     "choose_what_to_revoke": "Choose what to revoke",
     "continue": "Continue",
     "no_keyring_available": "Unable to save credentials on this device.",
-    "two_factor_no_prompt": "If no prompt appears on your devices, cancel this dialog and try again — the account may require a different verification method."
+    "two_factor_no_prompt": "If no prompt appears on your devices, cancel this dialog and try again — the account may require a different verification method.",
+    "two_factor_sms_prompt": "Enter the verification code sent by SMS.",
+    "two_factor_resend": "Resend code",
+    "two_factor_use_devices": "Use trusted devices",
+    "two_factor_phone": "Trusted phone number",
+    "two_factor_phone_ending": "Number ending in {{digits}}",
+    "two_factor_send_sms": "Send SMS",
+    "two_factor_no_numbers": "No trusted phone numbers are available for this sign-in. You can resend the device prompt or cancel and try again.",
+    "two_factor_action_failed": "Could not send the verification response. Please try again.",
+    "two_factor_listener_failed": "Could not prepare sign-in. Please restart WatchBridge.",
+    "two_factor_choose_phone": "Choose a number, then select Send SMS.",
+    "two_factor_current_phone": "Receiving codes",
+    "two_factor_sent_to": "SMS verification number: {{number}}"
   },
   "device": {
     "title": "iDevice",

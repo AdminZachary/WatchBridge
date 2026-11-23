@@ -182,7 +182,19 @@
     "hide_certificate_list": "인증서 목록 숨기기",
     "choose_what_to_revoke": "폐기할 인증서 선택",
     "continue": "계속",
-    "no_keyring_available": "이기기에 인증서를 저장할 수 없습니다."
+    "no_keyring_available": "이기기에 인증서를 저장할 수 없습니다.",
+    "two_factor_sms_prompt": "SMS로 받은 확인 코드를 입력하세요.",
+    "two_factor_resend": "코드 다시 보내기",
+    "two_factor_use_devices": "신뢰하는 기기 사용",
+    "two_factor_phone": "신뢰하는 전화번호",
+    "two_factor_phone_ending": "끝자리가 {{digits}}인 번호",
+    "two_factor_send_sms": "SMS 보내기",
+    "two_factor_no_numbers": "이번 로그인에 사용할 수 있는 신뢰하는 전화번호가 없습니다. 기기 알림을 다시 보내거나 취소 후 다시 시도하세요.",
+    "two_factor_action_failed": "확인 응답을 보내지 못했습니다. 다시 시도하세요.",
+    "two_factor_listener_failed": "로그인을 준비하지 못했습니다. WatchBridge를 다시 시작하세요.",
+    "two_factor_choose_phone": "번호를 선택한 다음 SMS 보내기를 누르세요.",
+    "two_factor_current_phone": "현재 수신 번호",
+    "two_factor_sent_to": "SMS 인증 번호 수신처: {{number}}"
   },
   "device": {
     "title": "기기",

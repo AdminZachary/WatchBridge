@@ -1,7 +1,7 @@
 use futures::FutureExt;
 use isideload::{
     anisette::{AnisetteClientInfo, remote_v3::RemoteV3AnisetteProvider},
-    auth::apple_account::{AppleAccount, TwoFactorCallbackParams, TwoFactorCallbackResponse},
+    auth::apple_account::{AppleAccount, TwoFactorCallbackParams},
     dev::{
         app_ids::{AppIdsApi, ListAppIdsResponse},
         certificates::{CertificatesApi, DevelopmentCertificate},
@@ -10,11 +10,14 @@ use isideload::{
     sideload::{SideloaderBuilder, builder::MaxCertsBehavior, sideloader::Sideloader},
 };
 use keyring::Entry;
-use rootcause::prelude::*;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::time::Duration;
 use tauri::{AppHandle, Emitter, Listener, Manager, State, Window};
+
+mod two_factor;
+
+static LOGIN_LOCK: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 use tauri_plugin_store::StoreExt;
 use tracing::debug;
 
@@ -96,9 +99,10 @@ pub async fn login_stored(
 
 #[tauri::command]
 pub fn delete_account(handle: AppHandle, email: String) -> Result<(), AppError> {
-    let directory = handle.path().app_data_dir().map_err(|e| {
-        AppError::Filesystem("Failed to locate app data".into(), e.to_string())
-    })?;
+    let directory = handle
+        .path()
+        .app_data_dir()
+        .map_err(|e| AppError::Filesystem("Failed to locate app data".into(), e.to_string()))?;
     crate::renewal::management::Catalog::acquire(&directory)
         .and_then(|catalog| catalog.forget_account(&email))
         .map_err(AppError::Misc)?;
@@ -111,9 +115,7 @@ pub fn delete_account(handle: AppHandle, email: String) -> Result<(), AppError> 
     credential_deleted_or_absent(pass_entry.delete_credential())?;
     // The signing private key is stored per Apple ID (lowercase, as in login()).
     create_sideloading_storage(&handle)?
-        .delete(&isideload::sideload::cert_identity::private_key_storage_key(
-            &email.to_lowercase(),
-        ))
+        .delete(&isideload::sideload::cert_identity::private_key_storage_key(&email.to_lowercase()))
         .map_err(|e| AppError::Storage("Failed to delete signing key".into(), e.to_string()))?;
     // Remove metadata only after deletion succeeded or the credential was already
     // absent. A keyring failure must not hide a credential that still exists.
@@ -251,39 +253,14 @@ async fn login(
     password: &str,
     anisette_server: String,
 ) -> Result<Sideloader, AppError> {
+    let _login_guard = LOGIN_LOCK.try_lock().map_err(|_| {
+        AppError::Misc("Another sign-in is in progress. Finish or cancel it first.".into())
+    })?;
     let tfa_closure = {
-        let window_clone = window.clone();
+        let window = window.clone();
         move |params: TwoFactorCallbackParams| {
-            let window_clone = window_clone.clone();
-
-            async move {
-                window_clone
-                    .emit("2fa-required", params)
-                    .context("Failed to emit 2fa-required event")?;
-
-                // The dialog can be cancelled, so the channel carries `None` for
-                // "the user gave up" and `Some(code)` for a submitted code.
-                let (tx, rx) = std::sync::mpsc::channel::<Option<String>>();
-                let tx_abort = tx.clone();
-                let handler_id = window_clone.listen("2fa-recieved", move |event| {
-                    let code = event.payload().trim_matches('"').to_string();
-                    let _ = tx.send(Some(code));
-                });
-                let abort_id = window_clone.listen("2fa-aborted", move |_| {
-                    let _ = tx_abort.send(None);
-                });
-
-                let result = rx.recv_timeout(Duration::from_secs(120));
-                window_clone.unlisten(handler_id);
-                window_clone.unlisten(abort_id);
-
-                match result {
-                    Ok(Some(code)) => Ok(TwoFactorCallbackResponse::SubmitCode(code)),
-                    Ok(None) => Ok(TwoFactorCallbackResponse::Abort),
-                    Err(_) => Err(report!("Timed out waiting for the two-factor code")),
-                }
-            }
-            .boxed()
+            let window = window.clone();
+            async move { two_factor::request(&window, params).await }.boxed()
         }
     };
 

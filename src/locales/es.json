@@ -81,7 +81,19 @@
     "continue": "Continuar",
     "no_keyring_available": "No se pueden guardar las credenciales en este dispositivo.",
     "revoke_count": "Se revocarán {{count}} certificado(s)",
-    "revoke_warning": "Revocar un certificado invalida las apps ya firmadas con él; deberás firmarlas de nuevo."
+    "revoke_warning": "Revocar un certificado invalida las apps ya firmadas con él; deberás firmarlas de nuevo.",
+    "two_factor_sms_prompt": "Introduce el código de verificación recibido por SMS.",
+    "two_factor_resend": "Reenviar código",
+    "two_factor_use_devices": "Usar dispositivos de confianza",
+    "two_factor_phone": "Número de teléfono de confianza",
+    "two_factor_phone_ending": "Número terminado en {{digits}}",
+    "two_factor_send_sms": "Enviar SMS",
+    "two_factor_no_numbers": "No hay números de confianza disponibles para este inicio de sesión. Reenvía la solicitud al dispositivo o cancela y vuelve a intentarlo.",
+    "two_factor_action_failed": "No se pudo enviar la respuesta de verificación. Vuelve a intentarlo.",
+    "two_factor_listener_failed": "No se pudo preparar el inicio de sesión. Reinicia WatchBridge.",
+    "two_factor_choose_phone": "Elige un número y pulsa Enviar SMS.",
+    "two_factor_current_phone": "Recibe códigos",
+    "two_factor_sent_to": "Número de verificación por SMS: {{number}}"
   },
   "device": {
     "title": "iDevice",
