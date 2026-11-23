@@ -27,11 +27,13 @@ const WATCH_INSTALL_MAX_RETRY_DELAY_MS: u64 = 2500;
 /// the Watch is unreachable (asleep, out of range) and would otherwise leave the
 /// install waiting forever.
 const WATCH_RESPONSE_TIMEOUT: Duration = Duration::from_secs(180);
+mod policy;
+use policy::*;
+
 const CENTRAL_DIRECTORY_HEADER: &[u8] = &[0x50, 0x4b, 0x01, 0x02];
 const ZIP_EXTRA: &[u8] = &[
-    0x55, 0x54, 0x0d, 0x00, 0x07, 0xf3, 0xa2, 0xec, 0x60, 0xf6, 0xa2, 0xec, 0x60, 0xf3,
-    0xa2, 0xec, 0x60, 0x75, 0x78, 0x0b, 0x00, 0x01, 0x04, 0xf5, 0x01, 0x00, 0x00, 0x04,
-    0x14, 0x00, 0x00, 0x00,
+    0x55, 0x54, 0x0d, 0x00, 0x07, 0xf3, 0xa2, 0xec, 0x60, 0xf6, 0xa2, 0xec, 0x60, 0xf3, 0xa2, 0xec,
+    0x60, 0x75, 0x78, 0x0b, 0x00, 0x01, 0x04, 0xf5, 0x01, 0x00, 0x00, 0x04, 0x14, 0x00, 0x00, 0x00,
 ];
 
 /// Install or update already-signed embedded Watch apps directly on the paired Apple Watch.
@@ -50,80 +52,106 @@ pub async fn install_watch_apps(
         return Ok(());
     }
 
-    let iphone_pairing = device_provider
-        .get_pairing_file()
+    let mut completed_apps = 0;
+    for attempt in 1..=SESSION_ATTEMPTS {
+        match install_watch_apps_once(
+            device_provider,
+            watch_apps,
+            host_name,
+            &progress_callback,
+            &mut completed_apps,
+        )
         .await
-        .map_err(Error::IdeviceError)?;
+        {
+            Err(error) if attempt < SESSION_ATTEMPTS && is_transient_watch_error(&error) => {
+                warn!(
+                    "Apple Watch install failed (attempt {attempt}/{SESSION_ATTEMPTS}); reconnecting: {error}"
+                );
+                tokio::time::sleep(Duration::from_secs(3)).await;
+            }
+            result => return result,
+        }
+    }
+
+    unreachable!("bounded Watch session retry loop must return")
+}
+
+async fn install_watch_apps_once(
+    device_provider: &impl IdeviceProvider,
+    watch_apps: &[Bundle],
+    host_name: &str,
+    progress_callback: &(impl Fn(u64) + Send + Sync),
+    completed_apps: &mut usize,
+) -> Result<(), Report> {
+    let iphone_pairing = watch_step(device_provider.get_pairing_file()).await?;
 
     let forwarded_lockdown_port = {
-        let mut companion_proxy = CompanionProxy::connect(device_provider)
+        let mut companion_proxy = watch_step(CompanionProxy::connect(device_provider))
             .await
-            .map_err(Error::IdeviceError)
-            .context("Failed to connect to fresh Apple Watch companion proxy for lockdown forwarding")?;
+            .context(
+                "Failed to connect to fresh Apple Watch companion proxy for lockdown forwarding",
+            )?;
 
-        companion_proxy
-            .start_forwarding_service_port(
-                WATCH_LOCKDOWN_PORT,
-                Some(WATCH_LOCKDOWN_SERVICE),
-                None,
-            )
-            .await
-            .map_err(Error::IdeviceError)
-            .context("Failed to forward Apple Watch lockdown")?
+        watch_step(companion_proxy.start_forwarding_service_port(
+            WATCH_LOCKDOWN_PORT,
+            Some(WATCH_LOCKDOWN_SERVICE),
+            None,
+        ))
+        .await
+        .context("Failed to forward Apple Watch lockdown")?
     };
 
     let result = async {
-        let watch_connection = connect_forwarded_watch_port(
-            device_provider,
-            forwarded_lockdown_port,
-            "lockdown",
-        )
-        .await?;
+        let watch_connection =
+            connect_forwarded_watch_port(device_provider, forwarded_lockdown_port, "lockdown")
+                .await?;
         let mut watch_lockdown = LockdownClient::new(watch_connection);
 
-        let watch_pairing = watch_lockdown
-            .pair(
+        let watch_pairing = bounded_step(
+            PAIR_TIMEOUT,
+            watch_lockdown.pair(
                 iphone_pairing.host_id.clone(),
                 iphone_pairing.system_buid.clone(),
                 Some(host_name),
-            )
-            .await
-            .map_err(Error::IdeviceError)
-            .context("Failed to pair with the Apple Watch through companion proxy")?;
+            ),
+        )
+        .await
+        .context("Failed to pair with the Apple Watch through companion proxy")
+        .context(WatchInstallError::PairingUnconfirmed)?;
 
-        let legacy = watch_lockdown
-            .start_session(&watch_pairing)
+        let legacy = watch_step(watch_lockdown.start_session(&watch_pairing))
             .await
-            .map_err(Error::IdeviceError)
             .context("Failed to start Apple Watch lockdown session")?;
 
-        for watch_app in watch_apps {
+        for watch_app in watch_apps.iter().skip(*completed_apps) {
             install_watch_app_with_retry(
                 device_provider,
                 &mut watch_lockdown,
                 &watch_pairing,
                 legacy,
                 watch_app,
-                &progress_callback,
+                progress_callback,
             )
             .await?;
+            *completed_apps += 1;
         }
 
         Ok(())
     }
     .await;
 
-    match CompanionProxy::connect(device_provider).await {
+    match watch_step(CompanionProxy::connect(device_provider)).await {
         Ok(mut companion_proxy) => {
-            if let Err(e) = companion_proxy
-                .stop_forwarding_service_port(WATCH_LOCKDOWN_PORT)
-                .await
+            if let Err(e) =
+                watch_step(companion_proxy.stop_forwarding_service_port(WATCH_LOCKDOWN_PORT)).await
             {
                 warn!("Failed to stop Apple Watch lockdown forwarding: {e}");
             }
         }
         Err(e) => {
-            warn!("Failed to open fresh Apple Watch companion proxy to stop lockdown forwarding: {e}");
+            warn!(
+                "Failed to open fresh Apple Watch companion proxy to stop lockdown forwarding: {e}"
+            );
         }
     }
 
@@ -144,19 +172,15 @@ pub async fn register_paired_watches_rsd(
 ) -> Result<usize, Report> {
     use crate::dev::{device_type::DeveloperDeviceType, devices::DevicesApi};
 
-    let mut companion_proxy = CompanionProxy::connect_rsd(rsd_provider, handshake)
+    let mut companion_proxy = watch_step(CompanionProxy::connect_rsd(rsd_provider, handshake))
         .await
-        .map_err(Error::IdeviceError)
         .context("Failed to connect to Apple Watch companion proxy over RSD")?;
-    let paired_watches = companion_proxy
-        .get_device_registry()
+    let paired_watches = watch_step(companion_proxy.get_device_registry())
         .await
-        .map_err(Error::IdeviceError)
         .context("Failed to list paired Apple Watch devices over RSD")?;
 
     for watch_udid in &paired_watches {
-        let watch_name = companion_proxy
-            .get_value(watch_udid, "DeviceName")
+        let watch_name = watch_step(companion_proxy.get_value(watch_udid, "DeviceName"))
             .await
             .ok()
             .and_then(|value| value.as_string().map(str::to_string))
@@ -182,55 +206,82 @@ pub async fn install_watch_apps_rsd(
     host_name: &str,
     progress_callback: impl Fn(u64) + Send + Sync,
 ) -> Result<(), Report> {
+    let mut completed_apps = 0;
+    for attempt in 1..=SESSION_ATTEMPTS {
+        match install_watch_apps_rsd_once(
+            rsd_provider,
+            handshake,
+            iphone_pairing,
+            watch_apps,
+            host_name,
+            &progress_callback,
+            &mut completed_apps,
+        )
+        .await
+        {
+            Err(error) if attempt < SESSION_ATTEMPTS && is_transient_watch_error(&error) => {
+                warn!(
+                    "Apple Watch RSD connection setup failed (attempt {attempt}/{SESSION_ATTEMPTS}); reconnecting"
+                );
+                tokio::time::sleep(Duration::from_secs(3)).await;
+            }
+            result => return result,
+        }
+    }
+    unreachable!("bounded Watch RSD session retry loop must return")
+}
+
+async fn install_watch_apps_rsd_once(
+    rsd_provider: &mut impl RsdProvider,
+    handshake: &mut RsdHandshake,
+    iphone_pairing: &PairingFile,
+    watch_apps: &[Bundle],
+    host_name: &str,
+    progress_callback: &(impl Fn(u64) + Send + Sync),
+    completed_apps: &mut usize,
+) -> Result<(), Report> {
     if watch_apps.is_empty() {
         return Ok(());
     }
 
     let forwarded_lockdown_port = {
-        let mut companion_proxy = CompanionProxy::connect_rsd(rsd_provider, handshake)
-            .await
-            .map_err(Error::IdeviceError)
+        let mut companion_proxy = watch_step(CompanionProxy::connect_rsd(rsd_provider, handshake)).await
             .context(
                 "Failed to connect to fresh Apple Watch RSD companion proxy for lockdown forwarding",
             )?;
 
-        companion_proxy
-            .start_forwarding_service_port(
-                WATCH_LOCKDOWN_PORT,
-                Some(WATCH_LOCKDOWN_SERVICE),
-                None,
-            )
-            .await
-            .map_err(Error::IdeviceError)
-            .context("Failed to forward Apple Watch lockdown over RSD")?
+        watch_step(companion_proxy.start_forwarding_service_port(
+            WATCH_LOCKDOWN_PORT,
+            Some(WATCH_LOCKDOWN_SERVICE),
+            None,
+        ))
+        .await
+        .context("Failed to forward Apple Watch lockdown over RSD")?
     };
 
     let result = async {
-        let watch_connection = connect_forwarded_watch_port_rsd(
-            rsd_provider,
-            forwarded_lockdown_port,
-            "lockdown",
-        )
-        .await?;
+        let watch_connection =
+            connect_forwarded_watch_port_rsd(rsd_provider, forwarded_lockdown_port, "lockdown")
+                .await?;
         let mut watch_lockdown = LockdownClient::new(watch_connection);
 
-        let watch_pairing = watch_lockdown
-            .pair(
+        let watch_pairing = bounded_step(
+            PAIR_TIMEOUT,
+            watch_lockdown.pair(
                 iphone_pairing.host_id.clone(),
                 iphone_pairing.system_buid.clone(),
                 Some(host_name),
-            )
-            .await
-            .map_err(Error::IdeviceError)
-            .context("Failed to pair with the Apple Watch through RSD companion proxy")?;
+            ),
+        )
+        .await
+        .context("Failed to pair with the Apple Watch through RSD companion proxy")
+        .context(WatchInstallError::PairingUnconfirmed)?;
 
-        let legacy = watch_lockdown
-            .start_session(&watch_pairing)
+        let legacy = watch_step(watch_lockdown.start_session(&watch_pairing))
             .await
-            .map_err(Error::IdeviceError)
             .context("Failed to start Apple Watch lockdown session over RSD")?;
 
-        for watch_app in watch_apps {
+        for watch_app in watch_apps.iter().skip(*completed_apps) {
             install_watch_app_with_retry_rsd(
                 rsd_provider,
                 handshake,
@@ -238,20 +289,20 @@ pub async fn install_watch_apps_rsd(
                 &watch_pairing,
                 legacy,
                 watch_app,
-                &progress_callback,
+                progress_callback,
             )
             .await?;
+            *completed_apps += 1;
         }
 
         Ok(())
     }
     .await;
 
-    match CompanionProxy::connect_rsd(rsd_provider, handshake).await {
+    match watch_step(CompanionProxy::connect_rsd(rsd_provider, handshake)).await {
         Ok(mut companion_proxy) => {
-            if let Err(e) = companion_proxy
-                .stop_forwarding_service_port(WATCH_LOCKDOWN_PORT)
-                .await
+            if let Err(e) =
+                watch_step(companion_proxy.stop_forwarding_service_port(WATCH_LOCKDOWN_PORT)).await
             {
                 warn!("Failed to stop Apple Watch RSD lockdown forwarding: {e}");
             }
@@ -271,44 +322,35 @@ async fn connect_forwarded_watch_port(
     forwarded_port: u16,
     service: &str,
 ) -> Result<Idevice, Report> {
-    for attempt in 1..=WATCH_FORWARD_CONNECT_ATTEMPTS {
-        match device_provider.connect(forwarded_port).await {
-            Ok(connection) => {
-                if attempt > 1 {
-                    info!(
-                        "Connected to Apple Watch {} on forwarded port {} after {} attempts",
-                        service, forwarded_port, attempt
-                    );
+    bounded_operation(async {
+        for attempt in 1..=WATCH_FORWARD_CONNECT_ATTEMPTS {
+            match device_provider.connect(forwarded_port).await {
+                Ok(connection) => {
+                    if attempt > 1 {
+                        info!(
+                            "Connected to Apple Watch {} on forwarded port {} after {} attempts",
+                            service, forwarded_port, attempt
+                        );
+                    }
+                    return Ok(connection);
                 }
-                return Ok(connection);
-            }
-            Err(error) if attempt < WATCH_FORWARD_CONNECT_ATTEMPTS => {
-                warn!(
-                    "Apple Watch {} forwarded port {} is not ready (attempt {}/{}): {}",
-                    service,
-                    forwarded_port,
-                    attempt,
-                    WATCH_FORWARD_CONNECT_ATTEMPTS,
-                    error
-                );
-                tokio::time::sleep(Duration::from_millis(
-                    WATCH_FORWARD_CONNECT_DELAY_MS,
-                ))
-                .await;
-            }
-            Err(error) => {
-                bail!(
-                    "Failed to connect to Apple Watch {} on forwarded iPhone port {} after {} attempts: {}",
-                    service,
-                    forwarded_port,
-                    WATCH_FORWARD_CONNECT_ATTEMPTS,
-                    error
-                );
+                Err(error) if attempt < WATCH_FORWARD_CONNECT_ATTEMPTS => {
+                    warn!(
+                        "Apple Watch {} forwarded port {} is not ready (attempt {}/{}): {}",
+                        service, forwarded_port, attempt, WATCH_FORWARD_CONNECT_ATTEMPTS, error
+                    );
+                    tokio::time::sleep(Duration::from_millis(WATCH_FORWARD_CONNECT_DELAY_MS)).await;
+                }
+                Err(error) => {
+                    return Err(report!(Error::IdeviceError(error)).context(format!(
+                        "Failed to connect to Apple Watch {service} on forwarded iPhone port {forwarded_port} after {WATCH_FORWARD_CONNECT_ATTEMPTS} attempts"
+                    )).into());
+                }
             }
         }
-    }
 
-    unreachable!("bounded forwarded-port retry loop must return")
+        unreachable!("bounded forwarded-port retry loop must return")
+    }).await
 }
 
 async fn connect_forwarded_watch_port_rsd(
@@ -316,44 +358,35 @@ async fn connect_forwarded_watch_port_rsd(
     forwarded_port: u16,
     service: &str,
 ) -> Result<Idevice, Report> {
-    for attempt in 1..=WATCH_FORWARD_CONNECT_ATTEMPTS {
-        match rsd_provider.connect_to_service_port(forwarded_port).await {
-            Ok(stream) => {
-                if attempt > 1 {
-                    info!(
-                        "Connected to Apple Watch {} over RSD on forwarded port {} after {} attempts",
-                        service, forwarded_port, attempt
-                    );
+    bounded_operation(async {
+        for attempt in 1..=WATCH_FORWARD_CONNECT_ATTEMPTS {
+            match rsd_provider.connect_to_service_port(forwarded_port).await {
+                Ok(stream) => {
+                    if attempt > 1 {
+                        info!(
+                            "Connected to Apple Watch {} over RSD on forwarded port {} after {} attempts",
+                            service, forwarded_port, attempt
+                        );
+                    }
+                    return Ok(Idevice::new(stream, "isideload-watch-rsd"));
                 }
-                return Ok(Idevice::new(stream, "isideload-watch-rsd"));
-            }
-            Err(error) if attempt < WATCH_FORWARD_CONNECT_ATTEMPTS => {
-                warn!(
-                    "Apple Watch {} RSD forwarded port {} is not ready (attempt {}/{}): {}",
-                    service,
-                    forwarded_port,
-                    attempt,
-                    WATCH_FORWARD_CONNECT_ATTEMPTS,
-                    error
-                );
-                tokio::time::sleep(Duration::from_millis(
-                    WATCH_FORWARD_CONNECT_DELAY_MS,
-                ))
-                .await;
-            }
-            Err(error) => {
-                bail!(
-                    "Failed to connect to Apple Watch {} on RSD forwarded iPhone port {} after {} attempts: {}",
-                    service,
-                    forwarded_port,
-                    WATCH_FORWARD_CONNECT_ATTEMPTS,
-                    error
-                );
+                Err(error) if attempt < WATCH_FORWARD_CONNECT_ATTEMPTS => {
+                    warn!(
+                        "Apple Watch {} RSD forwarded port {} is not ready (attempt {}/{}): {}",
+                        service, forwarded_port, attempt, WATCH_FORWARD_CONNECT_ATTEMPTS, error
+                    );
+                    tokio::time::sleep(Duration::from_millis(WATCH_FORWARD_CONNECT_DELAY_MS)).await;
+                }
+                Err(error) => {
+                    return Err(report!(Error::IdeviceError(error)).context(format!(
+                        "Failed to connect to Apple Watch {service} on RSD forwarded iPhone port {forwarded_port} after {WATCH_FORWARD_CONNECT_ATTEMPTS} attempts"
+                    )).into());
+                }
             }
         }
-    }
 
-    unreachable!("bounded RSD forwarded-port retry loop must return")
+        unreachable!("bounded RSD forwarded-port retry loop must return")
+    }).await
 }
 
 async fn install_watch_app_with_retry(
@@ -383,9 +416,7 @@ async fn install_watch_app_with_retry(
         {
             Ok(()) => {
                 if attempt > 1 {
-                    info!(
-                        "Apple Watch app {bundle_id} installed/updated after {attempt} attempts"
-                    );
+                    info!("Apple Watch app {bundle_id} installed/updated after {attempt} attempts");
                 }
                 return Ok(());
             }
@@ -474,8 +505,7 @@ fn is_watch_coordinator_conflict(error: &Report) -> bool {
     let message = format!("{error:?}\n{error}");
     message.contains("IXErrorDomain Code=48")
         || message.contains("A coordinated install exists for this identity")
-        || (message.contains("process-scoped")
-            && message.contains("scoped to a different process"))
+        || (message.contains("process-scoped") && message.contains("scoped to a different process"))
 }
 
 async fn install_watch_app_zip_conduit(
@@ -486,53 +516,50 @@ async fn install_watch_app_zip_conduit(
     watch_app: &Bundle,
     progress_callback: &(impl Fn(u64) + Send + Sync),
 ) -> Result<(), Report> {
-    let (remote_port, ssl) = watch_lockdown
-        .start_service(WATCH_ZIP_SERVICE)
+    let (remote_port, ssl) = watch_step(watch_lockdown.start_service(WATCH_ZIP_SERVICE))
         .await
-        .map_err(Error::IdeviceError)
         .context("Failed to start Apple Watch streaming_zip_conduit")?;
 
     let forwarded_port = {
-        let mut companion_proxy = CompanionProxy::connect(device_provider)
-            .await
-            .map_err(Error::IdeviceError)
+        let mut companion_proxy = watch_step(CompanionProxy::connect(device_provider)).await
             .context("Failed to connect to fresh Apple Watch companion proxy for streaming_zip_conduit forwarding")?;
 
-        companion_proxy
-            .start_forwarding_service_port(remote_port, Some(WATCH_ZIP_SERVICE), None)
-            .await
-            .map_err(Error::IdeviceError)
-            .context("Failed to forward Apple Watch streaming_zip_conduit")?
+        watch_step(companion_proxy.start_forwarding_service_port(
+            remote_port,
+            Some(WATCH_ZIP_SERVICE),
+            Some(prefer_wifi()),
+        ))
+        .await
+        .context("Failed to forward Apple Watch streaming_zip_conduit")?
     };
 
     let result = async {
-        let mut connection = connect_forwarded_watch_port(
-            device_provider,
-            forwarded_port,
-            "streaming_zip_conduit",
-        )
-        .await?;
+        let mut connection =
+            connect_forwarded_watch_port(device_provider, forwarded_port, "streaming_zip_conduit")
+                .await?;
 
         if ssl {
-            connection
-                .start_session(watch_pairing, legacy)
+            watch_step(connection.start_session(watch_pairing, legacy))
                 .await
-                .map_err(Error::IdeviceError)
                 .context("Failed to secure Apple Watch streaming_zip_conduit connection")?;
         }
 
-        stream_watch_app(&mut connection, watch_app, progress_callback).await
+        transfer_result(stream_watch_app(&mut connection, watch_app, progress_callback).await)
     }
     .await;
 
-    match CompanionProxy::connect(device_provider).await {
+    match watch_step(CompanionProxy::connect(device_provider)).await {
         Ok(mut companion_proxy) => {
-            if let Err(e) = companion_proxy.stop_forwarding_service_port(remote_port).await {
+            if let Err(e) =
+                watch_step(companion_proxy.stop_forwarding_service_port(remote_port)).await
+            {
                 warn!("Failed to stop Apple Watch streaming_zip_conduit forwarding: {e}");
             }
         }
         Err(e) => {
-            warn!("Failed to open fresh Apple Watch companion proxy to stop streaming_zip_conduit forwarding: {e}");
+            warn!(
+                "Failed to open fresh Apple Watch companion proxy to stop streaming_zip_conduit forwarding: {e}"
+            );
         }
     }
 
@@ -548,50 +575,45 @@ async fn install_watch_app_zip_conduit_rsd(
     watch_app: &Bundle,
     progress_callback: &(impl Fn(u64) + Send + Sync),
 ) -> Result<(), Report> {
-    let (remote_port, ssl) = watch_lockdown
-        .start_service(WATCH_ZIP_SERVICE)
+    let (remote_port, ssl) = watch_step(watch_lockdown.start_service(WATCH_ZIP_SERVICE))
         .await
-        .map_err(Error::IdeviceError)
         .context("Failed to start Apple Watch streaming_zip_conduit over RSD")?;
 
     let forwarded_port = {
-        let mut companion_proxy = CompanionProxy::connect_rsd(rsd_provider, handshake)
-            .await
-            .map_err(Error::IdeviceError)
+        let mut companion_proxy = watch_step(CompanionProxy::connect_rsd(rsd_provider, handshake)).await
             .context(
                 "Failed to connect to fresh Apple Watch RSD companion proxy for streaming_zip_conduit forwarding",
             )?;
 
-        companion_proxy
-            .start_forwarding_service_port(remote_port, Some(WATCH_ZIP_SERVICE), None)
-            .await
-            .map_err(Error::IdeviceError)
-            .context("Failed to forward Apple Watch streaming_zip_conduit over RSD")?
+        watch_step(companion_proxy.start_forwarding_service_port(
+            remote_port,
+            Some(WATCH_ZIP_SERVICE),
+            Some(prefer_wifi()),
+        ))
+        .await
+        .context("Failed to forward Apple Watch streaming_zip_conduit over RSD")?
     };
 
     let result = async {
-        let mut connection = connect_forwarded_watch_port_rsd(
-            rsd_provider,
-            forwarded_port,
-            "streaming_zip_conduit",
-        )
-        .await?;
+        let mut connection =
+            connect_forwarded_watch_port_rsd(rsd_provider, forwarded_port, "streaming_zip_conduit")
+                .await?;
 
         if ssl {
-            connection
-                .start_session(watch_pairing, legacy)
+            watch_step(connection.start_session(watch_pairing, legacy))
                 .await
-                .map_err(Error::IdeviceError)
                 .context("Failed to secure Apple Watch RSD streaming_zip_conduit connection")?;
         }
 
-        stream_watch_app(&mut connection, watch_app, progress_callback).await
+        transfer_result(stream_watch_app(&mut connection, watch_app, progress_callback).await)
     }
     .await;
 
-    match CompanionProxy::connect_rsd(rsd_provider, handshake).await {
+    match watch_step(CompanionProxy::connect_rsd(rsd_provider, handshake)).await {
         Ok(mut companion_proxy) => {
-            if let Err(e) = companion_proxy.stop_forwarding_service_port(remote_port).await {
+            if let Err(e) =
+                watch_step(companion_proxy.stop_forwarding_service_port(remote_port)).await
+            {
                 warn!("Failed to stop Apple Watch RSD streaming_zip_conduit forwarding: {e}");
             }
         }
@@ -677,23 +699,35 @@ async fn stream_watch_app(
     let mut metadata_bytes = Vec::new();
     Value::Dictionary(metadata).to_writer_xml(&mut metadata_bytes)?;
 
+    let config = TransferConfig::from_env();
+    info!(
+        "Apple Watch transfer settings: {} KiB/s (0 = unlimited), {} unpaced bytes",
+        config.kbps, config.unpaced_bytes
+    );
+    let mut pacer = TransferPacer::new(config);
     send_zip_directory(connection, "META-INF/").await?;
     send_zip_file(
         connection,
         "META-INF/com.apple.ZipMetadata.plist",
         &metadata_bytes,
+        &mut pacer,
     )
     .await?;
 
+    let mut sent = 0u64;
+    let mut logged = 0u64;
     for (source, destination) in entries {
         let data = isideload_vfs::fs::read(&source)?;
-        send_zip_file(connection, &destination, &data).await?;
+        send_zip_file(connection, &destination, &data, &mut pacer).await?;
+        sent += data.len() as u64;
+        let percent = sent * 100 / total_uncompressed.max(1);
+        if percent >= logged + 5 {
+            logged = percent;
+            info!("Sending Apple Watch app: {percent}%");
+        }
     }
 
-    connection
-        .send_raw(CENTRAL_DIRECTORY_HEADER)
-        .await
-        .map_err(Error::IdeviceError)?;
+    watch_step(connection.send_raw(CENTRAL_DIRECTORY_HEADER)).await?;
 
     wait_for_watch_install(connection, progress_callback).await
 }
@@ -702,14 +736,11 @@ async fn wait_for_watch_install(
     connection: &mut Idevice,
     progress_callback: &(impl Fn(u64) + Send + Sync),
 ) -> Result<(), Report> {
+    let mut watchdog = ProgressWatchdog::new(tokio::time::Instant::now());
     loop {
-        let response = tokio::time::timeout(WATCH_RESPONSE_TIMEOUT, read_prefixed_plist(connection))
+        let response = tokio::time::timeout_at(watchdog.deadline, read_prefixed_plist(connection))
             .await
-            .map_err(|_| {
-                report!(
-                    "The Apple Watch didn't respond for 3 minutes. Keep it unlocked and near the iPhone, then try again."
-                )
-            })??;
+            .map_err(|_| report!(WatchInstallError::ProgressStalled))??;
 
         if response
             .get("Status")
@@ -743,6 +774,7 @@ async fn wait_for_watch_install(
             .and_then(Value::as_string)
             .unwrap_or("Unknown");
 
+        watchdog.observe(percent, status, tokio::time::Instant::now());
         info!("Installing Apple Watch app: {percent}% {status}");
         progress_callback(percent);
     }
@@ -776,18 +808,12 @@ async fn send_prefixed_plist(
     frame.extend_from_slice(&payload_len.to_be_bytes());
     frame.extend_from_slice(&payload);
 
-    connection
-        .send_raw(&frame)
-        .await
-        .map_err(Error::IdeviceError)?;
+    watch_step(connection.send_raw(&frame)).await?;
     Ok(())
 }
 
 async fn read_prefixed_plist(connection: &mut Idevice) -> Result<Dictionary, Report> {
-    let len = connection
-        .read_raw(4)
-        .await
-        .map_err(Error::IdeviceError)?;
+    let len = connection.read_raw(4).await.map_err(Error::IdeviceError)?;
     let payload_len = u32::from_be_bytes([len[0], len[1], len[2], len[3]]) as usize;
     let payload = connection
         .read_raw(payload_len)
@@ -803,25 +829,27 @@ async fn read_prefixed_plist(connection: &mut Idevice) -> Result<Dictionary, Rep
 
 async fn send_zip_directory(connection: &mut Idevice, name: &str) -> Result<(), Report> {
     let header = zip_header(name, 0, 0)?;
-    connection
-        .send_raw(&header)
-        .await
-        .map_err(Error::IdeviceError)?;
+    watch_step(connection.send_raw(&header)).await?;
     Ok(())
 }
 
-async fn send_zip_file(connection: &mut Idevice, name: &str, data: &[u8]) -> Result<(), Report> {
+async fn send_zip_file(
+    connection: &mut Idevice,
+    name: &str,
+    data: &[u8],
+    pacer: &mut TransferPacer,
+) -> Result<(), Report> {
     let size = u32::try_from(data.len()).context("Watch app file is too large")?;
     let header = zip_header(name, size, crc32_ieee(data))?;
 
-    connection
-        .send_raw(&header)
-        .await
-        .map_err(Error::IdeviceError)?;
-    connection
-        .send_raw(data)
-        .await
-        .map_err(Error::IdeviceError)?;
+    watch_step(connection.send_raw(&header)).await?;
+    for chunk in data.chunks(SEND_CHUNK) {
+        let deadline = pacer.next_deadline(chunk.len(), tokio::time::Instant::now());
+        watch_step(connection.send_raw(chunk)).await?;
+        if let Some(deadline) = deadline {
+            tokio::time::sleep_until(deadline).await;
+        }
+    }
     Ok(())
 }
 
@@ -859,6 +887,12 @@ fn insert_string(dictionary: &mut Dictionary, key: &str, value: impl Into<String
     dictionary.insert(key.to_string(), Value::String(value.into()));
 }
 
+fn prefer_wifi() -> Dictionary {
+    let mut options = Dictionary::new();
+    options.insert("PreferWifi".to_string(), Value::Boolean(true));
+    options
+}
+
 fn insert_integer(dictionary: &mut Dictionary, key: &str, value: i64) {
     dictionary.insert(key.to_string(), Value::Integer(value.into()));
 }
@@ -875,4 +909,179 @@ fn crc32_ieee(data: &[u8]) -> u32 {
     }
 
     !crc
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+
+    #[derive(Debug)]
+    struct FailingSetup {
+        calls: std::sync::atomic::AtomicUsize,
+        transient: bool,
+    }
+
+    impl IdeviceProvider for FailingSetup {
+        fn connect(
+            &self,
+            _: u16,
+        ) -> std::pin::Pin<
+            Box<dyn std::future::Future<Output = Result<Idevice, idevice::IdeviceError>> + Send>,
+        > {
+            panic!("a failed pairing-file lookup must not open device services");
+        }
+
+        fn label(&self) -> &str {
+            "test-setup"
+        }
+
+        fn get_pairing_file(
+            &self,
+        ) -> std::pin::Pin<
+            Box<
+                dyn std::future::Future<Output = Result<PairingFile, idevice::IdeviceError>> + Send,
+            >,
+        > {
+            let attempt = self
+                .calls
+                .fetch_add(1, std::sync::atomic::Ordering::Relaxed);
+            let transient = self.transient;
+            Box::pin(async move {
+                if transient && attempt == 0 {
+                    Err(idevice::IdeviceError::NoEstablishedConnection)
+                } else {
+                    Err(idevice::IdeviceError::UserDeniedPairing)
+                }
+            })
+        }
+    }
+
+    #[tokio::test]
+    async fn setup_reconnects_only_on_transient_failure_and_stops_on_denial() {
+        let root = std::env::temp_dir().join(format!("watch-retry-{}", uuid::Uuid::new_v4()));
+        std::fs::create_dir_all(&root).unwrap();
+        let mut info = Dictionary::new();
+        insert_string(&mut info, "CFBundleIdentifier", "com.example.retry");
+        plist::to_file_xml(root.join("Info.plist"), &info).unwrap();
+        let app = Bundle::new(root.clone()).unwrap();
+        std::fs::remove_dir_all(root).unwrap();
+        for (transient, expected_calls) in [(false, 1), (true, 2)] {
+            let provider = FailingSetup {
+                calls: std::sync::atomic::AtomicUsize::new(0),
+                transient,
+            };
+            assert!(
+                install_watch_apps(&provider, std::slice::from_ref(&app), "test", |_| panic!(
+                    "setup failure cannot emit install progress"
+                ))
+                .await
+                .is_err()
+            );
+            assert_eq!(
+                provider.calls.load(std::sync::atomic::Ordering::Relaxed),
+                expected_calls
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn chunked_transfer_preserves_zip_headers_and_every_byte() {
+        let (writer, mut reader) = tokio::io::duplex(1024);
+        let mut connection = Idevice::new(Box::new(writer), "test-watch-transfer");
+        let files = [
+            ("Payload/Watch.app/Watch", vec![0x91; SEND_CHUNK * 3 + 17]),
+            ("Payload/Watch.app/Info.plist", vec![0x23; 77]),
+        ];
+        let mut expected = Vec::new();
+        for (name, data) in &files {
+            expected.extend(zip_header(name, data.len() as u32, crc32_ieee(data)).unwrap());
+            expected.extend(data);
+        }
+        let receive = tokio::spawn(async move {
+            let mut bytes = Vec::new();
+            reader.read_to_end(&mut bytes).await.unwrap();
+            bytes
+        });
+        let mut pacer = TransferPacer::new(TransferConfig {
+            kbps: 0,
+            unpaced_bytes: 0,
+        });
+        for (name, data) in files {
+            send_zip_file(&mut connection, name, &data, &mut pacer)
+                .await
+                .unwrap();
+        }
+        drop(connection);
+        assert_eq!(receive.await.unwrap(), expected);
+    }
+
+    async fn install_response(response: Dictionary) -> (Result<(), Report>, Vec<u64>) {
+        let (reader, mut writer) = tokio::io::duplex(4096);
+        let mut connection = Idevice::new(Box::new(reader), "test-watch-result");
+        let mut payload = Vec::new();
+        Value::Dictionary(response)
+            .to_writer_xml(&mut payload)
+            .unwrap();
+        writer
+            .write_all(&(payload.len() as u32).to_be_bytes())
+            .await
+            .unwrap();
+        writer.write_all(&payload).await.unwrap();
+        drop(writer);
+        let progress = std::sync::Mutex::new(Vec::new());
+        let result = wait_for_watch_install(&mut connection, &|percent| {
+            progress.lock().unwrap().push(percent)
+        })
+        .await;
+        (result, progress.into_inner().unwrap())
+    }
+
+    #[tokio::test]
+    async fn only_explicit_data_complete_reports_install_success() {
+        let mut complete = Dictionary::new();
+        insert_string(&mut complete, "Status", "DataComplete");
+        let (result, progress) = install_response(complete).await;
+        result.unwrap();
+        assert_eq!(progress, vec![100]);
+
+        let mut incomplete = Dictionary::new();
+        let mut progress = Dictionary::new();
+        insert_integer(&mut progress, "PercentComplete", 50);
+        insert_string(&mut progress, "Status", "Installing");
+        incomplete.insert("InstallProgressDict".into(), Value::Dictionary(progress));
+        let (result, progress) = install_response(incomplete).await;
+        let error = transfer_result(result).unwrap_err();
+        assert!(!progress.contains(&100));
+        assert!(!is_transient_watch_error(&error));
+        assert!(error.iter_reports().any(|cause| matches!(
+            cause.downcast_current_context::<WatchInstallError>(),
+            Some(WatchInstallError::TransferUnconfirmed)
+        )));
+    }
+
+    #[tokio::test]
+    async fn explicit_rejection_is_preserved_and_never_replayed() {
+        let mut response = Dictionary::new();
+        let mut progress = Dictionary::new();
+        insert_string(&mut progress, "Error", "ApplicationVerificationFailed");
+        insert_string(&mut progress, "ErrorDescription", "invalid test signature");
+        response.insert("InstallProgressDict".into(), Value::Dictionary(progress));
+        let (result, progress) = install_response(response).await;
+        let error = transfer_result(result).unwrap_err();
+        assert!(format!("{error:?}").contains("ApplicationVerificationFailed"));
+        assert!(!is_transient_watch_error(&error));
+        assert!(progress.is_empty());
+    }
+
+    #[test]
+    fn explicit_coordinator_rejection_keeps_existing_retry_behavior() {
+        let error = transfer_result(Err(report!(
+            "IXErrorDomain Code=48: A coordinated install exists for this identity"
+        )
+        .into()))
+        .unwrap_err();
+        assert!(is_watch_coordinator_conflict(&error));
+        assert!(!is_transient_watch_error(&error));
+    }
 }

@@ -49,3 +49,25 @@ with a caller-supplied fallback identity and keeps it for the session
 (`auth/grandslam.rs`). The fallback uses upstream iLoader's macOS 27.0 claim
 with the shipping RTM build `26A428`, and is to be dropped once servers report
 an accepted identity themselves.
+
+## WatchBridge local integration of PR #8 (2026-11-24)
+
+Based on [seomin0610's Watch installation improvements](https://github.com/AdminZachary/WatchBridge/pull/8)
+at `8fd51211be5fa9c716b381b7eef3ce3401cdf400`: directory checks for embedded
+bundles, 32 KiB transfer chunks, Bluetooth pacing, a Wi-Fi forwarding preference,
+bounded connection retries, and installation progress logging.
+
+The local integration adds timeouts to USB and RSD setup/forwarding/cleanup,
+typed retry classification, and pacing that includes socket write time. Only
+connection setup is retried automatically; a transport failure after submitting
+the installation is reported as unconfirmed and is not replayed. Confirmed apps
+are skipped if setup for a later companion needs reconnecting. The existing
+watchOS coordinator-rejection retry remains in place.
+
+The default transfer rate is 256 KiB/s after a 32 MiB initial burst.
+`WATCHBRIDGE_WATCH_KBPS=0` disables pacing;
+`WATCHBRIDGE_WATCH_UNPACED_MB=0` disables the initial burst. Both settings are
+read once per app transfer, and the effective values are logged. Requesting
+Wi-Fi does not confirm which transport iOS actually uses. An installation-result
+watchdog expires after three minutes without a change of progress or stage,
+rather than imposing a total installation deadline.
