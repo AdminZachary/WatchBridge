@@ -348,7 +348,15 @@
       "done": "Installation abgeschlossen",
       "waiting": "Warten auf Rückmeldung des Geräts",
       "elapsed": "Verstrichen: {{time}}",
-      "companion": "Watch-App {{index}} von {{count}}"
+      "companion": "Watch-App {{index}} von {{count}}",
+      "adaptive": "Adaptive Beschleunigung (experimentell)",
+      "fixed": "Feste Begrenzung",
+      "speed": "Senden: {{speed}} KiB/s",
+      "peak": "Spitzenziel: {{speed}} KiB/s",
+      "rate": "Begrenzung: {{speed}} KiB/s",
+      "budget": "Budgetauffüllung: {{speed}} KiB/s",
+      "unlimited": "Unbegrenzte Rate",
+      "adaptive_hint": "Die Schreibgeschwindigkeit ist nicht die Empfangsrate der Watch. Der adaptive Modus begrenzt das Sendebudget."
     }
   }
 }

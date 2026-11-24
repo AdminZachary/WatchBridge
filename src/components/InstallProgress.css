@@ -14,6 +14,8 @@
 .install-progress-stages .is-complete > span { background: #e2eddb; border-color: #d3e2cb; }
 .install-progress-stages .is-current { color: #174b3e; font-weight: 600; }
 .install-progress-stages .is-current > span { background: #246756; border-color: #246756; color: #fff; }
+.install-transfer-policy { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 12px; color: #64766d; font-size: 11px; font-variant-numeric: tabular-nums; }
+.install-transfer-mode { background: #e3eddd; color: #245848; padding: 4px 7px; border-radius: 5px; }
 .wb-app .install-progress-note { margin: 12px 0 0; font-size: 11px; color: #64766d; }
 .install-progress.is-failed { border-color: #e7cfca; background: #fff8f5; }
 .install-progress.is-failed .install-progress-percent { color: #ab3535; }

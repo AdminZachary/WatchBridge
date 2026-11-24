@@ -27,6 +27,10 @@ pub struct InstallProgress {
     pub total_bytes: Option<u64>,
     pub app_index: Option<usize>,
     pub app_count: Option<usize>,
+    pub transfer_mode: Option<&'static str>,
+    pub target_kbps: Option<u64>,
+    pub speed_kbps: Option<f64>,
+    pub budget_kbps: Option<u64>,
 }
 
 impl InstallProgress {
@@ -38,6 +42,10 @@ impl InstallProgress {
             total_bytes: None,
             app_index: None,
             app_count: None,
+            transfer_mode: None,
+            target_kbps: None,
+            speed_kbps: None,
+            budget_kbps: None,
         }
     }
 
@@ -51,14 +59,14 @@ impl InstallProgress {
 
 pub(super) struct TransferProgress {
     total: u64,
-    state: Mutex<(u64, Instant)>,
+    state: Mutex<(u64, Instant, u64)>,
 }
 
 impl TransferProgress {
     pub fn new(total: u64) -> Self {
         Self {
             total,
-            state: Mutex::new((0, Instant::now())),
+            state: Mutex::new((0, Instant::now(), 0)),
         }
     }
 
@@ -68,7 +76,14 @@ impl TransferProgress {
         if state.0 != self.total && state.1.elapsed() < Duration::from_millis(100) {
             return None;
         }
+        let elapsed = state.1.elapsed().as_secs_f64();
+        let speed = if elapsed >= 0.001 {
+            Some((state.0 - state.2) as f64 / elapsed / 1024.0)
+        } else {
+            None
+        };
         state.1 = Instant::now();
+        state.2 = state.0;
         let mut update = InstallProgress::percent(
             InstallStage::WatchTransfer,
             if self.total == 0 {
@@ -79,6 +94,7 @@ impl TransferProgress {
         );
         update.bytes_sent = Some(state.0);
         update.total_bytes = Some(self.total);
+        update.speed_kbps = speed;
         Some(update)
     }
 }

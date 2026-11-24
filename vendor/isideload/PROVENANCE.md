@@ -76,3 +76,12 @@ The local progress-bar follow-up adds optional structured observers to the USB
 and RSD installers. Existing callback APIs remain available. Watch transfer
 updates count successfully written app-file bytes and are throttled; installation
 completion is still determined by the original protocol result, not UI progress.
+
+The optional adaptive sender uses write-duration backoff and gradual recovery,
+with a separate finite token allowance shared across files. This is a sending
+budget, not a measurement of iPhone memory or Watch acknowledgements. Fixed
+pacing remains the default. `WATCHBRIDGE_WATCH_MODE=adaptive` enables probing;
+`WATCHBRIDGE_WATCH_MAX_KBPS` bounds the peak (default 4096 KiB/s), while
+`WATCHBRIDGE_WATCH_KBPS` controls allowance replenishment. Adaptive bursts are
+capped at 32 MiB and unlimited refill is not permitted. This mode requires
+physical-device validation separately from the fixed-rate tests.

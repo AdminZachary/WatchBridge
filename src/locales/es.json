@@ -348,7 +348,15 @@
       "done": "Instalación completada",
       "waiting": "Esperando respuesta del dispositivo",
       "elapsed": "Tiempo transcurrido: {{time}}",
-      "companion": "App del Watch {{index}} de {{count}}"
+      "companion": "App del Watch {{index}} de {{count}}",
+      "adaptive": "Aceleración adaptativa (experimental)",
+      "fixed": "Ritmo fijo",
+      "speed": "Enviando {{speed}} KiB/s",
+      "peak": "Objetivo máximo: {{speed}} KiB/s",
+      "rate": "Límite: {{speed}} KiB/s",
+      "budget": "Recarga del presupuesto: {{speed}} KiB/s",
+      "unlimited": "Sin límite",
+      "adaptive_hint": "La velocidad de escritura no es la de recepción del Watch. El modo adaptativo mantiene un presupuesto de envío limitado."
     }
   }
 }

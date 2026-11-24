@@ -415,7 +415,15 @@
       "done": "Installation terminée",
       "waiting": "En attente de la réponse de l’appareil",
       "elapsed": "Temps écoulé : {{time}}",
-      "companion": "App Watch {{index}} sur {{count}}"
+      "companion": "App Watch {{index}} sur {{count}}",
+      "adaptive": "Accélération adaptative (expérimentale)",
+      "fixed": "Débit fixe",
+      "speed": "Envoi : {{speed}} KiB/s",
+      "peak": "Débit de pointe visé : {{speed}} KiB/s",
+      "rate": "Débit réglé : {{speed}} KiB/s",
+      "budget": "Recharge du budget : {{speed}} KiB/s",
+      "unlimited": "Débit illimité",
+      "adaptive_hint": "Le débit d’écriture ne mesure pas la réception de la Watch. Le mode adaptatif conserve un budget d’envoi limité."
     }
   }
 }

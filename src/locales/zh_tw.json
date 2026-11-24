@@ -348,7 +348,15 @@
       "done": "安裝已完成",
       "waiting": "等待裝置回應",
       "elapsed": "已用時 {{time}}",
-      "companion": "第 {{index}} / {{count}} 個手錶應用程式"
+      "companion": "第 {{index}} / {{count}} 個手錶應用程式",
+      "adaptive": "自適應提速（實驗）",
+      "fixed": "固定傳送策略",
+      "speed": "目前傳送 {{speed}} KiB/s",
+      "peak": "峰值目標 {{speed}} KiB/s",
+      "rate": "限速設定 {{speed}} KiB/s",
+      "budget": "額度恢復 {{speed}} KiB/s",
+      "unlimited": "不限速",
+      "adaptive_hint": "寫入速度不等於手錶接收速度；自動模式仍保留傳送額度保護。"
     }
   }
 }

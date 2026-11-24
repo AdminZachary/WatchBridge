@@ -464,7 +464,15 @@
       "done": "설치 완료",
       "waiting": "기기 응답 대기 중",
       "elapsed": "경과 시간 {{time}}",
-      "companion": "Watch 앱 {{index}} / {{count}}"
+      "companion": "Watch 앱 {{index}} / {{count}}",
+      "adaptive": "적응형 가속 (실험)",
+      "fixed": "고정 전송 속도",
+      "speed": "전송 중 {{speed}} KiB/s",
+      "peak": "최대 목표 {{speed}} KiB/s",
+      "rate": "속도 설정 {{speed}} KiB/s",
+      "budget": "전송 예산 회복 {{speed}} KiB/s",
+      "unlimited": "속도 제한 없음",
+      "adaptive_hint": "쓰기 속도는 Watch 수신 속도가 아닙니다. 적응형 모드에서도 전송 예산을 제한합니다."
     }
   }
 }

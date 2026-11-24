@@ -419,7 +419,15 @@
       "done": "インストールが完了しました",
       "waiting": "デバイスの応答を待機中",
       "elapsed": "経過時間 {{time}}",
-      "companion": "Watch アプリ {{index}} / {{count}}"
+      "companion": "Watch アプリ {{index}} / {{count}}",
+      "adaptive": "自動加速（実験）",
+      "fixed": "固定レート",
+      "speed": "送信中 {{speed}} KiB/s",
+      "peak": "ピーク目標 {{speed}} KiB/s",
+      "rate": "レート設定 {{speed}} KiB/s",
+      "budget": "送信枠の回復 {{speed}} KiB/s",
+      "unlimited": "レート制限なし",
+      "adaptive_hint": "書き込み速度はWatchの受信速度ではありません。自動モードでも送信枠に上限があります。"
     }
   }
 }

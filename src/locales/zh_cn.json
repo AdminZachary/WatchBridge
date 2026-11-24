@@ -398,7 +398,15 @@
       "done": "安装已完成",
       "waiting": "等待设备反馈",
       "elapsed": "已用时 {{time}}",
-      "companion": "第 {{index}} / {{count}} 个手表应用"
+      "companion": "第 {{index}} / {{count}} 个手表应用",
+      "adaptive": "自适应提速（实验）",
+      "fixed": "固定发送策略",
+      "speed": "当前发送 {{speed}} KiB/s",
+      "peak": "峰值目标 {{speed}} KiB/s",
+      "rate": "限速设定 {{speed}} KiB/s",
+      "budget": "预算恢复 {{speed}} KiB/s",
+      "unlimited": "不限速",
+      "adaptive_hint": "写入速度不等于手表接收速度；自动模式仍保留发送预算保护。"
     }
   },
   "err": {

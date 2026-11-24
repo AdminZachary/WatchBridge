@@ -689,7 +689,15 @@
       "done": "Installation complete",
       "waiting": "Waiting for device feedback",
       "elapsed": "Elapsed {{time}}",
-      "companion": "Watch app {{index}} of {{count}}"
+      "companion": "Watch app {{index}} of {{count}}",
+      "adaptive": "Adaptive acceleration (experimental)",
+      "fixed": "Fixed pacing",
+      "speed": "Sending {{speed}} KiB/s",
+      "peak": "Peak target {{speed}} KiB/s",
+      "rate": "Rate setting {{speed}} KiB/s",
+      "budget": "Credit refill {{speed}} KiB/s",
+      "unlimited": "Unlimited rate",
+      "adaptive_hint": "Write speed is not Watch receive speed. Adaptive mode keeps a bounded sending allowance."
     }
   },
   "err": {

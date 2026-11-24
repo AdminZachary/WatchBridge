@@ -33,6 +33,7 @@ const WATCH_INSTALL_MAX_RETRY_DELAY_MS: u64 = 2500;
 /// the Watch is unreachable (asleep, out of range) and would otherwise leave the
 /// install waiting forever.
 const WATCH_RESPONSE_TIMEOUT: Duration = Duration::from_secs(180);
+mod adaptive;
 mod policy;
 use policy::*;
 
@@ -778,16 +779,30 @@ async fn stream_watch_app(
     Value::Dictionary(metadata).to_writer_xml(&mut metadata_bytes)?;
 
     let transfer_progress = TransferProgress::new(total_uncompressed);
+    let config = TransferConfig::from_env();
+    let mut pacer = TransferPacer::new(config);
     let mut initial = InstallProgress::percent(InstallStage::WatchTransfer, 0);
     initial.bytes_sent = Some(0);
     initial.total_bytes = Some(total_uncompressed);
+    pacer.describe(&mut initial);
     observer(initial);
-    let config = TransferConfig::from_env();
+    if config.adaptive {
+        info!(
+            "Apple Watch adaptive transfer settings: credit refill {} KiB/s, burst allowance {} bytes, peak ceiling {} KiB/s",
+            config.kbps, config.unpaced_bytes, config.max_kbps
+        );
+    } else {
+        info!(
+            "Apple Watch transfer settings: {} KiB/s (0 = unlimited), {} unpaced bytes",
+            config.kbps, config.unpaced_bytes
+        );
+    }
     info!(
-        "Apple Watch transfer settings: {} KiB/s (0 = unlimited), {} unpaced bytes",
-        config.kbps, config.unpaced_bytes
+        "Apple Watch transfer mode: {}; adaptive peak ceiling {} KiB/s; credit refill {} KiB/s",
+        if config.adaptive { "adaptive" } else { "fixed" },
+        config.max_kbps,
+        config.kbps
     );
-    let mut pacer = TransferPacer::new(config);
     send_zip_directory(connection, "META-INF/").await?;
     send_zip_file(
         connection,
@@ -943,10 +958,16 @@ async fn send_zip_file(
 
     watch_step(connection.send_raw(&header)).await?;
     for chunk in data.chunks(SEND_CHUNK) {
-        let deadline = pacer.next_deadline(chunk.len(), tokio::time::Instant::now());
+        if let Some(deadline) = pacer.before_write(chunk.len(), tokio::time::Instant::now()) {
+            tokio::time::sleep_until(deadline).await;
+        }
+        let started = tokio::time::Instant::now();
+        let deadline = pacer.next_deadline(chunk.len(), started);
         watch_step(connection.send_raw(chunk)).await?;
+        pacer.observe_write(started, tokio::time::Instant::now());
         if let Some((tracker, observer)) = progress {
-            if let Some(update) = tracker.advance(chunk.len()) {
+            if let Some(mut update) = tracker.advance(chunk.len()) {
+                pacer.describe(&mut update);
                 observer(update);
             }
         }
@@ -1110,6 +1131,8 @@ mod tests {
         let mut pacer = TransferPacer::new(TransferConfig {
             kbps: 0,
             unpaced_bytes: 0,
+            adaptive: false,
+            max_kbps: 4096,
         });
         let total = files.iter().map(|(_, data)| data.len() as u64).sum();
         let tracker = TransferProgress::new(total);
@@ -1134,6 +1157,55 @@ mod tests {
         assert_eq!(last.percent, Some(100));
         assert_eq!(last.bytes_sent, Some(total));
         assert_eq!(last.total_bytes, Some(total));
+    }
+
+    #[tokio::test]
+    async fn adaptive_pressure_reduces_target_without_replaying_or_changing_wire_bytes() {
+        let data = vec![0x42; SEND_CHUNK * 3 + 7];
+        let name = "Payload/Watch.app/resource.bin";
+        let header = zip_header(name, data.len() as u32, crc32_ieee(&data)).unwrap();
+        let mut expected = header.clone();
+        expected.extend(&data);
+        let (writer, mut reader) = tokio::io::duplex(1024);
+        let mut connection = Idevice::new(Box::new(writer), "adaptive-test");
+        let receive = tokio::spawn(async move {
+            let mut bytes = vec![0; header.len()];
+            reader.read_exact(&mut bytes).await.unwrap();
+            // Deliberately stop draining the socket during the first body write.
+            tokio::time::sleep(Duration::from_millis(200)).await;
+            reader.read_to_end(&mut bytes).await.unwrap();
+            bytes
+        });
+        let tracker = TransferProgress::new(data.len() as u64);
+        let updates = std::sync::Mutex::new(Vec::new());
+        let observe = |update| updates.lock().unwrap().push(update);
+        let mut pacer = TransferPacer::new(TransferConfig {
+            kbps: 512,
+            unpaced_bytes: 32 * 1024 * 1024,
+            adaptive: true,
+            max_kbps: 4096,
+        });
+        send_zip_file(
+            &mut connection,
+            name,
+            &data,
+            &mut pacer,
+            Some((&tracker, &observe)),
+        )
+        .await
+        .unwrap();
+        drop(connection);
+        assert_eq!(receive.await.unwrap(), expected);
+        let updates = updates.into_inner().unwrap();
+        assert!(
+            updates
+                .iter()
+                .any(|update| update.target_kbps.is_some_and(|rate| rate < 4096))
+        );
+        let last = updates.last().unwrap();
+        assert_eq!(last.transfer_mode, Some("adaptive"));
+        assert_eq!(last.percent, Some(100));
+        assert_eq!(last.bytes_sent, Some(data.len() as u64));
     }
 
     async fn install_response(response: Dictionary) -> (Result<(), Report>, Vec<u64>) {
