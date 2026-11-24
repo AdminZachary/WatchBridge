@@ -472,7 +472,9 @@
       "rate": "속도 설정 {{speed}} KiB/s",
       "budget": "전송 예산 회복 {{speed}} KiB/s",
       "unlimited": "속도 제한 없음",
-      "adaptive_hint": "쓰기 속도는 Watch 수신 속도가 아닙니다. 적응형 모드에서도 전송 예산을 제한합니다."
+      "adaptive_hint": "쓰기 속도는 Watch 수신 속도가 아닙니다. 적응형 모드에서도 전송 예산을 제한합니다.",
+      "adaptiveUnlimited": "사전 상한 없음 (실험)",
+      "uncapped_hint": "쓰기 속도는 Watch 수신 속도가 아닙니다. 쓰기 지연을 감지하면 속도를 낮추지만 하위 전송 대기열에 데이터가 쌓일 수 있습니다."
     }
   }
 }

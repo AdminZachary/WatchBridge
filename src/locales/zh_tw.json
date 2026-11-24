@@ -356,7 +356,9 @@
       "rate": "限速設定 {{speed}} KiB/s",
       "budget": "額度恢復 {{speed}} KiB/s",
       "unlimited": "不限速",
-      "adaptive_hint": "寫入速度不等於手錶接收速度；自動模式仍保留傳送額度保護。"
+      "adaptive_hint": "寫入速度不等於手錶接收速度；自動模式仍保留傳送額度保護。",
+      "adaptiveUnlimited": "無預設上限（實驗）",
+      "uncapped_hint": "寫入速度不等於手錶接收速度；此模式僅在觀察到寫入阻塞後退讓，下游仍可能積壓。"
     }
   }
 }

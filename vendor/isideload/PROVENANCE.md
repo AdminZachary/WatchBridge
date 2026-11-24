@@ -85,3 +85,12 @@ pacing remains the default. `WATCHBRIDGE_WATCH_MODE=adaptive` enables probing;
 `WATCHBRIDGE_WATCH_KBPS` controls allowance replenishment. Adaptive bursts are
 capped at 32 MiB and unlimited refill is not permitted. This mode requires
 physical-device validation separately from the fixed-rate tests.
+
+An additional explicitly selected `WATCHBRIDGE_WATCH_MODE=adaptive_unlimited`
+experiment bypasses the credit controller and has no preset rate ceiling. It
+begins without intentional pacing, temporarily backs off from measured local
+write stalls, increases its target while writes remain stable, and can probe
+without pacing again after a stable interval. This does not observe downstream
+buffer occupancy or confirm that a queue has drained; forwarding-service memory
+pressure can still occur without local write stalls. Fixed and bounded adaptive
+modes remain available unchanged.

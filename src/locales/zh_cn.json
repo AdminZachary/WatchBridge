@@ -406,7 +406,9 @@
       "rate": "限速设定 {{speed}} KiB/s",
       "budget": "预算恢复 {{speed}} KiB/s",
       "unlimited": "不限速",
-      "adaptive_hint": "写入速度不等于手表接收速度；自动模式仍保留发送预算保护。"
+      "adaptive_hint": "写入速度不等于手表接收速度；自动模式仍保留发送预算保护。",
+      "adaptiveUnlimited": "无预设上限（实验）",
+      "uncapped_hint": "写入速度不等于手表接收速度；此模式仅在观察到写入阻塞后退让，下游仍可能积压。"
     }
   },
   "err": {
