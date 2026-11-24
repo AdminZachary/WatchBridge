@@ -417,15 +417,7 @@
       "elapsed": "Temps écoulé : {{time}}",
       "companion": "App Watch {{index}} sur {{count}}",
       "adaptive": "Débit de transfert adaptatif (expérimental)",
-      "fixed": "Débit fixe",
-      "speed": "{{speed}} KiB/s",
-      "peak": "Débit de pointe visé : {{speed}} KiB/s",
-      "rate": "Débit réglé : {{speed}} KiB/s",
-      "budget": "Recharge du budget : {{speed}} KiB/s",
-      "unlimited": "Débit illimité",
-      "adaptive_hint": "Le débit d’écriture ne mesure pas la réception de la Watch. Le mode adaptatif conserve un budget d’envoi limité.",
-      "adaptiveUnlimited": "Sans plafond prédéfini (expérimental)",
-      "uncapped_hint": "Le débit d’écriture ne mesure pas la réception de la Watch. Ce mode ralentit en cas de blocage observé ; des données peuvent encore s’accumuler en aval."
+      "speed": "{{speed}} KiB/s"
     },
     "wifi_speed_hint": "Nous recommandons d’activer le Wi-Fi de l’iPhone pour accélérer l’installation."
   }

@@ -113,150 +113,30 @@ pub(super) fn is_transient_watch_error(error: &Report) -> bool {
     })
 }
 
-#[derive(Clone, Copy)]
-pub(super) struct TransferConfig {
-    pub kbps: u64,
-    pub unpaced_bytes: u64,
-    pub adaptive: bool,
-    pub max_kbps: u64,
-}
-
-impl TransferConfig {
-    pub fn from_env() -> Self {
-        let mode = std::env::var("WATCHBRIDGE_WATCH_MODE").ok();
-        let mut config = Self::parse(
-            std::env::var("WATCHBRIDGE_WATCH_KBPS").ok().as_deref(),
-            std::env::var("WATCHBRIDGE_WATCH_UNPACED_MB")
-                .ok()
-                .as_deref(),
-        );
-        config.adaptive = match mode.as_deref() {
-            Some("adaptive" | "adaptive_unlimited") => true,
-            None | Some("fixed") => false,
-            _ => {
-                warn!("Unknown Watch transfer mode; using fixed pacing");
-                false
-            }
-        };
-        config.max_kbps = std::env::var("WATCHBRIDGE_WATCH_MAX_KBPS")
-            .ok()
-            .and_then(|value| value.trim().parse::<u64>().ok())
-            .filter(|value| (128..=65536).contains(value))
-            .unwrap_or(4096);
-        if mode.as_deref() == Some("adaptive_unlimited") {
-            config.max_kbps = 0;
-        }
-        if config.adaptive {
-            // Settings for the bounded mode; the explicit uncapped mode bypasses
-            // its credit controller entirely.
-            if config.kbps == 0 {
-                config.kbps = 256;
-            }
-            if config.max_kbps > 0 {
-                config.kbps = config.kbps.clamp(128, config.max_kbps);
-            }
-            config.unpaced_bytes = config.unpaced_bytes.min(32 * 1024 * 1024);
-        }
-        config
-    }
-
-    fn parse(rate: Option<&str>, burst: Option<&str>) -> Self {
-        fn setting(raw: Option<&str>, default: u64, multiplier: u64) -> u64 {
-            match raw {
-                None => default,
-                Some(value) => value
-                    .trim()
-                    .parse::<u64>()
-                    .ok()
-                    .filter(|value| value.checked_mul(multiplier).is_some())
-                    .unwrap_or_else(|| {
-                        warn!("Invalid Watch transfer setting; using its default");
-                        default
-                    }),
-            }
-        }
-        Self {
-            kbps: setting(rate, 256, 1024),
-            unpaced_bytes: setting(burst, 32, 1024 * 1024) * 1024 * 1024,
-            adaptive: false,
-            max_kbps: 4096,
-        }
-    }
-}
-
+// The tested uncapped V2 controller is the only Watch transfer policy.
+// No environment setting can select a fixed rate or a credit-limited sender.
 pub(super) struct TransferPacer {
-    config: TransferConfig,
-    sent: u64,
-    deadline: Option<Instant>,
-    adaptive: Option<super::adaptive::AdaptivePacer>,
-    uncapped: Option<super::uncapped::UncappedPacer>,
+    controller: super::uncapped::UncappedPacer,
 }
 
 impl TransferPacer {
-    pub fn new(config: TransferConfig) -> Self {
+    pub fn new() -> Self {
         Self {
-            config,
-            sent: 0,
-            deadline: None,
-            adaptive: (config.adaptive && config.max_kbps > 0)
-                .then(|| super::adaptive::AdaptivePacer::new(config, Instant::now())),
-            uncapped: (config.adaptive && config.max_kbps == 0)
-                .then(|| super::uncapped::UncappedPacer::new(Instant::now())),
+            controller: super::uncapped::UncappedPacer::new(Instant::now()),
         }
-    }
-
-    // Called before sending, then slept until after sending. Socket write time
-    // counts towards the budget; a stalled write does not earn a future burst.
-    pub fn next_deadline(&mut self, bytes: usize, now: Instant) -> Option<Instant> {
-        if self.adaptive.is_some() || self.uncapped.is_some() {
-            return None;
-        }
-        let before = self.sent.saturating_sub(self.config.unpaced_bytes);
-        self.sent = self.sent.saturating_add(bytes as u64);
-        let paced = self.sent.saturating_sub(self.config.unpaced_bytes) - before;
-        if self.config.kbps == 0 || paced == 0 {
-            return None;
-        }
-        let duration = Duration::from_secs_f64(paced as f64 / (self.config.kbps as f64 * 1024.0));
-        let deadline = self.deadline.unwrap_or(now).max(now) + duration;
-        self.deadline = Some(deadline);
-        Some(deadline)
     }
 
     pub fn before_write(&mut self, bytes: usize, now: Instant) -> Option<Instant> {
-        if let Some(pacer) = &mut self.uncapped {
-            return pacer.plan(bytes, now);
-        }
-        self.adaptive.as_mut().map(|pacer| pacer.plan(bytes, now))
+        self.controller.plan(bytes, now)
     }
 
     pub fn observe_write(&mut self, bytes: usize, started: Instant, finished: Instant) {
-        if let Some(pacer) = &mut self.uncapped {
-            pacer.observe(bytes, started, finished);
-        }
-        if let Some(pacer) = &mut self.adaptive {
-            pacer.observe(started, finished);
-        }
+        self.controller.observe(bytes, started, finished);
     }
 
     pub fn describe(&self, update: &mut InstallProgress) {
-        if let Some(pacer) = &self.uncapped {
-            update.transfer_mode = Some("adaptiveUnlimited");
-            update.target_kbps = Some(pacer.target_kbps());
-            update.budget_kbps = None;
-            return;
-        }
-        update.transfer_mode = Some(if self.adaptive.is_some() {
-            "adaptive"
-        } else {
-            "fixed"
-        });
-        update.target_kbps = Some(
-            self.adaptive
-                .as_ref()
-                .map_or(self.config.kbps, |pacer| pacer.target_kbps()),
-        );
-        update.budget_kbps = self.adaptive.as_ref().map(|pacer| pacer.budget_kbps());
+        update.transfer_mode = Some("adaptiveUnlimited");
+        update.target_kbps = Some(self.controller.target_kbps());
     }
 }
 
@@ -341,53 +221,6 @@ mod tests {
                 .unwrap()
                 == 42
         );
-    }
-
-    #[test]
-    fn settings_handle_zero_invalid_and_overflow_without_panics() {
-        let defaults = TransferConfig::parse(None, None);
-        assert_eq!(defaults.kbps, 256);
-        assert_eq!(defaults.unpaced_bytes, 32 * 1024 * 1024);
-        let zero = TransferConfig::parse(Some("0"), Some("0"));
-        assert_eq!(zero.kbps, 0);
-        assert_eq!(zero.unpaced_bytes, 0);
-        for value in ["-1", "bad", "18446744073709551615"] {
-            let config = TransferConfig::parse(Some(value), Some(value));
-            assert_eq!(config.kbps, defaults.kbps);
-            assert_eq!(config.unpaced_bytes, defaults.unpaced_bytes);
-        }
-    }
-
-    #[test]
-    fn pacing_counts_send_time_crosses_threshold_and_spans_files() {
-        let now = Instant::now();
-        let mut pacer = TransferPacer::new(TransferConfig {
-            kbps: 256,
-            unpaced_bytes: 32768,
-            adaptive: false,
-            max_kbps: 4096,
-        });
-        assert_eq!(pacer.next_deadline(16384, now), None);
-        // Only the final 16 KiB of this chunk are paced, including across files.
-        let deadline = pacer.next_deadline(32768, now).unwrap();
-        assert_eq!(
-            deadline - now,
-            Duration::from_millis(62) + Duration::from_micros(500)
-        );
-        let write_finished = now + Duration::from_millis(50);
-        assert_eq!(deadline - write_finished, Duration::from_micros(12500));
-        let later = now + Duration::from_secs(5);
-        assert_eq!(
-            pacer.next_deadline(32768, later).unwrap() - later,
-            Duration::from_millis(125)
-        );
-        let mut unlimited = TransferPacer::new(TransferConfig {
-            kbps: 0,
-            unpaced_bytes: 0,
-            adaptive: false,
-            max_kbps: 4096,
-        });
-        assert_eq!(unlimited.next_deadline(32768, now), None);
     }
 
     #[test]

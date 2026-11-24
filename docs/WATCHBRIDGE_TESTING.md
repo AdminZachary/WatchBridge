@@ -1,6 +1,6 @@
 # WatchBridge hardware acceptance
 
-For installation progress, optional adaptive transfer modes and the recorded
+For installation progress, the adaptive transfer policy and the recorded
 large-payload tests, see [Watch installation transfer notes](watch-install-transfer.md).
 
 Record source SHA and binary SHA-256, Windows version, iOS/watchOS versions,

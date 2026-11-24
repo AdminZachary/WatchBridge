@@ -350,15 +350,7 @@
       "elapsed": "Verstrichen: {{time}}",
       "companion": "Watch-App {{index}} von {{count}}",
       "adaptive": "Adaptive Übertragungsrate (experimentell)",
-      "fixed": "Feste Begrenzung",
-      "speed": "{{speed}} KiB/s",
-      "peak": "Spitzenziel: {{speed}} KiB/s",
-      "rate": "Begrenzung: {{speed}} KiB/s",
-      "budget": "Budgetauffüllung: {{speed}} KiB/s",
-      "unlimited": "Unbegrenzte Rate",
-      "adaptive_hint": "Die Schreibgeschwindigkeit ist nicht die Empfangsrate der Watch. Der adaptive Modus begrenzt das Sendebudget.",
-      "adaptiveUnlimited": "Ohne feste Obergrenze (experimentell)",
-      "uncapped_hint": "Die Schreibgeschwindigkeit ist nicht die Empfangsrate der Watch. Dieser Modus reagiert auf blockierte Schreibvorgänge; nachgelagerte Warteschlangen können dennoch wachsen."
+      "speed": "{{speed}} KiB/s"
     },
     "wifi_speed_hint": "Für eine schnellere Installation empfehlen wir, WLAN auf dem iPhone einzuschalten."
   }

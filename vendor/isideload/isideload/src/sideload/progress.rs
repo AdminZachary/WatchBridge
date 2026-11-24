@@ -30,7 +30,6 @@ pub struct InstallProgress {
     pub transfer_mode: Option<&'static str>,
     pub target_kbps: Option<u64>,
     pub speed_kbps: Option<f64>,
-    pub budget_kbps: Option<u64>,
 }
 
 impl InstallProgress {
@@ -45,7 +44,6 @@ impl InstallProgress {
             transfer_mode: None,
             target_kbps: None,
             speed_kbps: None,
-            budget_kbps: None,
         }
     }
 

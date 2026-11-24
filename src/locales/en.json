@@ -691,15 +691,7 @@
       "elapsed": "Elapsed {{time}}",
       "companion": "Watch app {{index}} of {{count}}",
       "adaptive": "Adaptive transfer rate (experimental)",
-      "fixed": "Fixed pacing",
-      "speed": "{{speed}} KiB/s",
-      "peak": "Peak target {{speed}} KiB/s",
-      "rate": "Rate setting {{speed}} KiB/s",
-      "budget": "Credit refill {{speed}} KiB/s",
-      "unlimited": "Unlimited rate",
-      "adaptive_hint": "Write speed is not Watch receive speed. Adaptive mode keeps a bounded sending allowance.",
-      "adaptiveUnlimited": "No preset ceiling (experimental)",
-      "uncapped_hint": "Write speed is not Watch receive speed. This mode backs off only on observed write pressure; downstream queues may still grow."
+      "speed": "{{speed}} KiB/s"
     },
     "wifi_speed_hint": "We recommend turning on Wi-Fi on your iPhone for faster installation."
   },

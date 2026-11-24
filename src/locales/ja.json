@@ -421,15 +421,7 @@
       "elapsed": "経過時間 {{time}}",
       "companion": "Watch アプリ {{index}} / {{count}}",
       "adaptive": "自動転送速度（実験）",
-      "fixed": "固定レート",
-      "speed": "{{speed}} KiB/s",
-      "peak": "ピーク目標 {{speed}} KiB/s",
-      "rate": "レート設定 {{speed}} KiB/s",
-      "budget": "送信枠の回復 {{speed}} KiB/s",
-      "unlimited": "レート制限なし",
-      "adaptive_hint": "書き込み速度はWatchの受信速度ではありません。自動モードでも送信枠に上限があります。",
-      "adaptiveUnlimited": "上限未設定（実験）",
-      "uncapped_hint": "書き込み速度はWatchの受信速度ではありません。書き込みの停滞に応じて減速しますが、転送先にデータが蓄積する可能性があります。"
+      "speed": "{{speed}} KiB/s"
     },
     "wifi_speed_hint": "インストールを高速化するため、iPhoneのWi-Fiをオンにすることをおすすめします。"
   }

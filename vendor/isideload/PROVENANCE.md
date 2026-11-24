@@ -64,36 +64,20 @@ the installation is reported as unconfirmed and is not replayed. Confirmed apps
 are skipped if setup for a later companion needs reconnecting. The existing
 watchOS coordinator-rejection retry remains in place.
 
-The default transfer rate is 256 KiB/s after a 32 MiB initial burst.
-`WATCHBRIDGE_WATCH_KBPS=0` disables pacing;
-`WATCHBRIDGE_WATCH_UNPACED_MB=0` disables the initial burst. Both settings are
-read once per app transfer, and the effective values are logged. Requesting
-Wi-Fi does not confirm which transport iOS actually uses. An installation-result
-watchdog expires after three minutes without a change of progress or stage,
-rather than imposing a total installation deadline.
+The final integration uses the tested `adaptive_unlimited` V2 sender as its
+only policy. It starts without intentional pacing, backs off on sustained local
+write pressure and recovers toward unpaced operation. Fixed pacing, the bounded
+credit controller and their environment settings have been removed. There is no
+preset rate ceiling or refill limiter. Requesting Wi-Fi does not confirm which
+transport iOS actually uses. Local write timing does not measure downstream
+buffer occupancy or Watch acknowledgements.
 
-The local progress-bar follow-up adds optional structured observers to the USB
-and RSD installers. Existing callback APIs remain available. Watch transfer
-updates count successfully written app-file bytes and are throttled; installation
-completion is still determined by the original protocol result, not UI progress.
-
-The optional adaptive sender uses write-duration backoff and gradual recovery,
-with a separate finite token allowance shared across files. This is a sending
-budget, not a measurement of iPhone memory or Watch acknowledgements. Fixed
-pacing remains the default. `WATCHBRIDGE_WATCH_MODE=adaptive` enables probing;
-`WATCHBRIDGE_WATCH_MAX_KBPS` bounds the peak (default 4096 KiB/s), while
-`WATCHBRIDGE_WATCH_KBPS` controls allowance replenishment. Adaptive bursts are
-capped at 32 MiB and unlimited refill is not permitted. This mode requires
-physical-device validation separately from the fixed-rate tests.
-
-An additional explicitly selected `WATCHBRIDGE_WATCH_MODE=adaptive_unlimited`
-experiment bypasses the credit controller and has no preset rate ceiling. It
-begins without intentional pacing, temporarily backs off from measured local
-write stalls, increases its target while writes remain stable, and can probe
-without pacing again after a stable interval. This does not observe downstream
-buffer occupancy or confirm that a queue has drained; forwarding-service memory
-pressure can still occur without local write stalls. Fixed and bounded adaptive
-modes remain available unchanged.
+The progress-bar follow-up adds optional structured observers to the USB and
+RSD installers. Existing callback APIs remain available. Transfer updates count
+successfully written app-file bytes and are throttled; installation completion
+is determined by the original protocol result. The installation-result watchdog
+expires after three minutes without a change of progress or stage, rather than
+imposing a total installation deadline.
 
 The uncapped v2 controller follows slow-start/AIMD ideas from RFC 5681 with
 application-specific timing. It estimates local I/O throughput over the last

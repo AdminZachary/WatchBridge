@@ -12,10 +12,9 @@ export type InstallProgressUpdate = {
   totalBytes: number | null;
   appIndex?: number | null;
   appCount?: number | null;
-  transferMode?: "adaptive" | "adaptiveUnlimited" | "fixed" | null;
+  transferMode?: "adaptiveUnlimited" | null;
   targetKbps?: number | null;
   speedKbps?: number | null;
-  budgetKbps?: number | null;
 };
 
 export function validProgress(update: InstallProgressUpdate): boolean {
@@ -59,7 +58,7 @@ export function InstallProgress({ update, state, startedAt }: {
         <span>{t("wb.progress.elapsed", { time })}</span>
       </div>
       {bytes && update.transferMode && <div className="install-transfer-policy">
-        <span className="install-transfer-mode">{t(`wb.progress.${update.transferMode === "fixed" ? "fixed" : "adaptive"}`)}</span>
+        <span className="install-transfer-mode">{t("wb.progress.adaptive")}</span>
         <span>{t("wb.progress.speed", { speed: update.speedKbps != null && Number.isFinite(update.speedKbps) ? Math.round(update.speedKbps).toLocaleString() : "—" })}</span>
       </div>}
       {(update.appCount ?? 0) > 1 && <p className="install-progress-note">{t("wb.progress.companion", { index: update.appIndex, count: update.appCount })}</p>}
