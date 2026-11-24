@@ -675,7 +675,22 @@
     "btn_settings_hide": "Hide settings and logs",
     "btn_settings": "Settings and logs",
     "headline": "One computer,<br />connect your watch.",
-    "footer": "Independent community project, based on <l1>nab138 / iLoader</l1>, <l2>Andrey's fork</l2>, Rzbck's Watch install contribution and <l3>oacevedo / xtool</l3>. Not an official upstream release."
+    "footer": "Independent community project, based on <l1>nab138 / iLoader</l1>, <l2>Andrey's fork</l2>, Rzbck's Watch install contribution and <l3>oacevedo / xtool</l3>. Not an official upstream release.",
+    "progress": {
+      "title": "Installation progress",
+      "preparing": "Preparing",
+      "signing": "Signing app",
+      "phoneInstall": "Installing on iPhone",
+      "watchConnect": "Connecting to Watch",
+      "watchTransfer": "Transferring to Watch",
+      "watchInstall": "Installing on Watch",
+      "hint": "The percentage describes the current stage. Transfer completion does not mean installation is complete.",
+      "failed": "Installation stopped",
+      "done": "Installation complete",
+      "waiting": "Waiting for device feedback",
+      "elapsed": "Elapsed {{time}}",
+      "companion": "Watch app {{index}} of {{count}}"
+    }
   },
   "err": {
     "watch_denied_retry": "The Watch rejected the trust request. Confirm it on the Watch and try again.",

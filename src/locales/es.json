@@ -333,5 +333,22 @@
     "failed": "La configuración de Wi-Fi falló",
     "hint": "Permite que esta computadora llegue al teléfono por Wi-Fi: activa la opción de conexiones Wi-Fi del teléfono y crea una confianza de emparejamiento para instalaciones por Wi-Fi. Mantén el teléfono desbloqueado y conectado por USB. Para deshacerlo, restablece Ubicación y privacidad en el teléfono.",
     "working": "Configurando Wi-Fi… Mantén el teléfono desbloqueado y conectado por USB."
+  },
+  "wb": {
+    "progress": {
+      "title": "Progreso de instalación",
+      "preparing": "Preparando",
+      "signing": "Firmando la app",
+      "phoneInstall": "Instalando en el iPhone",
+      "watchConnect": "Conectando al Watch",
+      "watchTransfer": "Transfiriendo al Watch",
+      "watchInstall": "Instalando en el Watch",
+      "hint": "El porcentaje corresponde a la etapa actual. Completar la transferencia no significa que la instalación haya finalizado.",
+      "failed": "Instalación detenida",
+      "done": "Instalación completada",
+      "waiting": "Esperando respuesta del dispositivo",
+      "elapsed": "Tiempo transcurrido: {{time}}",
+      "companion": "App del Watch {{index}} de {{count}}"
+    }
   }
 }

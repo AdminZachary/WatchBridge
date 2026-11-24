@@ -306,6 +306,31 @@ impl Sideloader {
         F: Fn(f32) -> Fut,
         Fut: Future<Output = ()>,
     {
+        self.install_app_observed(
+            device_provider,
+            app_path,
+            increased_memory_limit,
+            progress_callback,
+            &|_| {},
+        )
+        .await
+    }
+
+    pub async fn install_app_observed<F, Fut>(
+        &mut self,
+        device_provider: &impl IdeviceProvider,
+        app_path: PathBuf,
+        // this is gross but will be replaced with proper entitlement handling later
+        increased_memory_limit: bool,
+        progress_callback: Option<F>,
+        observer: &crate::sideload::progress::ProgressObserver<'_>,
+    ) -> Result<Option<SpecialApp>, Report>
+    where
+        F: Fn(f32) -> Fut,
+        Fut: Future<Output = ()>,
+    {
+        use crate::sideload::progress::{InstallProgress, InstallStage};
+        observer(InstallProgress::stage(InstallStage::Preparing));
         let device_info = IdeviceInfo::from_device(device_provider).await?;
 
         let team = self.get_team().await?;
@@ -343,6 +368,7 @@ impl Sideloader {
 
         drop(provisioning_companion_proxy);
 
+        observer(InstallProgress::stage(InstallStage::Signing));
         let (signed_app_path, special_app) = self
             .sign_app(
                 app_path,
@@ -352,10 +378,15 @@ impl Sideloader {
             )
             .await?;
 
+        observer(InstallProgress::stage(InstallStage::PhoneInstall));
         info!("Transferring App...");
 
         let last_logged_progress = std::sync::Arc::new(std::sync::Mutex::new(0));
         crate::sideload::install::install_app(device_provider, &signed_app_path, |progress| {
+            observer(InstallProgress::percent(
+                InstallStage::PhoneInstall,
+                progress,
+            ));
             let mut last_progress = last_logged_progress.lock().unwrap();
             if progress >= *last_progress + 10 {
                 *last_progress = progress;
@@ -370,13 +401,14 @@ impl Sideloader {
 
         if !watch_apps.is_empty() {
             info!("Installing Apple Watch companion app...");
-            crate::sideload::watch_install::install_watch_apps(
+            crate::sideload::watch_install::install_watch_apps_observed(
                 device_provider,
                 &watch_apps,
                 &self.machine_name,
                 |progress| {
                     info!("Installing Apple Watch app: {}%", progress);
                 },
+                observer,
             )
             .await
             .context("Failed to install Apple Watch companion app")?;

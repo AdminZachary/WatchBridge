@@ -71,3 +71,8 @@ read once per app transfer, and the effective values are logged. Requesting
 Wi-Fi does not confirm which transport iOS actually uses. An installation-result
 watchdog expires after three minutes without a change of progress or stage,
 rather than imposing a total installation deadline.
+
+The local progress-bar follow-up adds optional structured observers to the USB
+and RSD installers. Existing callback APIs remain available. Watch transfer
+updates count successfully written app-file bytes and are throttled; installation
+completion is still determined by the original protocol result, not UI progress.

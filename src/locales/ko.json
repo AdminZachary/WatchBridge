@@ -450,6 +450,21 @@
     "btn_settings_hide": "설정 및 로그 접기",
     "btn_settings": "설정 및 로그",
     "headline": "컴퓨터 한 대로,<br />워치를 연결하세요.",
-    "footer": "독립 커뮤니티 프로젝트로, <l1>nab138 / iLoader</l1>, <l2>Andrey의 fork</l2>, Rzbck의 Watch 설치 기여, <l3>oacevedo / xtool</l3>을 기반으로 합니다. 업스트림의 공식 버전이 아닙니다."
+    "footer": "독립 커뮤니티 프로젝트로, <l1>nab138 / iLoader</l1>, <l2>Andrey의 fork</l2>, Rzbck의 Watch 설치 기여, <l3>oacevedo / xtool</l3>을 기반으로 합니다. 업스트림의 공식 버전이 아닙니다.",
+    "progress": {
+      "title": "설치 진행 상황",
+      "preparing": "패키지 확인",
+      "signing": "앱 서명",
+      "phoneInstall": "iPhone에 설치",
+      "watchConnect": "Apple Watch 연결",
+      "watchTransfer": "Apple Watch로 전송",
+      "watchInstall": "Watch에 설치",
+      "hint": "진행률은 현재 단계를 나타냅니다. 전송이 100%여도 설치 완료 확인을 기다려야 합니다.",
+      "failed": "설치 중지됨",
+      "done": "설치 완료",
+      "waiting": "기기 응답 대기 중",
+      "elapsed": "경과 시간 {{time}}",
+      "companion": "Watch 앱 {{index}} / {{count}}"
+    }
   }
 }

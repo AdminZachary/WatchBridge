@@ -10,6 +10,7 @@ mod pairing;
 mod secure_storage;
 mod error;
 mod install_lock;
+mod install_progress;
 mod log_export;
 mod logging;
 mod manual_install;

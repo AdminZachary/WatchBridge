@@ -13,7 +13,13 @@ use std::{
 };
 use tracing::{info, warn};
 
-use crate::{SideloadError as Error, sideload::bundle::Bundle};
+use crate::{
+    SideloadError as Error,
+    sideload::{
+        bundle::Bundle,
+        progress::{InstallProgress, InstallStage, ProgressObserver, TransferProgress},
+    },
+};
 
 const WATCH_LOCKDOWN_PORT: u16 = 62078;
 const WATCH_LOCKDOWN_SERVICE: &str = "com.apple.mobile.lockdownd";
@@ -48,10 +54,28 @@ pub async fn install_watch_apps(
     host_name: &str,
     progress_callback: impl Fn(u64) + Send + Sync,
 ) -> Result<(), Report> {
+    install_watch_apps_observed(
+        device_provider,
+        watch_apps,
+        host_name,
+        progress_callback,
+        &|_| {},
+    )
+    .await
+}
+
+pub async fn install_watch_apps_observed(
+    device_provider: &impl IdeviceProvider,
+    watch_apps: &[Bundle],
+    host_name: &str,
+    progress_callback: impl Fn(u64) + Send + Sync,
+    observer: &ProgressObserver<'_>,
+) -> Result<(), Report> {
     if watch_apps.is_empty() {
         return Ok(());
     }
 
+    observer(InstallProgress::stage(InstallStage::WatchConnect));
     let mut completed_apps = 0;
     for attempt in 1..=SESSION_ATTEMPTS {
         match install_watch_apps_once(
@@ -59,6 +83,7 @@ pub async fn install_watch_apps(
             watch_apps,
             host_name,
             &progress_callback,
+            observer,
             &mut completed_apps,
         )
         .await
@@ -81,6 +106,7 @@ async fn install_watch_apps_once(
     watch_apps: &[Bundle],
     host_name: &str,
     progress_callback: &(impl Fn(u64) + Send + Sync),
+    observer: &ProgressObserver<'_>,
     completed_apps: &mut usize,
 ) -> Result<(), Report> {
     let iphone_pairing = watch_step(device_provider.get_pairing_file()).await?;
@@ -123,7 +149,13 @@ async fn install_watch_apps_once(
             .await
             .context("Failed to start Apple Watch lockdown session")?;
 
-        for watch_app in watch_apps.iter().skip(*completed_apps) {
+        for (index, watch_app) in watch_apps.iter().enumerate().skip(*completed_apps) {
+            let positioned = |mut update: InstallProgress| {
+                update.app_index = Some(index + 1);
+                update.app_count = Some(watch_apps.len());
+                observer(update);
+            };
+            positioned(InstallProgress::stage(InstallStage::WatchConnect));
             install_watch_app_with_retry(
                 device_provider,
                 &mut watch_lockdown,
@@ -131,6 +163,7 @@ async fn install_watch_apps_once(
                 legacy,
                 watch_app,
                 progress_callback,
+                &positioned,
             )
             .await?;
             *completed_apps += 1;
@@ -206,6 +239,31 @@ pub async fn install_watch_apps_rsd(
     host_name: &str,
     progress_callback: impl Fn(u64) + Send + Sync,
 ) -> Result<(), Report> {
+    install_watch_apps_rsd_observed(
+        rsd_provider,
+        handshake,
+        iphone_pairing,
+        watch_apps,
+        host_name,
+        progress_callback,
+        &|_| {},
+    )
+    .await
+}
+
+pub async fn install_watch_apps_rsd_observed(
+    rsd_provider: &mut impl RsdProvider,
+    handshake: &mut RsdHandshake,
+    iphone_pairing: &PairingFile,
+    watch_apps: &[Bundle],
+    host_name: &str,
+    progress_callback: impl Fn(u64) + Send + Sync,
+    observer: &ProgressObserver<'_>,
+) -> Result<(), Report> {
+    if watch_apps.is_empty() {
+        return Ok(());
+    }
+    observer(InstallProgress::stage(InstallStage::WatchConnect));
     let mut completed_apps = 0;
     for attempt in 1..=SESSION_ATTEMPTS {
         match install_watch_apps_rsd_once(
@@ -215,6 +273,7 @@ pub async fn install_watch_apps_rsd(
             watch_apps,
             host_name,
             &progress_callback,
+            observer,
             &mut completed_apps,
         )
         .await
@@ -238,6 +297,7 @@ async fn install_watch_apps_rsd_once(
     watch_apps: &[Bundle],
     host_name: &str,
     progress_callback: &(impl Fn(u64) + Send + Sync),
+    observer: &ProgressObserver<'_>,
     completed_apps: &mut usize,
 ) -> Result<(), Report> {
     if watch_apps.is_empty() {
@@ -281,7 +341,13 @@ async fn install_watch_apps_rsd_once(
             .await
             .context("Failed to start Apple Watch lockdown session over RSD")?;
 
-        for watch_app in watch_apps.iter().skip(*completed_apps) {
+        for (index, watch_app) in watch_apps.iter().enumerate().skip(*completed_apps) {
+            let positioned = |mut update: InstallProgress| {
+                update.app_index = Some(index + 1);
+                update.app_count = Some(watch_apps.len());
+                observer(update);
+            };
+            positioned(InstallProgress::stage(InstallStage::WatchConnect));
             install_watch_app_with_retry_rsd(
                 rsd_provider,
                 handshake,
@@ -290,6 +356,7 @@ async fn install_watch_apps_rsd_once(
                 legacy,
                 watch_app,
                 progress_callback,
+                &positioned,
             )
             .await?;
             *completed_apps += 1;
@@ -396,6 +463,7 @@ async fn install_watch_app_with_retry(
     legacy: bool,
     watch_app: &Bundle,
     progress_callback: &(impl Fn(u64) + Send + Sync),
+    observer: &ProgressObserver<'_>,
 ) -> Result<(), Report> {
     let bundle_id = watch_app
         .bundle_identifier()
@@ -411,6 +479,7 @@ async fn install_watch_app_with_retry(
             legacy,
             watch_app,
             progress_callback,
+            observer,
         )
         .await
         {
@@ -451,6 +520,7 @@ async fn install_watch_app_with_retry_rsd(
     legacy: bool,
     watch_app: &Bundle,
     progress_callback: &(impl Fn(u64) + Send + Sync),
+    observer: &ProgressObserver<'_>,
 ) -> Result<(), Report> {
     let bundle_id = watch_app
         .bundle_identifier()
@@ -467,6 +537,7 @@ async fn install_watch_app_with_retry_rsd(
             legacy,
             watch_app,
             progress_callback,
+            observer,
         )
         .await
         {
@@ -515,6 +586,7 @@ async fn install_watch_app_zip_conduit(
     legacy: bool,
     watch_app: &Bundle,
     progress_callback: &(impl Fn(u64) + Send + Sync),
+    observer: &ProgressObserver<'_>,
 ) -> Result<(), Report> {
     let (remote_port, ssl) = watch_step(watch_lockdown.start_service(WATCH_ZIP_SERVICE))
         .await
@@ -544,7 +616,9 @@ async fn install_watch_app_zip_conduit(
                 .context("Failed to secure Apple Watch streaming_zip_conduit connection")?;
         }
 
-        transfer_result(stream_watch_app(&mut connection, watch_app, progress_callback).await)
+        transfer_result(
+            stream_watch_app(&mut connection, watch_app, progress_callback, observer).await,
+        )
     }
     .await;
 
@@ -574,6 +648,7 @@ async fn install_watch_app_zip_conduit_rsd(
     legacy: bool,
     watch_app: &Bundle,
     progress_callback: &(impl Fn(u64) + Send + Sync),
+    observer: &ProgressObserver<'_>,
 ) -> Result<(), Report> {
     let (remote_port, ssl) = watch_step(watch_lockdown.start_service(WATCH_ZIP_SERVICE))
         .await
@@ -605,7 +680,9 @@ async fn install_watch_app_zip_conduit_rsd(
                 .context("Failed to secure Apple Watch RSD streaming_zip_conduit connection")?;
         }
 
-        transfer_result(stream_watch_app(&mut connection, watch_app, progress_callback).await)
+        transfer_result(
+            stream_watch_app(&mut connection, watch_app, progress_callback, observer).await,
+        )
     }
     .await;
 
@@ -631,6 +708,7 @@ async fn stream_watch_app(
     connection: &mut Idevice,
     watch_app: &Bundle,
     progress_callback: &(impl Fn(u64) + Send + Sync),
+    observer: &ProgressObserver<'_>,
 ) -> Result<(), Report> {
     let app_name = watch_app
         .bundle_dir
@@ -699,6 +777,11 @@ async fn stream_watch_app(
     let mut metadata_bytes = Vec::new();
     Value::Dictionary(metadata).to_writer_xml(&mut metadata_bytes)?;
 
+    let transfer_progress = TransferProgress::new(total_uncompressed);
+    let mut initial = InstallProgress::percent(InstallStage::WatchTransfer, 0);
+    initial.bytes_sent = Some(0);
+    initial.total_bytes = Some(total_uncompressed);
+    observer(initial);
     let config = TransferConfig::from_env();
     info!(
         "Apple Watch transfer settings: {} KiB/s (0 = unlimited), {} unpaced bytes",
@@ -711,6 +794,7 @@ async fn stream_watch_app(
         "META-INF/com.apple.ZipMetadata.plist",
         &metadata_bytes,
         &mut pacer,
+        None,
     )
     .await?;
 
@@ -718,7 +802,14 @@ async fn stream_watch_app(
     let mut logged = 0u64;
     for (source, destination) in entries {
         let data = isideload_vfs::fs::read(&source)?;
-        send_zip_file(connection, &destination, &data, &mut pacer).await?;
+        send_zip_file(
+            connection,
+            &destination,
+            &data,
+            &mut pacer,
+            Some((&transfer_progress, observer)),
+        )
+        .await?;
         sent += data.len() as u64;
         let percent = sent * 100 / total_uncompressed.max(1);
         if percent >= logged + 5 {
@@ -729,12 +820,14 @@ async fn stream_watch_app(
 
     watch_step(connection.send_raw(CENTRAL_DIRECTORY_HEADER)).await?;
 
-    wait_for_watch_install(connection, progress_callback).await
+    observer(InstallProgress::stage(InstallStage::WatchInstall));
+    wait_for_watch_install(connection, progress_callback, observer).await
 }
 
 async fn wait_for_watch_install(
     connection: &mut Idevice,
     progress_callback: &(impl Fn(u64) + Send + Sync),
+    observer: &ProgressObserver<'_>,
 ) -> Result<(), Report> {
     let mut watchdog = ProgressWatchdog::new(tokio::time::Instant::now());
     loop {
@@ -748,6 +841,7 @@ async fn wait_for_watch_install(
             .is_some_and(|status| status == "DataComplete")
         {
             progress_callback(100);
+            observer(InstallProgress::percent(InstallStage::WatchInstall, 100));
             info!("Apple Watch installation completed");
             return Ok(());
         }
@@ -777,6 +871,10 @@ async fn wait_for_watch_install(
         watchdog.observe(percent, status, tokio::time::Instant::now());
         info!("Installing Apple Watch app: {percent}% {status}");
         progress_callback(percent);
+        observer(InstallProgress::percent(
+            InstallStage::WatchInstall,
+            percent,
+        ));
     }
 }
 
@@ -838,6 +936,7 @@ async fn send_zip_file(
     name: &str,
     data: &[u8],
     pacer: &mut TransferPacer,
+    progress: Option<(&TransferProgress, &ProgressObserver<'_>)>,
 ) -> Result<(), Report> {
     let size = u32::try_from(data.len()).context("Watch app file is too large")?;
     let header = zip_header(name, size, crc32_ieee(data))?;
@@ -846,6 +945,11 @@ async fn send_zip_file(
     for chunk in data.chunks(SEND_CHUNK) {
         let deadline = pacer.next_deadline(chunk.len(), tokio::time::Instant::now());
         watch_step(connection.send_raw(chunk)).await?;
+        if let Some((tracker, observer)) = progress {
+            if let Some(update) = tracker.advance(chunk.len()) {
+                observer(update);
+            }
+        }
         if let Some(deadline) = deadline {
             tokio::time::sleep_until(deadline).await;
         }
@@ -1007,13 +1111,29 @@ mod tests {
             kbps: 0,
             unpaced_bytes: 0,
         });
+        let total = files.iter().map(|(_, data)| data.len() as u64).sum();
+        let tracker = TransferProgress::new(total);
+        let updates = std::sync::Mutex::new(Vec::new());
+        let observe = |update| updates.lock().unwrap().push(update);
         for (name, data) in files {
-            send_zip_file(&mut connection, name, &data, &mut pacer)
-                .await
-                .unwrap();
+            send_zip_file(
+                &mut connection,
+                name,
+                &data,
+                &mut pacer,
+                Some((&tracker, &observe)),
+            )
+            .await
+            .unwrap();
         }
         drop(connection);
         assert_eq!(receive.await.unwrap(), expected);
+        let updates = updates.into_inner().unwrap();
+        let last = updates.last().unwrap();
+        assert_eq!(last.stage, InstallStage::WatchTransfer);
+        assert_eq!(last.percent, Some(100));
+        assert_eq!(last.bytes_sent, Some(total));
+        assert_eq!(last.total_bytes, Some(total));
     }
 
     async fn install_response(response: Dictionary) -> (Result<(), Report>, Vec<u64>) {
@@ -1030,9 +1150,11 @@ mod tests {
         writer.write_all(&payload).await.unwrap();
         drop(writer);
         let progress = std::sync::Mutex::new(Vec::new());
-        let result = wait_for_watch_install(&mut connection, &|percent| {
-            progress.lock().unwrap().push(percent)
-        })
+        let result = wait_for_watch_install(
+            &mut connection,
+            &|percent| progress.lock().unwrap().push(percent),
+            &|_| {},
+        )
         .await;
         (result, progress.into_inner().unwrap())
     }
