@@ -59,13 +59,9 @@ export function InstallProgress({ update, state, startedAt }: {
         <span>{t("wb.progress.elapsed", { time })}</span>
       </div>
       {bytes && update.transferMode && <div className="install-transfer-policy">
-        <span className="install-transfer-mode">{t(`wb.progress.${update.transferMode}`)}</span>
-        {update.speedKbps != null && Number.isFinite(update.speedKbps) && <span>{t("wb.progress.speed", { speed: Math.round(update.speedKbps).toLocaleString() })}</span>}
-        {update.targetKbps != null && <span>{update.targetKbps === 0 ? t("wb.progress.unlimited") : t(`wb.progress.${update.transferMode !== "fixed" ? "peak" : "rate"}`, { speed: update.targetKbps.toLocaleString() })}</span>}
-        {update.transferMode === "adaptive" && update.budgetKbps != null && <span>{t("wb.progress.budget", { speed: update.budgetKbps.toLocaleString() })}</span>}
+        <span className="install-transfer-mode">{t(`wb.progress.${update.transferMode === "fixed" ? "fixed" : "adaptive"}`)}</span>
+        <span>{t("wb.progress.speed", { speed: update.speedKbps != null && Number.isFinite(update.speedKbps) ? Math.round(update.speedKbps).toLocaleString() : "—" })}</span>
       </div>}
-      {bytes && update.transferMode === "adaptive" && <p className="install-progress-note">{t("wb.progress.adaptive_hint")}</p>}
-      {bytes && update.transferMode === "adaptiveUnlimited" && <p className="install-progress-note">{t("wb.progress.uncapped_hint")}</p>}
       {(update.appCount ?? 0) > 1 && <p className="install-progress-note">{t("wb.progress.companion", { index: update.appIndex, count: update.appCount })}</p>}
       <ol className="install-progress-stages">
         {stages.map((stage, step) => {
@@ -76,7 +72,6 @@ export function InstallProgress({ update, state, startedAt }: {
           </li>;
         })}
       </ol>
-      {state !== "done" && <p className="install-progress-note">{t("wb.progress.hint")}</p>}
     </section>
   );
 }
