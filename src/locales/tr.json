@@ -286,5 +286,12 @@
     "updating": "Güncelleniyor...",
     "downloaded_restarting": "Güncelleme indirildi! Uygulama yeniden başlatılıyor...",
     "failed_download": "Güncelleme indirilemedi: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Kurulumu hızlandırmak için iPhone’unuzda Wi-Fi’ı açmanızı öneririz.",
+    "progress": {
+      "adaptive": "Uyarlanabilir aktarım hızı (deneysel)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

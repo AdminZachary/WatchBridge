@@ -276,5 +276,12 @@
     "updating": "Aggiorno...",
     "downloaded_restarting": "Aggiornamento scaricato! Riavvio l'app...",
     "failed_download": "Impossibile scaricare l'aggiornamento: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Consigliamo di attivare il Wi-Fi sull’iPhone per velocizzare l’installazione.",
+    "progress": {
+      "adaptive": "Velocità di trasferimento adattiva (sperimentale)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

@@ -426,6 +426,7 @@
       "adaptive_hint": "A velocidade de escrita não é a de recepção do Watch. O modo adaptativo mantém um orçamento de envio limitado.",
       "adaptiveUnlimited": "Sem teto predefinido (experimental)",
       "uncapped_hint": "A velocidade de escrita não é a recepção do Watch. Este modo recua ao detectar bloqueios; ainda pode haver acúmulo de dados no caminho."
-    }
+    },
+    "wifi_speed_hint": "Recomendamos ativar o Wi-Fi do iPhone para acelerar a instalação."
   }
 }

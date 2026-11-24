@@ -282,5 +282,12 @@
     "updating": "Se actualizează...",
     "downloaded_restarting": "Actualizarea a fost descărcată! Aplicația se repornește...",
     "failed_download": "Descărcarea actualizării a eșuat: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Recomandăm activarea Wi-Fi pe iPhone pentru o instalare mai rapidă.",
+    "progress": {
+      "adaptive": "Viteză de transfer adaptivă (experimentală)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

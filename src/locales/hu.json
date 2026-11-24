@@ -282,5 +282,12 @@
     "updating": "Frissítés...",
     "downloaded_restarting": "Frissítés letöltve! Alkalmazás újraindítása folyamatban...",
     "failed_download": "Nem sikerült letölteni a frissítést: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "A gyorsabb telepítéshez javasoljuk a Wi-Fi bekapcsolását az iPhone-on.",
+    "progress": {
+      "adaptive": "Adaptív átviteli sebesség (kísérleti)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

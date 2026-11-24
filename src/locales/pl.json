@@ -282,5 +282,12 @@
     "updating": "Aktualizowanie...",
     "downloaded_restarting": "Aktualizacja pobrana! Ponowne uruchamianie aplikacji...",
     "failed_download": "Nie udało się pobrać aktualizacji: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Zalecamy włączenie Wi-Fi na iPhonie, aby przyspieszyć instalację.",
+    "progress": {
+      "adaptive": "Adaptacyjna szybkość przesyłania (eksperymentalna)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

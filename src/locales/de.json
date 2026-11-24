@@ -359,6 +359,7 @@
       "adaptive_hint": "Die Schreibgeschwindigkeit ist nicht die Empfangsrate der Watch. Der adaptive Modus begrenzt das Sendebudget.",
       "adaptiveUnlimited": "Ohne feste Obergrenze (experimentell)",
       "uncapped_hint": "Die Schreibgeschwindigkeit ist nicht die Empfangsrate der Watch. Dieser Modus reagiert auf blockierte Schreibvorgänge; nachgelagerte Warteschlangen können dennoch wachsen."
-    }
+    },
+    "wifi_speed_hint": "Für eine schnellere Installation empfehlen wir, WLAN auf dem iPhone einzuschalten."
   }
 }

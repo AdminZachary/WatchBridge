@@ -409,7 +409,8 @@
       "adaptive_hint": "写入速度不等于手表接收速度；自动模式仍保留发送预算保护。",
       "adaptiveUnlimited": "无预设上限（实验）",
       "uncapped_hint": "写入速度不等于手表接收速度；此模式仅在观察到写入阻塞后退让，下游仍可能积压。"
-    }
+    },
+    "wifi_speed_hint": "建议打开手机 Wi-Fi，以加速安装。"
   },
   "err": {
     "watch_denied_retry": "手表拒绝了信任请求。请在手表上确认后重试。",

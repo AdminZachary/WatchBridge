@@ -700,7 +700,8 @@
       "adaptive_hint": "Write speed is not Watch receive speed. Adaptive mode keeps a bounded sending allowance.",
       "adaptiveUnlimited": "No preset ceiling (experimental)",
       "uncapped_hint": "Write speed is not Watch receive speed. This mode backs off only on observed write pressure; downstream queues may still grow."
-    }
+    },
+    "wifi_speed_hint": "We recommend turning on Wi-Fi on your iPhone for faster installation."
   },
   "err": {
     "watch_denied_retry": "The Watch rejected the trust request. Confirm it on the Watch and try again.",

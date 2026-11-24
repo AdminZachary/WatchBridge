@@ -426,6 +426,7 @@
       "adaptive_hint": "Le débit d’écriture ne mesure pas la réception de la Watch. Le mode adaptatif conserve un budget d’envoi limité.",
       "adaptiveUnlimited": "Sans plafond prédéfini (expérimental)",
       "uncapped_hint": "Le débit d’écriture ne mesure pas la réception de la Watch. Ce mode ralentit en cas de blocage observé ; des données peuvent encore s’accumuler en aval."
-    }
+    },
+    "wifi_speed_hint": "Nous recommandons d’activer le Wi-Fi de l’iPhone pour accélérer l’installation."
   }
 }

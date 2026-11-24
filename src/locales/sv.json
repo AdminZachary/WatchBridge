@@ -203,5 +203,12 @@
     "updating": "Uppdaterar...",
     "downloaded_restarting": "Uppdateringen har laddad ner! Startar om appen...",
     "failed_download": "Misslyckades att uppdatera: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Vi rekommenderar att du slår på wifi på din iPhone för snabbare installation.",
+    "progress": {
+      "adaptive": "Adaptiv överföringshastighet (experimentell)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }
