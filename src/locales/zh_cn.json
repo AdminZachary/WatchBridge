@@ -384,7 +384,25 @@
     "btn_settings_hide": "收起设置与日志",
     "btn_settings": "设置与日志",
     "headline": "一台电脑，<br />连接你的手表。",
-    "footer": "独立社区项目，基于 <l1>nab138 / iLoader</l1>、<l2>Andrey 的 fork</l2>、Rzbck 的 Watch 安装贡献及 <l3>oacevedo / xtool</l3>。不代表上游官方版本。"
+    "footer": "独立社区项目，基于 <l1>nab138 / iLoader</l1>、<l2>Andrey 的 fork</l2>、Rzbck 的 Watch 安装贡献及 <l3>oacevedo / xtool</l3>。不代表上游官方版本。",
+    "progress": {
+      "title": "安装进度",
+      "preparing": "检查安装包",
+      "signing": "签名应用",
+      "phoneInstall": "安装到 iPhone",
+      "watchConnect": "连接 Apple Watch",
+      "watchTransfer": "传输到 Apple Watch",
+      "watchInstall": "在手表上安装",
+      "hint": "进度条显示当前阶段；传输达到 100% 后，仍需等待手表确认安装完成。",
+      "failed": "安装已停止",
+      "done": "安装已完成",
+      "waiting": "等待设备反馈",
+      "elapsed": "已用时 {{time}}",
+      "companion": "第 {{index}} / {{count}} 个手表应用",
+      "adaptive": "自适应传输速率（实验）",
+      "speed": "{{speed}} KiB/s"
+    },
+    "wifi_speed_hint": "建议打开手机 Wi-Fi，以加速安装。"
   },
   "err": {
     "watch_denied_retry": "手表拒绝了信任请求。请在手表上确认后重试。",

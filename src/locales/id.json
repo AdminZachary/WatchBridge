@@ -282,5 +282,12 @@
     "updating": "Memperbarui...",
     "downloaded_restarting": "Pembaruan diunduh! Memulai ulang aplikasi...",
     "failed_download": "Gagal mengunduh pembaruan: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Sebaiknya nyalakan Wi-Fi di iPhone agar pemasangan lebih cepat.",
+    "progress": {
+      "adaptive": "Kecepatan transfer adaptif (eksperimental)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

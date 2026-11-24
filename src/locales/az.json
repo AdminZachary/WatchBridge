@@ -282,5 +282,12 @@
     "updating": "Yenilənir...",
     "downloaded_restarting": "Yeniləmə yükləndi! Tətbiq yenidən başladılır...",
     "failed_download": "Yeniləmə yüklənə bilmədi: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Quraşdırmanı sürətləndirmək üçün iPhone-da Wi-Fi-ı aktiv etməyiniz tövsiyə olunur.",
+    "progress": {
+      "adaptive": "Adaptiv ötürmə sürəti (eksperimental)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

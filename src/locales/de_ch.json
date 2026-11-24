@@ -286,5 +286,12 @@
     "updating": "Wird aktualisiert...",
     "downloaded_restarting": "Update abeglade! App wird neu gstartet...",
     "failed_download": "Update het nöd chöne abeglade werde: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Für e schnälleri Installation empfehled mir, s WLAN uf em iPhone iizschalte.",
+    "progress": {
+      "adaptive": "Adaptivi Übertragigsrate (experimentell)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

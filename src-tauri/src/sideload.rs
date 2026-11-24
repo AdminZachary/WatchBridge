@@ -19,7 +19,8 @@ use isideload::{
         bundle::Bundle,
         install::install_app_rsd,
         sideloader::Sideloader,
-        watch_install::{install_watch_apps_rsd, register_paired_watches_rsd},
+        watch_install::{install_watch_apps_rsd_observed, register_paired_watches_rsd},
+        progress::{InstallProgress, InstallStage, ProgressObserver},
     },
 };
 use tauri::{AppHandle, Manager, State, Window};
@@ -90,6 +91,7 @@ pub async fn sideload(
         app_path,
         false,
         &mut RenewalReport::default(),
+        &|_| {},
     )
     .await
 }
@@ -111,6 +113,7 @@ pub async fn renew_wifi(
         app_path,
         true,
         &mut report,
+        &|_| {},
     ))
     .await
     {
@@ -127,6 +130,7 @@ async fn sideload_with_report(
     app_path: String,
     wifi_only: bool,
     report: &mut RenewalReport,
+    observer: &ProgressObserver<'_>,
 ) -> Result<Option<SpecialApp>, AppError> {
     let directory = handle
         .path()
@@ -240,6 +244,7 @@ async fn sideload_with_report(
             info!("Registered {watches} paired Apple Watch device(s) over Wi-Fi");
         }
 
+        observer(InstallProgress::stage(InstallStage::Signing));
         let (signed_app_path, special) = manual_signing::result(SigningStage::SignApp, sideloader
             .get_mut()
             .sign_app(
@@ -261,6 +266,7 @@ async fn sideload_with_report(
             report.record_profiles(&signed_bundle);
             let watch_apps = signed_bundle.watch_apps().to_vec();
             report.iphone = StepResult::Failed;
+            observer(InstallProgress::stage(InstallStage::PhoneInstall));
             match &mut transport {
                 Route::Phone(phone) => {
                     crate::manual_install::install(&phone.provider, &signed_app_path)
@@ -268,6 +274,7 @@ async fn sideload_with_report(
                 }
                 Route::Watch((rsd_provider, handshake)) => {
                     install_app_rsd(rsd_provider, handshake, &signed_app_path, |progress| {
+                        observer(InstallProgress::percent(InstallStage::PhoneInstall, progress));
                         info!("Installing over RSD: {}%", progress)
                     })
                     .await?;
@@ -292,7 +299,7 @@ async fn sideload_with_report(
                 })?;
 
                 info!("Using RSD-native CompanionProxy for Apple Watch install");
-                install_watch_apps_rsd(
+                install_watch_apps_rsd_observed(
                     rsd_provider,
                     handshake,
                     &iphone_pairing,
@@ -301,6 +308,7 @@ async fn sideload_with_report(
                     |progress| {
                         info!("Installing Apple Watch app over RSD: {}%", progress);
                     },
+                    observer,
                 )
                 .await?;
                 report.watch = StepResult::Installed;
@@ -328,11 +336,12 @@ async fn sideload_with_report(
 
     let special = sideloader
         .get_mut()
-        .install_app(
+        .install_app_observed(
             &provider,
             app_path.into(),
             false,
             None::<fn(f32) -> std::future::Ready<()>>,
+            observer,
         )
         .await?;
 
@@ -347,7 +356,10 @@ pub async fn watch_sideload_operation(
     sideloader_state: State<'_, SideloaderMutex>,
     operation: State<'_, crate::wifi_pairing::PairingOperation>,
     app_path: String,
+    request_id: Option<String>,
 ) -> Result<(), AppError> {
+    let reporter = crate::install_progress::Reporter::new(&window, request_id.unwrap_or_default());
+    reporter.emit(InstallProgress::stage(InstallStage::Preparing));
     let op = Operation::new("watch_sideload".into(), &window);
     op.start("validate")?;
     let _selection = op.fail_if_err("validate", operation.try_lock().map_err(|_| AppError::Misc("err.device_busy".into())))?;
@@ -356,7 +368,15 @@ pub async fn watch_sideload_operation(
     op.fail_if_err("validate", require_companion(original.has_watch()))?;
     op.complete("validate")?;
     op.start("install")?;
-    op.fail_if_err("install", Box::pin(sideload(window.app_handle(), device_state, sideloader_state, original.path().to_string_lossy().into_owned())).await)?;
+    op.fail_if_err("install", Box::pin(sideload_with_report(
+        window.app_handle(),
+        device_state,
+        sideloader_state,
+        original.path().to_string_lossy().into_owned(),
+        false,
+        &mut RenewalReport::default(),
+        &|update| reporter.emit(update),
+    )).await)?;
     op.complete("install")?;
     Ok(())
 }

@@ -333,5 +333,25 @@
     "failed": "WLAN-Einrichtung fehlgeschlagen",
     "hint": "Ermöglicht diesem Computer den Zugriff auf das Telefon per WLAN: aktiviert die WLAN-Verbindungseinstellung des Telefons und erstellt eine Kopplungsvertrauensstellung für WLAN-Installationen. Lass das Telefon entsperrt und per USB verbunden. Zum Rückgängigmachen setze „Standort & Datenschutz“ am Telefon zurück.",
     "working": "WLAN wird eingerichtet… Lass das Telefon entsperrt und per USB verbunden."
+  },
+  "wb": {
+    "progress": {
+      "title": "Installationsfortschritt",
+      "preparing": "Vorbereitung",
+      "signing": "App signieren",
+      "phoneInstall": "Auf dem iPhone installieren",
+      "watchConnect": "Watch verbinden",
+      "watchTransfer": "An die Watch übertragen",
+      "watchInstall": "Auf der Watch installieren",
+      "hint": "Die Prozentangabe gilt für den aktuellen Schritt. Eine abgeschlossene Übertragung bedeutet noch keine abgeschlossene Installation.",
+      "failed": "Installation gestoppt",
+      "done": "Installation abgeschlossen",
+      "waiting": "Warten auf Rückmeldung des Geräts",
+      "elapsed": "Verstrichen: {{time}}",
+      "companion": "Watch-App {{index}} von {{count}}",
+      "adaptive": "Adaptive Übertragungsrate (experimentell)",
+      "speed": "{{speed}} KiB/s"
+    },
+    "wifi_speed_hint": "Für eine schnellere Installation empfehlen wir, WLAN auf dem iPhone einzuschalten."
   }
 }

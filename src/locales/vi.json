@@ -200,5 +200,12 @@
     "updating": "Đang cập nhật.",
     "downloaded_restarting": "Đã cài đặt cập nhật, đang khởi động lại iLoader..",
     "failed_download": "Lỗi tải xuống cập nhật: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Bạn nên bật Wi-Fi trên iPhone để cài đặt nhanh hơn.",
+    "progress": {
+      "adaptive": "Tốc độ truyền thích ứng (thử nghiệm)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

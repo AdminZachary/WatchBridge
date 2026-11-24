@@ -400,5 +400,25 @@
     "failed": "Échec de la configuration du Wi-Fi",
     "hint": "Permet à cet ordinateur de joindre le téléphone en Wi-Fi : il active le réglage des connexions Wi-Fi du téléphone et crée une confiance de jumelage pour les installations en Wi-Fi. Gardez le téléphone déverrouillé et connecté en USB. Pour annuler, réinitialisez « Localisation et confidentialité » sur le téléphone.",
     "working": "Configuration du Wi-Fi… Gardez le téléphone déverrouillé et connecté en USB."
+  },
+  "wb": {
+    "progress": {
+      "title": "Progression de l’installation",
+      "preparing": "Préparation",
+      "signing": "Signature de l’app",
+      "phoneInstall": "Installation sur l’iPhone",
+      "watchConnect": "Connexion à la Watch",
+      "watchTransfer": "Transfert vers la Watch",
+      "watchInstall": "Installation sur la Watch",
+      "hint": "Le pourcentage concerne l’étape actuelle. La fin du transfert ne signifie pas que l’installation est terminée.",
+      "failed": "Installation arrêtée",
+      "done": "Installation terminée",
+      "waiting": "En attente de la réponse de l’appareil",
+      "elapsed": "Temps écoulé : {{time}}",
+      "companion": "App Watch {{index}} sur {{count}}",
+      "adaptive": "Débit de transfert adaptatif (expérimental)",
+      "speed": "{{speed}} KiB/s"
+    },
+    "wifi_speed_hint": "Nous recommandons d’activer le Wi-Fi de l’iPhone pour accélérer l’installation."
   }
 }

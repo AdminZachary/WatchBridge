@@ -1,0 +1,27 @@
+.install-progress { margin-top: 20px; padding: 20px; border: 1px solid #dce7dc; background: #f6f9f3; border-radius: 13px; }
+.install-progress-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.install-progress-eyebrow { display: block; font-size: 10px; color: #64766d; letter-spacing: 1px; margin-bottom: 5px; }
+.install-progress-heading strong { display: block; font-size: 15px; color: #153d36; }
+.install-progress-percent { font-size: 26px; font-weight: 650; color: #246756; font-variant-numeric: tabular-nums; }
+.install-progress-track { height: 9px; border-radius: 10px; overflow: hidden; background: #dfe8dc; margin-top: 17px; }
+.install-progress-track > span { display: block; height: 100%; background: #246756; border-radius: inherit; transition: width .25s ease; }
+.install-progress-track.is-indeterminate > span { animation: install-wait 1.7s ease-in-out infinite; }
+.install-progress-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; font-size: 11px; color: #64766d; margin-top: 9px; font-variant-numeric: tabular-nums; }
+.install-progress-stages { list-style: none; padding: 15px 0 0; margin: 16px 0 0; border-top: 1px solid #dce7dc; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 8px; }
+.install-progress-stages li { display: flex; align-items: center; gap: 7px; color: #7b8a7e; font-size: 11px; min-width: 0; overflow-wrap: anywhere; }
+.install-progress-stages li > span { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; border: 1px solid #d5dfd1; flex-shrink: 0; font-size: 10px; }
+.install-progress-stages .is-complete { color: #426f4c; }
+.install-progress-stages .is-complete > span { background: #e2eddb; border-color: #d3e2cb; }
+.install-progress-stages .is-current { color: #174b3e; font-weight: 600; }
+.install-progress-stages .is-current > span { background: #246756; border-color: #246756; color: #fff; }
+.install-transfer-policy { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin-top: 12px; color: #64766d; font-size: 11px; font-variant-numeric: tabular-nums; }
+.install-transfer-mode { background: #e3eddd; color: #245848; padding: 4px 7px; border-radius: 5px; }
+.wb-app .install-progress-note { margin: 12px 0 0; font-size: 11px; color: #64766d; }
+.install-progress.is-failed { border-color: #e7cfca; background: #fff8f5; }
+.install-progress.is-failed .install-progress-percent { color: #ab3535; }
+.install-progress.is-failed .install-progress-track > span { background: #ab3535; }
+.install-progress.is-failed .is-current { color: #ab3535; }
+.install-progress.is-failed .is-current > span { background: #ab3535; border-color: #ab3535; }
+@keyframes install-wait { from { transform: translateX(-105%); } to { transform: translateX(390%); } }
+@media (prefers-reduced-motion: reduce) { .install-progress-track > span { transition: none; } .install-progress-track.is-indeterminate > span { animation: none; width: 100% !important; opacity: .4; } }
+@media (max-width: 650px) { .install-progress { padding: 16px; } .install-progress-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

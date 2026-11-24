@@ -200,5 +200,12 @@
     "updating": "更新緊...",
     "downloaded_restarting": "更新下載完成！重啟應用程式...",
     "failed_download": "下載更新失敗：{{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "建議開啟手機 Wi-Fi，加快安裝速度。",
+    "progress": {
+      "adaptive": "自適應傳輸速率（實驗）",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

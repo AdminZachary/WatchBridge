@@ -12,12 +12,12 @@ import { Device, DeviceInfo } from "./Device";
 import { Modal } from "./components/Modal";
 import { Certificates } from "./pages/Certificates";
 import { Settings } from "./pages/Settings";
+import { InstallProgress, validProgress, type InstallProgressUpdate } from "./components/InstallProgress";
 import { usePlatform } from "./PlatformContext";
 import "./App.css";
 import "./WatchBridge.css";
 
 type WatchStatus = { name: string; paired: boolean; developerMode: boolean | null; switchRevealed: boolean };
-type InstallUpdate = { updateType: "started" | "finished" | "failed"; stepId: string; extraDetails?: { message: string } };
 type InstallState = "idle" | "validating" | "installing" | "done" | "failed";
 const repo = "https://github.com/AdminZachary/WatchBridge";
 const message = (error: unknown): string => localizeError(error);
@@ -30,6 +30,9 @@ export default function App() {
   const [watchError, setWatchError] = useState("");
   const [installError, setInstallError] = useState("");
   const [installState, setInstallState] = useState<InstallState>("idle");
+  const [progress, setProgress] = useState<InstallProgressUpdate | null>(null);
+  const [installStartedAt, setInstallStartedAt] = useState(0);
+  const activeInstall = useRef<string | null>(null);
   const [ipa, setIpa] = useState<string | null>(null);
   const [version, setVersion] = useState("");
   const [noKeyring, setNoKeyring] = useState(false);
@@ -44,7 +47,8 @@ export default function App() {
     setNoKeyring(!(await invoke<boolean>("keyring_available").catch(() => false)));
   }, []);
   useEffect(() => { void checkKeyring(); void getVersion().then(setVersion).catch(() => {}); }, [checkKeyring]);
-  useEffect(() => { setWatch(null); setWatchError(""); setInstallState("idle"); setInstallError(""); }, [device?.udid, device?.id, device?.connectionType]);
+  useEffect(() => { setWatch(null); setWatchError(""); if (!inFlight.current) { setInstallState("idle"); setInstallError(""); setProgress(null); } }, [device?.udid, device?.id, device?.connectionType]);
+  useEffect(() => () => { activeInstall.current = null; }, []);
   const registerRefresh = useCallback((fn?: () => void) => { refreshDevices.current = fn ?? null; }, []);
 
   const prepare = async (action: "check" | "pair" | "reveal") => {
@@ -63,17 +67,24 @@ export default function App() {
 
   const install = async () => {
     if (!account || !device || !ipa || inFlight.current) return;
+    const requestId = `install-${Date.now()}-${crypto.getRandomValues(new Uint32Array(2)).join("-")}`;
     inFlight.current = true;
     setBusy("install"); setInstallError(""); setInstallState("validating");
+    activeInstall.current = requestId;
+    setInstallStartedAt(Date.now());
+    setProgress({ requestId, stage: "preparing", percent: null, bytesSent: null, totalBytes: null });
     let unlisten: UnlistenFn | undefined;
     try {
-      unlisten = await listen<InstallUpdate>("operation_watch_sideload", ({ payload }) => {
-        if (payload.stepId === "install" && payload.updateType === "started") setInstallState("installing");
+      unlisten = await listen<InstallProgressUpdate>("watch-install-progress", ({ payload }) => {
+        if (activeInstall.current !== requestId || !validProgress(payload) || payload.requestId !== requestId) return;
+        setProgress(payload);
+        if (payload.stage !== "preparing") setInstallState("installing");
       });
-      await invoke("watch_sideload_operation", { appPath: ipa });
-      setInstallState("done");
-    } catch (error) { setInstallError(message(error)); setInstallState("failed"); }
-    finally { unlisten?.(); inFlight.current = false; setBusy(null); }
+      if (activeInstall.current !== requestId) return;
+      await invoke("watch_sideload_operation", { appPath: ipa, requestId });
+      if (activeInstall.current === requestId) setInstallState("done");
+    } catch (error) { if (activeInstall.current === requestId) { setInstallError(message(error)); setInstallState("failed"); } }
+    finally { activeInstall.current = null; unlisten?.(); inFlight.current = false; setBusy(null); }
   };
 
   const usb = device?.connectionType === "USB" && !device.networkAddress;
@@ -108,8 +119,10 @@ export default function App() {
           <section className="wb-card wb-step">
             <div className="wb-step-heading"><span className="wb-step-number">02</span><div><h2>{t("wb.s2_title")}</h2><p>{t("wb.s2_sub")}</p></div></div>
             <div className="wb-file"><span className="wb-file-icon" aria-hidden="true">↥</span><div><strong>{ipa ? ipa.split(/[\\/]/).pop() : t("wb.file_pick")}</strong><p>{ipa ? t("wb.file_chosen") : t("wb.file_hint")}</p></div><button disabled={busy !== null} onClick={async () => { try { const path = await openFileDialog({ multiple: false, filters: [{ name: t("wb.file_filter"), extensions: ["ipa"] }] }); if (typeof path === "string") { setIpa(path); setInstallState("idle"); setInstallError(""); } } catch (error) { setInstallError(message(error)); } }}>{ipa ? t("wb.btn_change") : t("wb.btn_pick")}</button></div>
+            {usb && <p className="wb-note">{t("wb.wifi_speed_hint")}</p>}
             <div className="wb-install-footer"><div><strong>{installState === "validating" ? t("wb.inst_validating") : installState === "installing" ? t("wb.inst_installing") : t("wb.inst_ready")}</strong><p>{t("wb.inst_note")}</p></div><button className="wb-primary" disabled={!ipa || !account || !device || busy !== null} onClick={() => void install()}>{busy === "install" ? t("wb.btn_install_busy") : t("wb.btn_install")}</button></div>
             {!account && <p className="wb-note">{t("wb.note_login")}</p>}
+            {progress && installState !== "idle" && <InstallProgress update={progress} state={installState === "done" ? "done" : installState === "failed" ? "failed" : "running"} startedAt={installStartedAt} />}
             {installState === "done" && <div className="wb-result" role="status"><strong>{t("wb.done_title")}</strong><p>{t("wb.done_body")}</p></div>}
             {installError && <p className="wb-error" role="alert">{installError}</p>}
             <details className="wb-details"><summary>{t("wb.usb_fail_summary")}</summary><p>{t("wb.usb_fail_body")}</p></details>

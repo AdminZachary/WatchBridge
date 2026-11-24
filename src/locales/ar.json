@@ -280,5 +280,12 @@
     "updating": "...يتم التحميل",
     "downloaded_restarting": "...تم التحميل، يجرى إعادة تشغيل التطبيق ",
     "failed_download": "{{error}}:فشل تحميل الإصدار الجديد"
+  },
+  "wb": {
+    "wifi_speed_hint": "نوصي بتشغيل Wi-Fi على iPhone لتسريع التثبيت.",
+    "progress": {
+      "adaptive": "معدل نقل تكيفي (تجريبي)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

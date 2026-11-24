@@ -333,5 +333,25 @@
     "failed": "Wi-Fi 設定失敗",
     "hint": "讓此電腦能透過 Wi-Fi 連線到手機：開啟手機的 Wi-Fi 連線設定，並建立供 Wi-Fi 安裝使用的配對信任。請保持手機解鎖並以 USB 連接。若要復原，請在手機上重設「位置與隱私權」。",
     "working": "正在設定 Wi-Fi… 請保持手機解鎖並以 USB 連接。"
+  },
+  "wb": {
+    "progress": {
+      "title": "安裝進度",
+      "preparing": "檢查安裝包",
+      "signing": "簽署應用程式",
+      "phoneInstall": "安裝至 iPhone",
+      "watchConnect": "連接 Apple Watch",
+      "watchTransfer": "傳輸至 Apple Watch",
+      "watchInstall": "在手錶上安裝",
+      "hint": "進度列顯示目前階段；傳輸達到 100% 後，仍需等待手錶確認安裝完成。",
+      "failed": "安裝已停止",
+      "done": "安裝已完成",
+      "waiting": "等待裝置回應",
+      "elapsed": "已用時 {{time}}",
+      "companion": "第 {{index}} / {{count}} 個手錶應用程式",
+      "adaptive": "自適應傳輸速率（實驗）",
+      "speed": "{{speed}} KiB/s"
+    },
+    "wifi_speed_hint": "建議開啟手機 Wi-Fi，以加快安裝速度。"
   }
 }

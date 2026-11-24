@@ -286,5 +286,12 @@
     "updating": "Updaten...",
     "downloaded_restarting": "Update gedownload! De app herstarten...",
     "failed_download": "Kon de update niet downloaden: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "We raden aan wifi op je iPhone in te schakelen om de installatie te versnellen.",
+    "progress": {
+      "adaptive": "Adaptieve overdrachtssnelheid (experimenteel)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

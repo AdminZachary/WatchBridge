@@ -200,5 +200,12 @@
     "updating": "Aktualizace...",
     "downloaded_restarting": "Aktualizace stažena! Restartování aplikace...",
     "failed_download": "Chyba při stahování aktualizace: {{error}}"
+  },
+  "wb": {
+    "wifi_speed_hint": "Pro rychlejší instalaci doporučujeme na iPhonu zapnout Wi-Fi.",
+    "progress": {
+      "adaptive": "Adaptivní přenosová rychlost (experimentální)",
+      "speed": "{{speed}} KiB/s"
+    }
   }
 }

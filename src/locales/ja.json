@@ -404,5 +404,25 @@
     "failed": "Wi-Fiのセットアップに失敗しました",
     "hint": "このコンピューターがWi-Fi経由でiPhoneに接続できるようにします。iPhoneのWi-Fi接続設定をオンにし、Wi-Fiインストール用のペアリング信頼を作成します。iPhoneのロックを解除し、USBで接続したままにしてください。元に戻すには、iPhoneで「位置情報とプライバシー」をリセットしてください。",
     "working": "Wi-Fiをセットアップ中… iPhoneのロックを解除し、USBで接続したままにしてください。"
+  },
+  "wb": {
+    "progress": {
+      "title": "インストールの進行状況",
+      "preparing": "パッケージを確認",
+      "signing": "アプリに署名",
+      "phoneInstall": "iPhone にインストール",
+      "watchConnect": "Apple Watch に接続",
+      "watchTransfer": "Apple Watch に転送",
+      "watchInstall": "Watch にインストール",
+      "hint": "進行状況は現在の段階を示します。転送が100%になっても、インストール完了の確認が必要です。",
+      "failed": "インストールを停止しました",
+      "done": "インストールが完了しました",
+      "waiting": "デバイスの応答を待機中",
+      "elapsed": "経過時間 {{time}}",
+      "companion": "Watch アプリ {{index}} / {{count}}",
+      "adaptive": "自動転送速度（実験）",
+      "speed": "{{speed}} KiB/s"
+    },
+    "wifi_speed_hint": "インストールを高速化するため、iPhoneのWi-Fiをオンにすることをおすすめします。"
   }
 }
