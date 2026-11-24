@@ -1,5 +1,8 @@
 # WatchBridge hardware acceptance
 
+For installation progress, optional adaptive transfer modes and the recorded
+large-payload tests, see [Watch installation transfer notes](watch-install-transfer.md).
+
 Record source SHA and binary SHA-256, Windows version, iOS/watchOS versions,
 iPhone/Watch models, IPA SHA-256, connection type, and success/failure stage.
 Do not publish account identifiers, device UDIDs, signing keys or pairing records.
