@@ -1183,7 +1183,11 @@ mod tests {
         let receive = tokio::spawn(async move {
             let mut bytes = vec![0; header.len()];
             reader.read_exact(&mut bytes).await.unwrap();
-            // Deliberately stop draining the socket during the first body write.
+            // Two stalled body writes exercise persistent-pressure detection.
+            tokio::time::sleep(Duration::from_millis(200)).await;
+            let mut first_body = vec![0; SEND_CHUNK];
+            reader.read_exact(&mut first_body).await.unwrap();
+            bytes.extend(first_body);
             tokio::time::sleep(Duration::from_millis(200)).await;
             reader.read_to_end(&mut bytes).await.unwrap();
             bytes
@@ -1209,11 +1213,11 @@ mod tests {
         drop(connection);
         assert_eq!(receive.await.unwrap(), expected);
         let updates = updates.into_inner().unwrap();
-        assert!(
-            updates
-                .iter()
-                .any(|update| update.target_kbps.is_some_and(|rate| rate < 4096))
-        );
+        assert!(updates.iter().any(|update| {
+            update
+                .target_kbps
+                .is_some_and(|rate| rate > 0 && rate < 4096)
+        }));
         let last = updates.last().unwrap();
         assert_eq!(last.transfer_mode, Some(mode));
         if max_kbps == 0 {

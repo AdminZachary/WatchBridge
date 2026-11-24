@@ -94,3 +94,13 @@ without pacing again after a stable interval. This does not observe downstream
 buffer occupancy or confirm that a queue has drained; forwarding-service memory
 pressure can still occur without local write stalls. Fixed and bounded adaptive
 modes remain available unchanged.
+
+The uncapped v2 controller follows slow-start/AIMD ideas from RFC 5681 with
+application-specific timing. It estimates local I/O throughput over the last
+32 writes, smooths ordinary write latency with an EWMA, and debounces isolated
+stalls. Sustained/long stalls cause multiplicative backoff; recovery first grows
+to a learned threshold and then uses additive increases. Stable windows with
+headroom permit another unpaced probe. These observations are neither TCP ACKs
+nor Watch delivery rates. Relevant background:
+https://www.rfc-editor.org/rfc/rfc5681.html and
+https://www.rfc-editor.org/rfc/rfc6298.html (smoothing only, not RTO behavior).
